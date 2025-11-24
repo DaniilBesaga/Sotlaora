@@ -1,0 +1,284 @@
+{
+  "Hero": {
+    "headlineTop": "Find a master nearby",
+    "headlineFast": "Fast",
+    "headlineReliable": "Reliable",
+    "lead": "Verified specialists, transparent prices, convenient search, and instant requests.",
+    "search": {
+      "placeholder": "Search: electrician, plumber, furniture assembly...",
+      "button": "Find a master",
+      "ariaLabel": "Search for a master"
+    },
+    "badges": {
+      "quality": "Quality guarantee",
+      "reviews": "Reviews"
+    }
+  },
+  "ServicesSection": {
+    "title": "Popular categories",
+    "subtitle": "Choose a service — see specialists and reviews",
+
+    "services": {
+      "repair": {
+        "title": "Repair and renovation",
+        "subtitle": "Major and minor repairs"
+      },
+      "electric": {
+        "title": "Electrical work and lighting",
+        "subtitle": "Installation, replacement, diagnostics"
+      },
+      "meters": {
+        "title": "Meters (gas, electricity, water)",
+        "subtitle": "Installation and verification"
+      },
+      "appliances": {
+        "title": "Household appliances",
+        "subtitle": "Repair and connection"
+      },
+      "gas": {
+        "title": "Gas equipment",
+        "subtitle": "Inspection and connection"
+      },
+      "climate": {
+        "title": "Air conditioning and climate",
+        "subtitle": "Installation and maintenance"
+      },
+      "security": {
+        "title": "Security and locks",
+        "subtitle": "Locks, alarms"
+      },
+      "clean": {
+        "title": "Cleaning and disinfection",
+        "subtitle": "Fast and neat"
+      },
+      "transport": {
+        "title": "Transport and machinery",
+        "subtitle": "Transportation and rental"
+      }
+    }
+  },
+  "WhyUs": {
+    "title": "Reliable specialists — right at your fingertips",
+
+    "cards": {
+      "trust": {
+        "title": "We are trusted",
+        "text": "Thousands of clients find verified specialists — fast and safe"
+      },
+      "benefit": {
+        "title": "It’s profitable with us",
+        "text": "Transparent prices, no hidden fees, and instant cost calculation"
+      },
+      "technology": {
+        "title": "Technology helps",
+        "text": "Smart specialist selection based on rating, experience, and your request"
+      },
+      "near": {
+        "title": "We are always nearby",
+        "text": "Specialists are available in your area — at any time of the day"
+      }
+    },
+
+    "imageAlt": "badge"
+  },
+  "TrustSection": {
+    "title": "Why you can trust us?",
+
+    "trustItems": {
+      "verified": {
+        "title": "Verified",
+        "hint": "ID and documents"
+      },
+      "payment": {
+        "title": "Payment protection",
+        "hint": "Secure transactions"
+      },
+      "guarantee": {
+        "title": "Money-back guarantee",
+        "hint": "Refund if service is poor"
+      },
+      "support": {
+        "title": "24/7 support",
+        "hint": "Help anytime"
+      }
+    },
+
+    "stats": {
+      "orders": {
+        "label": "orders"
+      },
+      "rating": {
+        "label": "average rating"
+      },
+      "cities": {
+        "label": "specialists"
+      }
+    }
+  },
+  "PopularProsSection": {
+    "title": "Popular specialists",
+    "description": "Quick access to verified specialists in your city",
+
+    "controls": {
+      "prev": "Back",
+      "next": "Forward"
+    },
+
+    "cardActions": {
+      "profile": "Profile",
+      "order": "Order",
+      "showMore": "Show more",
+      "collapse": "Collapse"
+    },
+
+    "chipAriaLabel": "Specialty",
+
+    "pros": {
+      "p1": {
+        "role": "Electrician",
+        "rate": "from 50 Ron/hour",
+        "specialties": ["Socket installation", "Diagnostics", "Wiring replacement", "Lighting installation"]
+      },
+      "p2": {
+        "role": "Plumber",
+        "rate": "from 60 Ron/hour",
+        "specialties": ["Pipe cleaning", "Toilet installation"]
+      },
+      "p3": {
+        "role": "Finishing master",
+        "rate": "from 45 Ron/hour",
+        "specialties": ["Plastering", "Puttying", "Painting", "Tile laying"]
+      },
+      "p4": {
+        "role": "Air conditioners",
+        "rate": "from 50 Ron/hour",
+        "specialties": ["Air conditioners", "Freon refill", "Maintenance"]
+      },
+      "p5": {
+        "role": "Furniture assembly",
+        "rate": "from 50 Ron/hour",
+        "specialties": ["IKEA assembly", "Case furniture assembly", "Door adjustment"]
+      }
+    }
+  },
+  "HowItWorksSection": {
+    "title": "How it works",
+    "lead": "Simple and transparent — three steps from request to completion",
+
+    "steps": {
+      "step1": {
+        "title": "Find a service",
+        "desc": "Describe your task or choose a category — we will select specialists."
+      },
+      "step2": {
+        "title": "Choose a specialist",
+        "desc": "Compare profiles, ratings, and reviews — choose the right one."
+      },
+      "step3": {
+        "title": "Pay and confirm",
+        "desc": "Payment through a secure system — confirmation and guarantee."
+      }
+    },
+
+    "cta": {
+      "label": "Learn more",
+      "href": "/how-it-works"
+    }
+  },
+  "VideoCall": {
+    "title": "We support video calls",
+    "text": "Communicate with specialists directly via video call — fast, convenient, and safe. Show the problem in real time and get professional advice without waiting.",
+    "button": "Start a video call",
+    "imageAlt": "Video call"
+  },
+  "PricingSection": {
+    "title": "Pricing and transparency",
+    "desc": "Approximate guidelines — the exact cost is indicated by the specialist in the request",
+
+    "toggle": {
+      "hour": "Ron / hour",
+      "fixed": "Fixed price"
+    },
+
+    "plans": {
+      "visit": {
+        "name": "Minimal visit",
+        "desc": "Specialist visit and diagnostics",
+        "note": "includes 30 min"
+      },
+      "hourly": {
+        "name": "Hourly rate",
+        "desc": "Standard rate for most tasks",
+        "note": "minimum 1 hour",
+        "ribbon": "Popular"
+      },
+      "job": {
+        "name": "Fixed price",
+        "desc": "For standard tasks (assembly, replacement)",
+        "note": "fixed rate"
+      }
+    },
+
+    "buttons": {
+      "details": "Learn more",
+      "order": "Order"
+    },
+
+    "disclaimer": "Prices are approximate — the final cost is confirmed by the specialist after inspection or via photo."
+  },
+  "FAQSection": {
+    "title": "Frequently Asked Questions",
+
+    "items": [
+      {
+        "question": "How do I register on the site?",
+        "answer": "To register, click the 'Create account' button and fill out the form with your email and password."
+      },
+      {
+        "question": "How do I change my password?",
+        "answer": "Go to your account settings and select 'Change password', then follow the instructions."
+      },
+      {
+        "question": "How is my data protected?",
+        "answer": "All data is encrypted using modern SSL/TLS standards and stored in a secure database."
+      },
+      {
+        "question": "What should I do if I suspect a hack?",
+        "answer": "Immediately contact our support team and change your password."
+      },
+      {
+        "question": "Can I delete my account?",
+        "answer": "Yes, you can delete your account in the settings. After that, all your data will be removed."
+      }
+    ]
+  },
+  "ForProsSection": {
+    "title": "Become a specialist on our platform",
+    "lead": "Receive requests, manage your profile, get payouts — all in one place",
+
+    "benefits": {
+      "leads": {
+        "title": "Ready requests",
+        "hint": "Move on to paying clients"
+      },
+      "profile": {
+        "title": "Convenient profile",
+        "hint": "Portfolio, prices, reviews"
+      },
+      "payouts": {
+        "title": "Fast payouts",
+        "hint": "Direct transfers to your card"
+      },
+      "protection": {
+        "title": "Protection and support",
+        "hint": "Dispute handling and insurance"
+      }
+    },
+    "imageAlt": "Handyman working with tools",
+    
+    "buttons": {
+      "becomePro": "Become a specialist",
+      "learnMore": "Learn more"
+    }
+  }
+}

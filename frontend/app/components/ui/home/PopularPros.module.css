@@ -1,0 +1,61 @@
+.popular{ padding: 44px 20px; }
+.wrap{ max-width:1200px; margin:0 auto }
+.headRow{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px }
+.title{ margin:0; font-size:var(--fontSizeHeader); font-weight:700; padding-bottom: 15px; }
+.desc{ margin:0; color: rgba(15,23,42,0.65) }
+
+
+.controls{ display:flex; gap:8px }
+.ctrl{ width:40px; height:40px; border-radius:10px; border:none; background: linear-gradient(180deg,#ffffff,#f6f9ff); box-shadow: 0 6px 18px rgba(12,18,30,0.06); cursor:pointer; font-size:18px }
+
+
+.carousel{ display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:6px; }
+.carousel::-webkit-scrollbar{ height:8px }
+.carousel::-webkit-scrollbar-thumb{ background: rgba(12,18,30,0.08); border-radius:10px }
+
+
+.proCard{ scroll-snap-align:start; display: flex;
+  flex-direction: column; min-width: 300px; max-width: 320px; border-radius:14px; overflow:hidden; text-decoration:none; color:inherit; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8)); box-shadow: 0 12px 40px rgba(12,18,30,0.06); border:1px solid rgba(15,23,42,0.04); display:flex; flex-direction:column }
+
+
+.media{ position:relative; height:280px }
+.img{ position:absolute; inset:0; background-size:cover; background-position:center; transform: scale(1.02); filter: saturate(105%); }
+.overlay{ position:absolute; inset:0; background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.12)) }
+
+
+.info{ padding:12px; display:flex; flex-direction:column; gap:8px; height: 50%;}
+.rowTop{ display:flex; justify-content:space-between; align-items:center }
+.name{ font-weight:700 }
+.rate{ font-weight:700; color: var(--accent1); padding: 10px 0; }
+.role{ font-size:13px; color: rgba(15,23,42,0.66) }
+
+
+.metaRow{ display:flex; gap: 15px; justify-content: center; flex-direction: column; align-items:center; margin-top: auto; }
+.rating{ font-size:.9rem; color: rgba(15,23,42,0.8) }
+.reviews{ color: rgba(15,23,42,0.6); font-size:.8rem }
+
+
+.actions{ display:flex; gap:8px; justify-self: flex-end; position: relative !important; bottom: 0;}
+.btn{ padding:8px 10px; border-radius:10px; border:none; cursor:pointer; font-weight:700 }
+.btn.primary{ background: linear-gradient(90deg,var(--accent1),#C58CFF); color:white }
+.btn.ghost{ background:transparent; border:1px solid var(--accent1) }
+
+
+/* grid fallback on wider screens */
+@media (min-width: 1100px){
+.carousel{ display:grid; grid-auto-flow:column; grid-template-columns: repeat(3, 320px); gap:20px; justify-content:start }
+}
+
+
+@media (max-width: 980px){ .controls{ display:none } }
+@media (max-width: 640px){ .proCard{ min-width: 88%; max-width: 88% } }
+
+.specs{ display:flex; gap:8px; flex-wrap:wrap }
+.chip{ background: rgba(255,255,255,0.92); border: 1px solid var(--white); padding:6px 10px; border-radius:999px; font-size:13px; cursor:default }
+.chip.more{ background: linear-gradient(90deg,#F0F7FF,#F6EFFA); cursor:pointer }
+.chip:focus{ outline:2px solid rgba(110,176,255,0.35) }
+
+
+.allSpecs{ display:none; gap:8px; margin-top:8px }
+.allSpecs.open{ display:flex; flex-wrap:wrap }
+.chip.full{ background: rgba(255,255,255,0.95); border:1px dashed rgba(15,23,42,0.03) }

@@ -1,0 +1,284 @@
+{
+  "Hero": {
+    "headlineTop": "Găsiți un meșter în apropiere",
+    "headlineFast": "Rapid",
+    "headlineReliable": "Fiabil",
+    "lead": "Specialiști verificați, prețuri transparente, căutare comodă și solicitări instantanee.",
+    "search": {
+      "placeholder": "Căutare: electrician, instalator, montaj mobilier...",
+      "button": "Găsește meșter",
+      "ariaLabel": "Căutare meșter"
+    },
+    "badges": {
+      "quality": "Garanția calității",
+      "reviews": "Recenzii"
+    }
+  },
+  "ServicesSection": {
+    "title": "Categorii populare",
+    "subtitle": "Alege serviciul — vezi meșterii și recenziile",
+
+    "services": {
+      "repair": {
+        "title": "Reparații și renovări",
+        "subtitle": "Reparații capitale și minore"
+      },
+      "electric": {
+        "title": "Electricitate și iluminat",
+        "subtitle": "Montaj, înlocuire, diagnosticare"
+      },
+      "meters": {
+        "title": "Contoare (gaz, electricitate, apă)",
+        "subtitle": "Instalare și verificare"
+      },
+      "appliances": {
+        "title": "Aparate de uz casnic",
+        "subtitle": "Reparații și conectare"
+      },
+      "gas": {
+        "title": "Echipamente pe gaz",
+        "subtitle": "Verificare și conectare"
+      },
+      "climate": {
+        "title": "Climatizare și aer condiționat",
+        "subtitle": "Instalare și întreținere"
+      },
+      "security": {
+        "title": "Securitate și încuietori",
+        "subtitle": "Lacături, alarme"
+      },
+      "clean": {
+        "title": "Curățare și dezinfectare",
+        "subtitle": "Rapid și îngrijit"
+      },
+      "transport": {
+        "title": "Transport și utilaje",
+        "subtitle": "Transport și închiriere"
+      }
+    }
+  },
+  "WhyUs": {
+    "title": "Meșteri de încredere — chiar la îndemâna dvs.",
+
+    "cards": {
+      "trust": {
+        "title": "Avem încrederea clienților",
+        "text": "Mii de clienți găsesc meșteri verificați — rapid și în siguranță"
+      },
+      "benefit": {
+        "title": "Cu noi este avantajos",
+        "text": "Prețuri transparente, fără taxe ascunse și calcul instant al costului"
+      },
+      "technology": {
+        "title": "Tehnologiile ajută",
+        "text": "Selectare inteligentă a meșterului după rating, experiență și cererea dvs."
+      },
+      "near": {
+        "title": "Suntem mereu aproape",
+        "text": "Meșterii sunt disponibili în zona dvs. — la orice oră din zi"
+      }
+    },
+
+    "imageAlt": "insignă"
+  },
+  "TrustSection": {
+    "title": "De ce ne puteți avea încredere?",
+
+    "trustItems": {
+      "verified": {
+        "title": "Verificat",
+        "hint": "ID și documente"
+      },
+      "payment": {
+        "title": "Protecția plăților",
+        "hint": "Tranzacții sigure"
+      },
+      "guarantee": {
+        "title": "Garanție de rambursare",
+        "hint": "Rambursare dacă serviciul este necalitativ"
+      },
+      "support": {
+        "title": "Asistență 24/7",
+        "hint": "Ajutor oricând"
+      }
+    },
+
+    "stats": {
+      "orders": {
+        "label": "comenzi"
+      },
+      "rating": {
+        "label": "rating mediu"
+      },
+      "cities": {
+        "label": "meșteri"
+      }
+    }
+  },
+  "PopularProsSection": {
+    "title": "Meșteri populari",
+    "description": "Acces rapid la specialiști verificați în orașul dvs.",
+
+    "controls": {
+      "prev": "Înapoi",
+      "next": "Înainte"
+    },
+
+    "cardActions": {
+      "profile": "Profil",
+      "order": "Comandă",
+      "showMore": "Arată mai mult",
+      "collapse": "Restrânge"
+    },
+
+    "chipAriaLabel": "Specializare",
+
+    "pros": {
+      "p1": {
+        "role": "Electrician",
+        "rate": "de la 50 Ron/oră",
+        "specialties": ["Montaj prize", "Diagnosticare", "Înlocuire cabluri", "Montaj iluminat"]
+      },
+      "p2": {
+        "role": "Instalator",
+        "rate": "de la 60 Ron/oră",
+        "specialties": ["Curățare țevi", "Montaj WC"]
+      },
+      "p3": {
+        "role": "Meșter finisaje",
+        "rate": "de la 45 Ron/oră",
+        "specialties": ["Tencuire", "Gletuire", "Vopsire", "Montaj gresie"]
+      },
+      "p4": {
+        "role": "Aparate de aer condiționat",
+        "rate": "de la 50 Ron/oră",
+        "specialties": ["Aparate aer condiționat", "Umplere freon", "Întreținere"]
+      },
+      "p5": {
+        "role": "Montaj mobilă",
+        "rate": "de la 50 Ron/oră",
+        "specialties": ["Asamblare IKEA", "Montaj mobilă de corp", "Reglaj uși"]
+      }
+    }
+  },
+  "HowItWorksSection": {
+    "title": "Cum funcționează",
+    "lead": "Simplu și transparent — trei pași de la cerere la realizare",
+
+    "steps": {
+      "step1": {
+        "title": "Găsiți un serviciu",
+        "desc": "Descrieți sarcina sau alegeți o categorie — noi vom selecta specialiștii."
+      },
+      "step2": {
+        "title": "Alegeți un specialist",
+        "desc": "Compară profilurile, ratingurile și recenziile — alegeți-l pe cel potrivit."
+      },
+      "step3": {
+        "title": "Plătiți și confirmați",
+        "desc": "Plată printr-un sistem sigur — confirmare și garanție."
+      }
+    },
+
+    "cta": {
+      "label": "Află mai multe",
+      "href": "/how-it-works"
+    }
+  },
+  "VideoCall": {
+    "title": "Suportăm apeluri video",
+    "text": "Comunicați cu specialiștii direct prin apel video — rapid, comod și sigur. Arătați problema în timp real și primiți consultanță profesională fără a aștepta.",
+    "button": "Pornește apelul video",
+    "imageAlt": "Apel video"
+  },
+  "PricingSection": {
+    "title": "Tarife și transparența prețurilor",
+    "desc": "Ghiduri aproximative — costul exact este indicat de specialist în cerere",
+
+    "toggle": {
+      "hour": "Ron / oră",
+      "fixed": "Preț fix"
+    },
+
+    "plans": {
+      "visit": {
+        "name": "Vizită minimală",
+        "desc": "Vizita specialistului și diagnosticare",
+        "note": "include 30 min"
+      },
+      "hourly": {
+        "name": "Tarif pe oră",
+        "desc": "Tarif standard pentru majoritatea sarcinilor",
+        "note": "minimum 1 oră",
+        "ribbon": "Popular"
+      },
+      "job": {
+        "name": "Preț fix",
+        "desc": "Pentru sarcini standard (asamblare, înlocuire)",
+        "note": "tarif fix"
+      }
+    },
+
+    "buttons": {
+      "details": "Detalii",
+      "order": "Comandă"
+    },
+
+    "disclaimer": "Prețurile sunt orientative — costul final este confirmat de specialist după inspecție sau prin fotografie."
+  },
+  "FAQSection": {
+    "title": "Întrebări frecvente",
+
+    "items": [
+      {
+        "question": "Cum mă înregistrez pe site?",
+        "answer": "Pentru a vă înregistra, faceți clic pe butonul 'Creează cont' și completați formularul cu email-ul și parola dvs."
+      },
+      {
+        "question": "Cum îmi schimb parola?",
+        "answer": "Mergeți la setările contului și selectați 'Schimbă parola', apoi urmați instrucțiunile."
+      },
+      {
+        "question": "Cum sunt protejate datele mele?",
+        "answer": "Toate datele sunt criptate folosind standarde moderne SSL/TLS și stocate într-o bază de date securizată."
+      },
+      {
+        "question": "Ce trebuie să fac dacă suspectez un hack?",
+        "answer": "Contactați imediat echipa noastră de suport și schimbați parola."
+      },
+      {
+        "question": "Pot să șterg contul?",
+        "answer": "Da, puteți șterge contul în setări. După aceea, toate datele dvs. vor fi șterse."
+      }
+    ]
+  },
+  "ForProsSection": {
+    "title": "Deveniți specialist pe platforma noastră",
+    "lead": "Primiți cereri, gestionați profilul, primiți plăți — totul într-un singur loc",
+
+    "benefits": {
+      "leads": {
+        "title": "Cereri gata",
+        "hint": "Treceți la clienți plătitori"
+      },
+      "profile": {
+        "title": "Profil convenabil",
+        "hint": "Portofoliu, prețuri, recenzii"
+      },
+      "payouts": {
+        "title": "Plăți rapide",
+        "hint": "Transferuri directe pe card"
+      },
+      "protection": {
+        "title": "Protecție și suport",
+        "hint": "Gestionarea disputelor și asigurare"
+      }
+    },
+    "imageAlt": "Meșter lucrând cu unelte",
+    
+    "buttons": {
+      "becomePro": "Deveniți specialist",
+      "learnMore": "Aflați mai multe"
+    }
+  }
+}

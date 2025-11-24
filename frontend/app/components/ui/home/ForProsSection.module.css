@@ -1,0 +1,42 @@
+.forPros{ padding: 56px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.98)); border-radius:12px }
+.wrap{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1fr 420px; gap:26px; align-items:start; }
+
+.head{ margin:0 0 6px 0; font-size:var(--fontSizeHeader); font-weight:700 }
+
+.leftCol{ padding:6px 0 }
+.title{ margin:0; font-size:1.5rem; font-weight:800 }
+.lead{ margin:8px 0 18px 0; color: rgba(15,23,42,0.7) }
+
+.benefits{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+.benefit{ display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.9)); box-shadow: 0 8px 24px rgba(12,18,30,0.04); }
+.icon{ width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:12px; background: linear-gradient(90deg,#F6FAFF,#F3EEF9); box-shadow: 0 6px 18px rgba(12,18,30,0.04) }
+.btitle{ font-weight:700 }
+.bhint{ font-size:13px; color: rgba(15,23,42,0.6) }
+
+.ctaRow{ margin-top:16px; display:flex; gap:12px; }
+.btn{ padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer; border:none }
+.btn.primary{ background: linear-gradient(90deg,var(--accent1),#C58CFF); color:white }
+.btn.ghost{ background:transparent; border:1px solid var(--accent1) }
+
+.rightCol{ }
+.rightCol img{
+    border-radius: 10px;
+}
+.card{ padding:14px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.92)); box-shadow: 0 12px 40px rgba(12,18,30,0.06); }
+
+.form{ display:flex; flex-direction:column; gap:10px }
+.fRow{ display:flex; flex-direction:column }
+.forPros label{ font-size:13px; color: rgba(15,23,42,0.66); margin-bottom:6px }
+.forPros input{ padding:10px 12px; border-radius:10px; border:1px solid rgba(15,23,42,0.06); outline:none }
+.small label{ font-size:13px }
+.consent{ display:flex; align-items:center; gap:8px }
+.err{ color:#c23; font-size:13px; margin-top:6px }
+
+.actions{ display:flex; gap:8px; margin-top:6px }
+
+.sent{ text-align:center; padding:18px }
+.tick{ width:64px; height:64px; margin:0 auto 12px auto; display:flex; align-items:center; justify-content:center; border-radius:999px; background: linear-gradient(90deg,#D6F7E1,#A9EBC4); color:#0a6e3a; font-weight:900; font-size:28px }
+.sTitle{ font-weight:800; margin-top:6px }
+.sText{ margin-top:6px; color: rgba(15,23,42,0.66) }
+
+@media (max-width: 980px){ .wrap{ grid-template-columns: 1fr; } .rightCol{ order: -1 } .benefits{ grid-template-columns: 1fr } }
