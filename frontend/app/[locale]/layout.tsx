@@ -2,6 +2,7 @@ import Header from "./components/layout/Header";
 import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
+import Footer from "./components/layout/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,14 +20,20 @@ export const metadata = {
   title: "Your site",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
+  const messages = (await import(`../../messages/ro.json`)).default
+
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <body>
-        <Header/>
-        <main>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        </main>
+        <NextIntlClientProvider messages={messages}>
+          <Header/>
+            <main>
+              {children}
+            </main>
+          <Footer/>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

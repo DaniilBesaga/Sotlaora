@@ -1,4 +1,64 @@
 {
+  "Header": {
+    "brand": "Soț la Ora.",
+    "nav": {
+      "createOrder": "Comandă",
+      "findPro": "Specialiști",
+      "myOrders": "Comenzile mele",
+      "becomePro": "Devino specialist"
+    },
+    "auth": {
+      "login": "Autentificare",
+      "order": "Comandă"
+    },
+    "mobileMenu": {
+      "services": "Servicii",
+      "pros": "Specialiști",
+      "pricing": "Prețuri",
+      "about": "Despre",
+      "order": "Comandă"
+    },
+    "lang": {
+      "ro": "RO",
+      "en": "EN"
+    },
+    "chat": "Chat"
+  },
+  "Footer": {
+    "brand": "Soț La Ora",
+    "tagline": "Găsește rapid un specialist verificat din apropiere — simplu și de încredere.",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "telegram": "Telegram"
+    },
+    "categories": {
+      "title": "Categorii",
+      "repair": "Reparații și finisaje",
+      "electric": "Electrice",
+      "meters": "Contoare",
+      "appliances": "Electrocasnice"
+    },
+    "support": {
+      "title": "Asistență",
+      "howItWorks": "Cum funcționează",
+      "faq": "Întrebări frecvente",
+      "contacts": "Contacte",
+      "terms": "Termeni și condiții"
+    },
+    "subscribe": {
+      "title": "Abonare",
+      "text": "Primește selecții de comenzi și sfaturi utile pentru meșteri.",
+      "placeholder": "Emailul tău",
+      "button": "Abonează-te",
+      "success": "Mulțumim!"
+    },
+    "bottom": {
+      "rights": "Toate drepturile rezervate",
+      "privacy": "Politica de confidențialitate",
+      "cookies": "Cookies"
+    }
+  },
   "Hero": {
     "headlineTop": "Găsiți un meșter în apropiere",
     "headlineFast": "Rapid",
@@ -11,7 +71,8 @@
     },
     "badges": {
       "quality": "Garanția calității",
-      "reviews": "Recenzii"
+      "reviews": "Recenzii",
+      "security": "Siguranță"
     }
   },
   "ServicesSection": {
@@ -228,29 +289,28 @@
   },
   "FAQSection": {
     "title": "Întrebări frecvente",
-
-    "items": [
-      {
+    "items": {
+      "q1": {
         "question": "Cum mă înregistrez pe site?",
         "answer": "Pentru a vă înregistra, faceți clic pe butonul 'Creează cont' și completați formularul cu email-ul și parola dvs."
       },
-      {
+      "q2": {
         "question": "Cum îmi schimb parola?",
         "answer": "Mergeți la setările contului și selectați 'Schimbă parola', apoi urmați instrucțiunile."
       },
-      {
+      "q3": {
         "question": "Cum sunt protejate datele mele?",
         "answer": "Toate datele sunt criptate folosind standarde moderne SSL/TLS și stocate într-o bază de date securizată."
       },
-      {
+      "q4": {
         "question": "Ce trebuie să fac dacă suspectez un hack?",
         "answer": "Contactați imediat echipa noastră de suport și schimbați parola."
       },
-      {
+      "q5": {
         "question": "Pot să șterg contul?",
         "answer": "Da, puteți șterge contul în setări. După aceea, toate datele dvs. vor fi șterse."
       }
-    ]
+    }
   },
   "ForProsSection": {
     "title": "Deveniți specialist pe platforma noastră",

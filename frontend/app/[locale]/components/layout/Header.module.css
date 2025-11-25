@@ -1,6 +1,6 @@
 /* header shell */
 .siteHeader {
-  background: var(--surface); /* белый фон */
+  background: black; /* белый фон */
   border-bottom: 1px solid var(--divider);
   position: sticky;
   top: 0;
@@ -28,9 +28,8 @@
 /* inner layout */
 .headerInner {
   display: flex;
-  gap: 18px;
+  gap: 78px;
   align-items: center;
-  justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
   padding: 14px 20px;
@@ -40,7 +39,7 @@
 .brand {
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--text-dark);
+  color: white;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -71,11 +70,39 @@
   border-radius: 10px;
   font-weight: 600;
   font-size: 0.95rem;
-  color: black;
+  color: white;
   text-decoration: none;
   transition: transform .12s ease, box-shadow .12s ease, color .12s ease;
   outline: none;
   border: 1px solid var(--accent-gradient);
+}
+
+/* 🔹 Верхняя узкая панель */
+.utilityBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 4px 0 6px;
+  margin: 0 100px;
+  height: 32px;
+}
+
+.utilityRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.utilityLink {
+  color: white;
+  font-size: 0.85rem;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.utilityLink:hover {
+  opacity: 1;
 }
 
 /* hover / focus: gradient highlight (temporary) */
@@ -182,6 +209,7 @@
   border: 1px solid var(--divider);
   border-radius: 10px;
   overflow: hidden;
+  margin-right: 30px;
 }
 
 .langBtn {
@@ -227,3 +255,28 @@
   padding: 0 20px;
 }
 
+.actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--divider);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.iconBtn:hover {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  transform: translateY(-2px);
+}

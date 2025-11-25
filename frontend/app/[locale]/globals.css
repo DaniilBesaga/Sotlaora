@@ -261,3 +261,31 @@ body {
 
 
 
+
+
+.siteFooter{ padding: 40px 20px; background: linear-gradient(180deg, #0f172a 0%, #081025 100%); color: rgba(255,255,255,0.92); }
+            .inner{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns: 1fr 1fr 1fr 360px; gap:20px; align-items:start }
+
+            .col h4{ margin:0 0 8px 0; font-size:14px }
+            .logo{ font-weight:800; font-size:18px; letter-spacing:0.4px }
+            .tag{ margin-top:8px; color: rgba(255,255,255,0.75); max-width:300px }
+
+            .social{ display:flex; gap:8px; margin-top:12px }
+            .socialBtn{ width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; background: rgba(255,255,255,0.06); color: white; text-decoration:none }
+
+            .links ul, .support ul{ list-style:none; padding:0; margin:0 }
+            .links li, .support li{ margin-bottom:8px }
+            .links a, .support a{ color: rgba(255,255,255,0.9); text-decoration:none }
+            .links a:hover, .support a:hover{ text-decoration:underline }
+
+            .subscribe .small{ color: rgba(255,255,255,0.75); margin-bottom:8px }
+            .newsForm{ display:flex; gap:8px }
+            .newsForm input{ flex:1; padding:10px 12px; border-radius:10px; border:none; outline:none; background: rgba(255,255,255,0.08); color: white; font-size: .9rem; }
+            .newsForm .btn{ padding:10px 12px; border-radius:10px; background: linear-gradient(90deg,var(--accent1),var(--accent2)); border:none; color:white; font-weight:700 }
+
+            .bottom{ max-width:1200px; margin:18px auto 0; display:flex; justify-content:space-between; color: rgba(255,255,255,0.6); font-size:13px }
+            .bottom a{ color: rgba(255,255,255,0.8); text-decoration:none }
+            .sep{ margin:0 8px; opacity:0.5 }
+
+            @media (max-width: 980px){ .inner{ grid-template-columns: 1fr 1fr; } .subscribe{ grid-column: span 2 } }
+            @media (max-width: 640px){ .inner{ grid-template-columns: 1fr; } .bottom{ flex-direction:column; gap:8px; align-items:center } .right{ display:flex; gap:8px } }

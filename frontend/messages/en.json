@@ -1,4 +1,64 @@
 {
+  "Header": {
+    "brand": "HandyHour.",
+    "nav": {
+      "createOrder": "Order",
+      "findPro": "Pros",
+      "myOrders": "My Orders",
+      "becomePro": "Become Pro"
+    },
+    "auth": {
+      "login": "Login",
+      "order": "Order"
+    },
+    "mobileMenu": {
+      "services": "Services",
+      "pros": "Pros",
+      "pricing": "Pricing",
+      "about": "About",
+      "order": "Order"
+    },
+    "lang": {
+      "ro": "RO",
+      "en": "EN"
+    },
+    "chat": "Chat"
+  },
+  "Footer": {
+    "brand": "Sot La Ora",
+    "tagline": "Find a trusted local professional — fast and reliably.",
+    "social": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "telegram": "Telegram"
+    },
+    "categories": {
+      "title": "Categories",
+      "repair": "Repairs & finishing",
+      "electric": "Electrical",
+      "meters": "Meters",
+      "appliances": "Home appliances"
+    },
+    "support": {
+      "title": "Support",
+      "howItWorks": "How it works",
+      "faq": "FAQ",
+      "contacts": "Contacts",
+      "terms": "Terms & Conditions"
+    },
+    "subscribe": {
+      "title": "Newsletter",
+      "text": "Receive curated job selections and tips for professionals.",
+      "placeholder": "Your email",
+      "button": "Subscribe",
+      "success": "Thank you!"
+    },
+    "bottom": {
+      "rights": "All rights reserved",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookies"
+    }
+  },
   "Hero": {
     "headlineTop": "Find a master nearby",
     "headlineFast": "Fast",
@@ -11,7 +71,8 @@
     },
     "badges": {
       "quality": "Quality guarantee",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "security": "Security"
     }
   },
   "ServicesSection": {
