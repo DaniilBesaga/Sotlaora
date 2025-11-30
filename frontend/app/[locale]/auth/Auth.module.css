@@ -1,0 +1,262 @@
+/* AuthFullBg.module.css */
+
+:root{
+  --accent1: #0abab5;
+  --accent2: #0abab5;
+}
+
+/* Fullscreen wrapper */
+.wrapper{
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+}
+
+/* background image (uses uploaded file path) */
+.bg{
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center center;
+  filter: saturate(95%) contrast(0.92) blur(0.4px);
+  transform: scale(1.02);
+  z-index: 0;
+}
+
+/* dark overlay to improve contrast */
+.overlay{
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* center wrapper for card */
+.cardWrap{
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 18px;
+}
+
+/* the card */
+.card{
+  border-radius: 34px;
+  padding: 22px;
+  background: linear-gradient(180deg, rgba(3,6,12,0.84), rgba(6,9,14,0.9));
+  box-shadow: 0 20px 60px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+}
+
+/* header */
+.header{
+  text-align: center;
+}
+.brand{
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: 0.3px;
+  padding-bottom: 10px;
+}
+.hint{
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+}
+
+/* role switch (segmented control) */
+.roleSwitch{
+  display: flex;
+  gap: 8px;
+  background: rgba(255,255,255,0.02);
+  padding: 6px;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+}
+.role{
+  flex: 1;
+  padding: 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255,255,255,0.82);
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s;
+}
+.role:hover{ transform: translateY(-3px); box-shadow: 0 10px 28px rgba(2,6,23,0.5); }
+.activeRole{
+  background: linear-gradient(90deg,var(--accent1),#C58CFF);
+  color: #071022;
+  box-shadow: 0 14px 40px rgba(110,176,255,0.12);
+  transform: translateY(-4px);
+}
+
+/* content */
+.content{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 4px;
+}
+.lead{
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  text-align: center;
+  margin: 8px 6px 6px;
+}
+
+/* Google button */
+.googleBtn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: none;
+  background: #fff;
+  color: #071022;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 16px 40px rgba(2,6,23,0.55);
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+.googleBtn:hover{ transform: translateY(-3px); box-shadow: 0 24px 60px rgba(2,6,23,0.6); }
+.googleIcon{ display:inline-flex; width:20px; height:20px; align-items:center; justify-content:center; }
+
+/* small separator text */
+.sep{
+  text-align:center;
+  font-size:12px;
+  color: rgba(255,255,255,0.6);
+  padding-top: 6px;
+  padding: 10px 0;
+}
+
+/* secondary links row */
+.secondary{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top: 6px;
+}
+.linkBtn{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.78);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* footer note */
+.footerNote{
+  margin-top: 6px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}
+.smallLink{ text-decoration: underline; cursor: pointer; color: rgba(255,255,255,0.82); }
+
+/* responsive tweaks */
+@media (max-width: 520px){
+  .cardWrap{ padding: 10px; }
+  .card{ padding: 16px; border-radius: 28px; }
+  .googleBtn{ padding: 12px; font-size: 14px; }
+}
+/* Role badge and hint row */
+.hintRow{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  margin-top:6px;
+}
+.roleBadge{
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.45);
+}
+
+/* specific badge colors */
+.badgeCustomer{
+  background: linear-gradient(90deg, #8EE3C5, #6EB0FF);
+  color: #04121a;
+}
+.badgePro{
+  background: linear-gradient(90deg, #C58CFF, #FF9ACC);
+  color: #071022;
+}
+
+/* Card accent depending on role */
+.customerCard{
+  border: 1px solid rgba(110,176,255,0.12);
+  box-shadow: 0 30px 80px rgba(14,60,120,0.12);
+}
+.proCard{
+  border: 1px solid rgba(197,140,255,0.12);
+  box-shadow: 0 30px 80px rgba(115,50,120,0.12);
+}
+
+/* Role description under segmented control */
+.roleDesc{
+  text-align:center;
+  font-size:13px;
+  color: rgba(255,255,255,0.85);
+  margin-top:6px;
+  padding: 15px 8px;
+}
+
+/* Google button variants */
+.customerBtn{
+  /* keep white look for customers (default) */
+  background: #fff;
+  color: #071022;
+  font-weight: 800;
+}
+.proBtn{
+  /* inverted, eye-catching for pros */
+  background: linear-gradient(90deg, var(--accent2), var(--accent1));
+  color: #071022;
+  font-weight: 800;
+  border: none;
+  box-shadow: 0 18px 50px rgba(197,140,255,0.18);
+}
+
+/* small helper for screen-reader-only text */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+.roleDesc{
+  text-align:center;
+  font-size:13px;
+  color: rgba(255,255,255,0.85);
+  margin-top:4px;
+}
+
+/* shorter google button labels already handled in JSX */

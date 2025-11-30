@@ -1,6 +1,6 @@
 {
   "Header": {
-    "brand": "HandyHour.",
+    "brand": "Sot La Ora",
     "nav": {
       "createOrder": "Order",
       "findPro": "Pros",
@@ -289,29 +289,33 @@
   },
   "FAQSection": {
     "title": "Frequently Asked Questions",
-
-    "items": [
-      {
-        "question": "How do I register on the site?",
-        "answer": "To register, click the 'Create account' button and fill out the form with your email and password."
-      },
+    "items": {
+      "q1":
+        {
+          "question": "How do I register on the site?",
+          "answer": "To register, click the 'Create account' button and fill out the form with your email and password."
+        },
+      "q2":
       {
         "question": "How do I change my password?",
         "answer": "Go to your account settings and select 'Change password', then follow the instructions."
       },
+      "q3":
       {
         "question": "How is my data protected?",
         "answer": "All data is encrypted using modern SSL/TLS standards and stored in a secure database."
       },
+      "q4":
       {
         "question": "What should I do if I suspect a hack?",
         "answer": "Immediately contact our support team and change your password."
       },
+      "q5":
       {
         "question": "Can I delete my account?",
         "answer": "Yes, you can delete your account in the settings. After that, all your data will be removed."
       }
-    ]
+    }
   },
   "ForProsSection": {
     "title": "Become a specialist on our platform",

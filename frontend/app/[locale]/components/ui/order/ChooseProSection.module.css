@@ -1,0 +1,60 @@
+:root{
+  --accent1: #6EB0FF;
+  --accent2: #C58CFF;
+  --muted: black;
+  --text: #0b1220;
+  --card-bg: #fff;
+  --shadow: 0 12px 40px rgba(12,18,30,0.06);
+}
+
+.chooseSection{ padding: 36px 20px; background: transparent; }
+.wrap{ max-width:1100px; margin:0 auto; }
+
+.headerRow{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.title{ margin:0; font-size:20px; font-weight:800; color:black !important; }
+.subtitle{ margin:0; color:rgba(255, 255, 255, 0.85); font-size:13px; margin-top:6px; }
+
+.candidatesRow{ display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; }
+.card{ min-width:320px; max-width:340px; border-radius:12px; background:var(--card-bg); box-shadow:var(--shadow); border:1px solid rgba(15,23,42,0.04); overflow:hidden; transition:transform .12s ease; }
+.card:hover{ transform: translateY(-6px); }
+.cardSelected{ outline: 3px solid rgba(110,176,255,0.12); box-shadow: 0 24px 60px rgba(110,176,255,0.06); }
+
+.radioWrap{ display:flex; gap:12px; align-items:flex-start; padding:12px; cursor:pointer; }
+.radio{ display:none; }
+
+.cardMedia{ width:100px; height:100px; border-radius:10px; background-size:cover; background-position:center; flex:0 0 100px; }
+
+.cardInfo{ flex:1; display:flex; flex-direction:column; gap:6px; }
+.name{ font-weight:800; color:var(--text); font-size:16px; }
+.role{ color:var(--muted); font-size:13px; }
+.meta{ display:flex; gap:8px; align-items:center; margin-top:4px; }
+.rate{ font-weight:800; color:var(--accent1); }
+.rating{ color:var(--muted); font-size:13px; margin-left:6px; }
+.reviews{ color:var(--muted); font-size:12px; }
+
+.specs{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+.chip{ background:#f7fbff; padding:6px 8px; border-radius:999px; font-size:12px; color:var(--text); }
+.chipMore{ background:linear-gradient(90deg,#F0F7FF,#F6EFFA); padding:6px 8px; border-radius:999px; font-size:12px; }
+
+.empty{ padding:18px; color:var(--muted); }
+
+.formRow{ display:flex; gap:20px; margin-top:18px; align-items:center; flex-wrap:wrap; }
+.inputs{ display:flex; gap:12px; flex:1; min-width:300px; flex-wrap:wrap; align-items: flex-start; padding: 15px 0; margin-top: 20px;}
+.field{ display:flex; flex-direction:column; min-width:200px; flex:1; }
+.fieldLabel{ font-size:13px; color:var(--muted); margin-bottom:6px; }
+.input{ width:100%; padding:14px 16px; border-radius:14px; border:1px solid black; background: rgba(255,255,255,0.02); color: black; font-size:16px; outline:none; }
+.textarea{ width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgb(0, 0, 0); min-height:120px; resize:vertical; font-size:15px; background: rgba(255,255,255,0.02); color:#eaf6ff; }
+
+.actions{ display:flex; gap:10px; align-items:center; }
+.btnGhost{ padding:10px 12px; border-radius:10px; border:1px solid var(--accent1); background:transparent; cursor:pointer; }
+.primaryBtn{ padding:10px 14px; border-radius:12px; background: linear-gradient(90deg,var(--accent1),var(--accent2)); color:#071022; font-weight:800; border:none; cursor:pointer; }
+.chatBtn{ padding:10px 12px; border-radius:12px; background:#fff; border:1px solid rgba(15,23,42,0.06); cursor:pointer; }
+
+.helper{ margin-top:12px; color:rgba(255, 255, 255, 0.85); font-size:13px; }
+
+/* responsive */
+@media (max-width:920px){
+  .card{ min-width:88%; max-width:88%; }
+  .formRow{ flex-direction:column; }
+  .inputs{ width:100%; }
+}

@@ -20,8 +20,8 @@ export default function Header() {
         {/* Nav */}
         <nav className={styles.mainNav} aria-label="Primary Navigation">
           <ul>
-            <li><a href="#" className={styles.navLink}>{t('nav.createOrder')}</a></li>
-            <li><a href="#" className={styles.navLink}>{t('nav.findPro')}</a></li>
+            <li><a href="/create-order" className={styles.navLink}>{t('nav.createOrder')}</a></li>
+            <li><a href="/searchpros" className={styles.navLink}>{t('nav.findPro')}</a></li>
             <li><a href="#" className={styles.navLink}>{t('nav.myOrders')}</a></li>
             <li><a href="#" className={styles.navLink}>{t('nav.becomePro')}</a></li>
           </ul>
@@ -37,12 +37,12 @@ export default function Header() {
           </div>
 
           {/* Login icon */}
-          <button className={styles.iconBtn} aria-label="Login">
+          <a href='/auth' className={styles.iconBtn} aria-label="Login">
             <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" fill="none">
               <circle cx="12" cy="7" r="4" strokeWidth="2"/>
               <path d="M4 21c0-4 4-7 8-7s8 3 8 7" strokeWidth="2"/>
             </svg>
-          </button>
+          </a>
 
           {/* Chat icon */}
           <button className={styles.iconBtn} aria-label={t('chat')}>

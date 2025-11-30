@@ -20,9 +20,16 @@ export const metadata = {
   title: "Your site",
 };
 
-export default async function RootLayout({ children }) {
+type Props = {
+  children: React.ReactNode;
+  params: Promise<{locale: string}>;
+};
 
-  const messages = (await import(`../../messages/ro.json`)).default
+export default async function RootLayout({children, params}: Props) {
+
+  const {locale} = await params
+
+  const messages = (await import(`../../messages/${locale}.json`)).default
 
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
