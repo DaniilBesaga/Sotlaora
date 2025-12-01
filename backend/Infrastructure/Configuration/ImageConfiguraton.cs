@@ -28,8 +28,7 @@ namespace Sotlaora.Infrastructure.Configuration
                    .IsRequired();
 
             builder.Property(i => i.EntityId)
-                   .HasColumnName("entity_id")
-                   .IsRequired();
+                   .HasColumnName("entity_id");
 
             builder.HasIndex(i => new { i.EntityType, i.EntityId })
                    .HasDatabaseName("IX_Images_EntityType_EntityId");

@@ -22,7 +22,7 @@ export interface Order {
   title: string | "";
   description: string | "";
 
-  postedAt: string | Date;
+  postedAt: Date;
   price: number;
 
   location: Location;
@@ -33,10 +33,10 @@ export interface Order {
 
   responsesCount: number | 0;
 
-  deadlineDate?: string | Date | null;
+  deadlineDate?: string | Date;
 
-  desiredTimeStart?: string | null; // "HH:mm"
-  desiredTimeEnd?: string | null;   // "HH:mm"
+  desiredTimeStart?: string | null; 
+  desiredTimeEnd?: string | null; 
 
   status: OrderStatus;
 
@@ -47,4 +47,26 @@ export interface Order {
   clientId: number;
 
   proId: number;
+}
+
+export interface OrderDTO {
+  
+  title: string | "";
+  description: string | "";
+
+  postedAt: Date;
+  price: number;
+
+  location: Location;
+
+  additionalComment: string | "";
+
+  deadlineDate?: string | Date;
+
+  desiredTimeStart?: string; 
+  desiredTimeEnd?: string;   
+
+  subcategories: number[];
+
+  clientId: number;
 }

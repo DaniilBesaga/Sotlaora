@@ -8,33 +8,16 @@ export default function ChoosePerformerSection({
   onConfirm = (payload) => { console.log('confirm', payload); },
   onOpenChat = (performer) => { console.log('open chat for', performer); },
   proId,
-  setAdditonalComment
+  setAdditonalComment,
+  setIsClicked
 }) {
   const [selectedId, setSelectedId] = useState(initialSelectedId);
   const [finalPrice, setFinalPrice] = useState('');
   const [deadline, setDeadline] = useState('');
   const [note, setNote] = useState('');
 
-  useEffect(() => {
-    // если есть только один кандидат — выбирать по умолчанию
-    if (!selectedId && candidates && candidates.length === 1) {
-      setSelectedId(candidates[0].id);
-      if (candidates[0].rate) setFinalPrice(String(candidates[0].rate));
-    }
-  }, [candidates, selectedId]);
-
-  useEffect(() => {
-    if (selectedId) {
-      const p = candidates.find(c => c.id === selectedId);
-      if (p && p.rate) setFinalPrice(String(p.rate));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId]);
-
   function handleConfirm() {
-    if (!selectedId) return alert('Выберите исполнителя');
-    // payload можно отправлять на сервер
-    const performer = candidates.find(c => c.id === selectedId);
+    const performer = candidates.find(c => c.id === proId);
     onConfirm({
       performerId: selectedId,
       performer,
@@ -43,6 +26,8 @@ export default function ChoosePerformerSection({
       note,
       timestamp: new Date().toISOString()
     });
+    
+    setIsClicked(true);
   }
 
   function handleOpenChat() {
@@ -105,6 +90,7 @@ export default function ChoosePerformerSection({
                 onChange={(e) => {setAdditonalComment(e.target.value);setNote(e.target.value)}}
                 placeholder="Например: прийти вечером, взять с собой гибкую трубку..."
                 rows={3}
+                style={{color: 'black'}}
               />
             </label>
           </div>

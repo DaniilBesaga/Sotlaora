@@ -1,0 +1,33 @@
+:root {
+--overlay: rgba(2,6,23,0.55);
+--bg: #ffffff;
+--muted: #6b7280;
+--accent: var(--accent-gradient);
+}
+.modalOverlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 60; background: var(--overlay); padding: 20px; }
+.modal { width: 720px; max-width: 94%; background: var(--bg); padding: 18px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 8px 30px rgba(2,6,23,0.12); }
+.modalHead { display: flex; gap: 12px; align-items: center; }
+.searchWrap { position: relative; flex: 1; }
+.input { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(229,231,235,0.8); background: #fff; color: #0f172a; outline: none; }
+.input:focus { box-shadow: 0 0 0 4px rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.8); }
+.clearBtn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: none; font-size: 18px; line-height: 1; cursor: pointer; color: var(--muted); }
+.btnGhost { background: transparent; border: 1px solid rgba(0,0,0,0.06); padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.modalBody { margin-top: 12px; max-height: 320px; overflow: auto; padding-right: 8px; }
+.empty { padding: 12px; color: var(--muted); }
+.catItem { padding: 8px; border-radius: 12px; background: linear-gradient(180deg,#fbfdff,#f8fafc); margin-bottom: 10px; border: 1px solid rgba(15,23,42,0.03); }
+.catHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; background: transparent; border: none; padding: 8px; cursor: pointer; text-align: left; }
+.ctitle { font-weight: 600; color: #111827; }
+.caret { transition: transform .18s ease; color: var(--muted); }
+.caretOpen { transform: rotate(180deg); }
+.subList { display: flex; gap: 8px; margin-top: 10px; overflow: hidden; max-height: 0; transition: max-height .22s ease, opacity .18s ease; opacity: 0; }
+.subList.open { max-height: 480px; opacity: 1; }
+.subBtn { padding: 8px 12px; border-radius: 8px; background: #f3f4f6; border: 1px solid rgba(0,0,0,0.04); color: #0f172a; cursor: pointer; }
+.subSel { background: var(--accent); color: #fff; font-weight: 700; border: none; }
+.modalFoot { display: flex; justify-content: flex-end; margin-top: 12px; }
+.saveBtn { padding: 10px 14px; border-radius: 10px; border: none; background: var(--accent-gradient); color: #fff; cursor: pointer; font-weight: 600; }
+
+/* small responsive tweaks */
+@media (max-width: 420px) {
+  .modal { padding: 14px; }
+  .subList { gap: 6px; flex-wrap: wrap; }
+}

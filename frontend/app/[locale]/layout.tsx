@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter, Poppins } from "next/font/google";
 import {NextIntlClientProvider} from 'next-intl';
 import Footer from "./components/layout/Footer";
+import LayoutClient from "./LayoutClient";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,11 +36,7 @@ export default async function RootLayout({children, params}: Props) {
     <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <Header/>
-            <main>
-              {children}
-            </main>
-          <Footer/>
+          <LayoutClient children={children} />
         </NextIntlClientProvider>
       </body>
     </html>

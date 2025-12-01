@@ -4,7 +4,9 @@ import styles from "./CreateOrder.module.css";
 import { CompareSection } from "../components/ui/order/CompareSection";
 import ChoosePerformerSection from "../components/ui/order/ChooseProSection";
 import CalendarDropdown from "../components/ui/order/CalendarDropdown";
-import { Location, Order, OrderStatus } from "@/types/Order";
+import { Location, Order, OrderDTO, OrderStatus } from "@/types/Order";
+import { Category } from "@/types/Category";
+import CategoryModal from "../components/ui/order/CategoryModal";
 
 const prosData = [
   {
@@ -68,21 +70,15 @@ type FormErrors = {
 
 type Item = { id: number; title: string };
 
-const emptyOrder: Order = {
+const emptyOrder: OrderDTO = {
   title: "",
   description: "",
   postedAt: new Date(),
   price: 0,
   location: Location.AtClients,
-  address: "",
-  distance: 0,
   additionalComment: "",
-  responsesCount: 0,
-  status: OrderStatus.Active,
   subcategories: [],
-  files: [],
-  clientId: 0,
-  proId: 0,
+  clientId: -1,
 };
 
 export default function OrderFormModern() {
@@ -158,10 +154,13 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
   const [steps, setSteps] = useState({ step1: false, step2: false, step3: false });
 
-  const [order, setOrder] = useState<Order>(emptyOrder);
+  const [order, setOrder] = useState<OrderDTO>(emptyOrder);
 
   const [proId, setProId] = useState<number>(-1);
   const [additionalComment, setAdditionalComment] = useState<string>("");
+  const [isClicked, setIsClicked] = useState<boolean>(false);
+
+  const [allCategories, setAllCategories] = useState([]);
 
   const filtered = categories.filter(c => c.title.toLowerCase().includes(catQuery.toLowerCase()));
 
@@ -207,18 +206,66 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
   const writeFilesAsync = async (files: File[])=>{
     //get orders count
 
-    let renamedFiles = [];
+    let renamedFiles : string[] = [];
+
     if(files.length !== 0){
-      renamedFiles = files.map((file, index) => {
+      const formData = new FormData();
+
+      files.forEach((file, index) => {
         const ext = file.name.split('.').pop();
         const newName = `order_${Date.now()}_${index}.${ext}`;
-        return new File([file], newName, { type: file.type });
-      })
+        const renamedFile = new File([file], newName, { type: file.type });
+        renamedFiles.push(newName);
+
+        formData.append("files", renamedFile); 
+      });
+
+      const res = await fetch("http://localhost:5221/api/image/upload", {
+        method: "POST",
+        body: formData,      
+      });
+
+      const dataImage = await res.json();
+
+      if(dataImage.insertedIds.length > 0){
+
+        setOrder(prev=> ({ ...prev, postedAt: new Date() }) );
+
+        const res = await fetch("http://localhost:5221/api/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            Title: order.title,
+            Description: order.description,
+            PostedAt: new Date(order.postedAt).toISOString(),
+            Price: order.price,
+            Location: order.location, // "AtPros" | "AtClients" | "Online"
+            AdditionalComment: order.additionalComment,
+            DeadlineDate: order.deadlineDate ? new Date(order.deadlineDate).toISOString() : null,
+            DesiredTimeStart: order.desiredTimeStart,
+            DesiredTimeEnd: order.desiredTimeEnd,
+            Subcategories: order.subcategories,
+            ClientId: order.clientId,
+            ImageFileIds: dataImage.insertedIds
+          }
+        ),});
+
+        const data = await res.json();
+        if(data.status === 200){
+          alert('Order created successfully');
+        }
+      }
 
       //api call to backend to upload files to folders
     }
+  }
 
-    //api call to backend to save order with file names
+  const getAllCategories = async () => {
+    const res = await fetch("http://localhost:5221/api/category/with-subcategories", {method: "GET"});
+    const data = await res.json();
+    setAllCategories(data);
   }
 
   const handleStep1Continue = () => {
@@ -271,8 +318,8 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
       title,
       description: desc, 
       location,
-      price,
-      deadlineDate: `${date.day}.${date.month}.${date.year}`,
+      price: price,
+      deadlineDate: new Date(date.year, date.month - 1, date.day).toISOString(),
       desiredTimeStart: timePref.timeStart,
       desiredTimeEnd: timePref.timeEnd,
       subcategories: selectedCategories.map(cat => cat.id),
@@ -304,6 +351,12 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
       setOrder(prev=> ({ ...prev, additionalComment: additionalComment }) );
     }
   }, [additionalComment])
+
+  useEffect(() => {
+    if(isClicked){
+      writeFilesAsync(files);
+    }
+  }, [isClicked])
 
   return (
     <main className={styles.wrapper}>
@@ -423,7 +476,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
             <div className={styles.formFooter}>
               <button type="submit" onClick={handleStep1Continue} className={styles.publishBtn}>Продолжить</button>
-              <button type="button" className={styles.btnGhost} onClick={() => setCategoriesModalOpen(true)}>Категория</button>
+              <button type="button" className={styles.btnGhost} onClick={() => {setCategoriesModalOpen(true); getAllCategories()}}>Категория</button>
             </div>
           </div>
         </div>
@@ -482,39 +535,28 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
           }}
           setAdditonalComment={setAdditionalComment}
           proId={proId}
+          setIsClicked={setIsClicked}
         />
         </div>
           
 
         {/* Modal (unchanged) */}
         {categoriesModalOpen && (
-          <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-            <div className={styles.modal}>
-              <div className={styles.modalHead}>
-                <input className={styles.input} placeholder="Поиск категории" value={catQuery} onChange={(e) => setCatQuery(e.target.value)} />
-                <button className={styles.btnGhost} onClick={() => setCategoriesModalOpen(false)}>Закрыть</button>
-              </div>
-
-              <div className={styles.modalBody}>
-                {filtered.map((c) => (
-                  <div className={styles.catItem} key={c.id}>
-                    <div className={styles.ctitle} onClick={() => pickCategory(c)}>{c.title}</div>
-                    <div className={styles.subList}>
-                      {c.subs.map((s) => (
-                        <button key={s.id} className={`${styles.subBtn} ${selectedCategories.some(item=>item.id === s.id) ? styles.subSel : ""}`} onClick={() => { pickCategory(c); pickSub(s.id); setSelectedCategories(prev => prev.some(item=>item.id === s.id) ? prev : [...prev, s])}}>
-                          {s.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.modalFoot}>
-                <button className={styles.publishBtn} onClick={() => setCategoriesModalOpen(false)}>Выбрать</button>
-              </div>
-            </div>
-          </div>
+          <CategoryModal
+            allCategories={allCategories}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+            // optional: when user picks a category/sub you might want to close modal or keep open
+            pickCategory={(c) => {
+              pickCategory(c);
+              // keep modal open so user can select subcategories, or uncomment to auto-close:
+              // setCategoriesModalOpen(false);
+            }}
+            pickSub={(subId) => {
+              pickSub(subId);
+            }}
+            onClose={() => setCategoriesModalOpen(false)}
+          />
         )}
       </div>
     </main>
