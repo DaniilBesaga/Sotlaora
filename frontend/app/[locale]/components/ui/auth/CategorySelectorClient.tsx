@@ -19,6 +19,8 @@ export default function CategorySelector({ categories, onNext }: Props) {
   // keep a local copy in case you want to mutate/filter client-side later
   const [categoriesToUse, setCategoriesToUse] = useState<Category[]>(categories ?? []);
 
+  const [isOpen, setIsOpen] = useState(true);
+
   useEffect(() => {
     // update local categories if prop changes (SSR -> client hydration)
     setCategoriesToUse(categories ?? []);
@@ -78,7 +80,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
     return String(id);
   }
 
-  return (
+  return ( isOpen &&
     <div className={styles.pageWrap}>
       <div className={styles.card}>
         <h1 className={styles.title}>Оберіть категорії робіт</h1>
@@ -221,8 +223,9 @@ export default function CategorySelector({ categories, onNext }: Props) {
           <button
             className={styles.nextButton}
             type="button"
+            onClick={() => setIsOpen(false)}
           >
-            Далі
+            Пропустити
           </button>
         </div>
       </div>

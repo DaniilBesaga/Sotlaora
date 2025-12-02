@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import styles from "./Auth.module.css";
 
 export default function AuthFullBg() {
-  const [role, setRole] = React.useState("customer"); // 'customer' | 'pro'
-  const isCustomer = role === "customer";
+  const [role, setRole] = React.useState("client"); // 'client' | 'pro'
+  const isCustomer = role === "client";
 
   const handleGoogleLogin = () => {
-      window.location.href = "http://localhost:5221/api/auth/auth"
+      const state = encodeURIComponent(JSON.stringify(role));
+
+      window.location.href = `http://localhost:5221/api/auth?state=${state}`;
   }
 
   return (
@@ -52,9 +54,9 @@ export default function AuthFullBg() {
           <div className={styles.roleSwitch} role="tablist" aria-label="Выбор роли">
             <button
               className={`${styles.role} ${role === "customer" ? styles.activeRole : ""}`}
-              onClick={() => setRole("customer")}
+              onClick={() => setRole("client")}
               role="tab"
-              aria-selected={role === "customer"}
+              aria-selected={role === "client"}
             >
               Я заказчик
             </button>

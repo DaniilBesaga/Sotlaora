@@ -1,21 +1,31 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using System.Web;
+using System.Text.Json;
+using Google.Apis.Auth;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using Sotlaora.Infrastructure.Data;
+using Sotlaora.Business.Entities;
 
 namespace Sotlaora.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IConfiguration configuration) : ControllerBase
+    public class AuthController(IConfiguration configuration, AppDbContext context) : ControllerBase
     {
-        [HttpGet("auth")]
+
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate()
+        public async Task<IActionResult> Authenticate([FromQuery] string state)
         {
             var baseUrl = "https://accounts.google.com/o/oauth2/v2/auth";
 
             var clientId = "1037158922473-73cj4ma759r2j2o7t7n4annrjlts1u34.apps.googleusercontent.com";
-            var redirectUri = "http://localhost:5221/api/account/callback"; 
+            var redirectUri = "http://localhost:5221/api/auth/callback"; 
             var responseType = "code";
             var scope = "openid email profile";
             var prompt = "consent";
@@ -30,15 +40,22 @@ namespace Sotlaora.Backend.Controllers
             queryParams["prompt"] = prompt;
             queryParams["access_type"] = access_type;
 
-            var fullUrl = $"${baseUrl}?{queryParams}";
+            if (!string.IsNullOrEmpty(state))
+                queryParams["state"] = state;
+
+            var fullUrl = $"{baseUrl}?{queryParams}";
             return Redirect(fullUrl);
         }
 
-        [HtppGet("callback")]
+        [HttpGet("callback")]
         [AllowAnonymous]
-        public async Task<IActionResult> Callback([FromQuery] string code)
+        public async Task<IActionResult> Callback([FromQuery] string code, [FromQuery] string state)
         {
             var http = new HttpClient();
+
+            var role = JsonSerializer.Deserialize<string>(
+                Uri.UnescapeDataString(state)
+            );
 
             var tokenRequest = new Dictionary<string, string>
             {
@@ -46,7 +63,7 @@ namespace Sotlaora.Backend.Controllers
                 {"client_id", "1037158922473-73cj4ma759r2j2o7t7n4annrjlts1u34.apps.googleusercontent.com"},
                 {"client_secret", "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"},
                 {"grant_type", "authorization_code"},
-                {"redirect_uri", "http://localhost:5097/api/account/callback"}
+                {"redirect_uri", "http://localhost:5221/api/auth/callback"}
             };
 
             var response = await http.PostAsync("https://oauth2.googleapis.com/token", new FormUrlEncodedContent(tokenRequest));
@@ -58,8 +75,11 @@ namespace Sotlaora.Backend.Controllers
             var name = payload.Name;
             var picture = payload.Picture;
 
-            var accessToken = "";
-            var refreshToken = "";
+            var accessToken = GenerateAccessToken(0, email);
+            var refreshToken = GenerateRefreshToken();
+
+            // context.Clients.Add(new User(email, name, role));
+            // await context.SaveChangesAsync();
 
             Response.Cookies.Append("access_token", accessToken, new CookieOptions
             {
@@ -87,8 +107,8 @@ namespace Sotlaora.Backend.Controllers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimsNames.Sub, id.ToString()),
-                new Claim(JwtRegisteredClaimsNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, email),
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -102,7 +122,8 @@ namespace Sotlaora.Backend.Controllers
 
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            string? accessToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            string accessToken = tokenHandler.WriteToken(token);
 
             return accessToken;
         }
