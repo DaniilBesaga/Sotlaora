@@ -7,9 +7,8 @@ export default function AuthFullBg() {
   const [role, setRole] = React.useState("customer"); // 'customer' | 'pro'
   const isCustomer = role === "customer";
 
-  function handleGoogleLogin() {
-    // TODO: подключить реальный OAuth (NextAuth / Google)
-    alert(`Google login as: ${role}`);
+  const handleGoogleLogin = () => {
+      window.location.href = "http://localhost:5221/api/auth/auth"
   }
 
   return (

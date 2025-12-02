@@ -37,6 +37,41 @@ builder.Services.AddDbContext<AppDbContext>(o =>
     o.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection"));
 });
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters.ValidIssuer = builder.Configuration["Jwt:Issuer"];
+    options.TokenValidationParameters.ValidAudience = builder.Configuration["Jwt:Audience"];
+    options.TokenValidationParameters.IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]));
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["access_token"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        },
+
+        OnAuthenticationFailed = context =>
+        {
+            if (context.Exception is SecurityTokenExpiredException)
+            {
+                context.Response.StatusCode = 401;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 using(var scope = app.Services.CreateScope())
