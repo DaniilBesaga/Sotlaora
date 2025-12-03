@@ -6,7 +6,7 @@ import ProOrders from "../components/ui/cabinet/ProOrders";
 export default function Cabinet() {
     return(
         <div>
-            <CategorySelector/>
+            {/* <CategorySelector/> */}
             <ProOrders/>
         </div>
     )

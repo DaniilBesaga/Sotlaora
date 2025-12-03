@@ -42,8 +42,8 @@
 .chip{ background:#f3f4f6; padding:6px 8px; border-radius:999px; font-weight:700; font-size:13px; color:#111827; }
 
 /* Buttons */
-.primary{ padding:10px 14px; border-radius:10px; background: linear-gradient(90deg,#6eb0ff,#c58cff); color:white; border:none; font-weight:800; cursor:pointer; }
-.ghost{ padding:8px 10px; border-radius:8px; border:1px solid rgba(12,18,30,0.06); background:white; cursor:pointer; }
+.primary{ padding:10px 14px; border-radius:10px; background: var(--accent-gradient) !important; color:white; border:none; font-weight:800; cursor:pointer; }
+.ghost{ padding:8px 10px; border-radius:8px; border:1px solid var(--accent-gradient) !important; background:white; cursor:pointer; }
 
 /* Empty state */
 .empty{ padding:24px; text-align:left; color:#6b7280; border:1px dashed rgba(12,18,30,0.04); border-radius:8px }
@@ -106,4 +106,283 @@
 .onsite {
   background: linear-gradient(90deg, #fff4e5, #fff9f0);
   border-color: #ffe3be;
+}
+
+/* list: карточки идут колонкой */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* крупная карточка — три столбца: media | body | actions */
+.card {
+  display: grid;
+  grid-template-columns: 160px 1fr 160px;
+  gap: 16px;
+  align-items: start;
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(12,18,30,0.06);
+  transition: transform .18s ease, box-shadow .18s ease;
+  cursor: pointer;
+}
+
+/* media column */
+.cardMedia {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mainThumb {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f4f6;
+  height: 120px;
+}
+
+.mainThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.thumb {
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 8px;
+  flex: 0 0 44px;
+  background: #f7fafc;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.moreThumb {
+  min-width: 44px;
+  height: 44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  background: linear-gradient(90deg,#f0f6ff,#fff7f3);
+  color: #0b1220;
+  font-weight:700;
+  font-size:13px;
+  padding: 6px;
+}
+
+/* body column */
+.cardBody {
+  min-width: 0; /* important for ellipsis */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardHeadRow {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.cardTitle {
+  font-weight:800;
+  font-size:16px;
+  margin:0;
+  line-height:1.2;
+  /* single-line ellipsis for title */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 120px);
+}
+
+.cardMeta {
+  font-size:13px;
+  color: #6b7280;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* description: clamp to 3 lines */
+.cardDesc {
+  margin: 0;
+  color: #374151;
+  font-size:14px;
+  line-height:1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* meta row: tags + location badge */
+.metaRow {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.tags {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+  max-width: calc(100% - 120px);
+}
+
+.chip {
+  background: #f3f4f6;
+  padding:6px 8px;
+  border-radius: 999px;
+  font-weight:700;
+  font-size:13px;
+  color:#111827;
+  white-space:nowrap;
+}
+
+/* location wrapper keeps badge aligned to right in metaRow */
+.locationWrap {
+  flex-shrink: 0;
+}
+
+/* actions column - vertical stack */
+.cardActions {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:stretch;
+  margin-left: 30px;
+}
+
+/* buttons full width to avoid overflow */
+.primary, .ghost, .secondary {
+  width:100%;
+  padding:10px 12px;
+  border-radius: 10px;
+  font-weight:700;
+  cursor:pointer;
+  border: 1px solid var(--accent-gradient);
+}
+
+/* primary gradient */
+.primary {
+  background: linear-gradient(90deg,#6eb0ff,#c58cff);
+  color: white;
+  box-shadow: 0 10px 30px rgba(110,176,255,0.12);
+}
+
+/* ghost: outline */
+.ghost {
+  background: #fff;
+  border: 1px solid rgba(12,18,30,0.06);
+  color: #111827;
+}
+
+/* secondary: subtle */
+.secondary {
+  background: linear-gradient(90deg,#fff,#fafafa);
+  color:#111827;
+}
+
+/* empty state */
+.empty {
+  padding: 20px;
+  color: #6b7280;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px dashed rgba(12,18,30,0.04);
+}
+
+/* Hover visual feedback */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 48px rgba(12,18,30,0.10);
+}
+
+/* Responsive: single column on small screens */
+@media (max-width: 880px) {
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .cardMedia {
+    order: -1; /* show media above content */
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .mainThumb { height: 160px; width: 45%; }
+  .thumbRow { order: 2; }
+
+  .cardActions { flex-direction: row; gap: 8px; }
+  .cardActions button { flex:1; }
+  .metaRow { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .cardTitle { max-width: 100%; }
+  .tags { max-width: 100%; }
+}
+
+/* Strip of mini thumbnails (between title and description) */
+.thumbStrip {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.thumbItem {
+  flex: 0 0 72px; /* ширина мини-картинки */
+  height: 52px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+  box-shadow: 0 4px 12px rgba(12,18,30,0.04);
+}
+
+.thumbItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* чуть увеличим mainDesc clamp чтобы не резать слишком жёстко */
+.cardDesc {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* 4 строки */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* на мобильных сделаем strip горизонтально прокручиваемым и чуть больше миниатюр */
+@media (max-width: 880px) {
+  .thumbStrip { gap: 10px; }
+  .thumbItem { flex: 0 0 88px; height: 64px; border-radius: 10px; }
 }

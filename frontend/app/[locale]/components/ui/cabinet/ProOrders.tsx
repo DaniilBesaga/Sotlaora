@@ -10,7 +10,7 @@ export default function ProOrders(){
   const profile = {
     name: 'Иван Петров',
     id: '№3831851',
-    city: 'Брашов',
+    city: 'Тимишоара, ул. Ласло Петефи 10',
     email: 'ivan@example.com',
     phone: '+40 712 345 678',
     avatar: '/images/pros/1.jpg',
@@ -60,10 +60,7 @@ export default function ProOrders(){
         <main className={styles.main}>
           {/* Topbar (заголовок) */}
           <div className={styles.topbarRow}>
-            <h1 className={styles.h1}>Замовлення</h1>
-            <div className={styles.topActions}>
-              <button className={styles.primary}>Создать заказ</button>
-            </div>
+            <h1 className={styles.h1}>Заказы</h1>
           </div>
 
           {/* HORIZONTAL TABS (под topbar) */}
@@ -73,47 +70,47 @@ export default function ProOrders(){
               className={`${styles.tab} ${activeTab==='inwork'?styles.active:''}`}
               onClick={() => setActiveTab('inwork')}
             >
-              В роботі
+              В процессе
             </button>
             <button
               role="tab"
               className={`${styles.tab} ${activeTab==='proposals'?styles.active:''}`}
               onClick={() => setActiveTab('proposals')}
             >
-              Пропозиції
+              Предложения
             </button>
             <button
               role="tab"
               className={`${styles.tab} ${activeTab==='search'?styles.active:''}`}
               onClick={() => setActiveTab('search')}
             >
-              Пошук замовлень
+              Поиск заказов
             </button>
             <button
               role="tab"
               className={`${styles.tab} ${activeTab==='all'?styles.active:''}`}
               onClick={() => setActiveTab('all')}
             >
-              Всі замовлення
+              Все заказы
             </button>
           </nav>
 
           {/* Content area */}
           <section className={styles.contentCard}>
             {activeTab === 'inwork' && (
-              <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В роботі немає замовлень" />
+              <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
             )}
 
             {activeTab === 'proposals' && (
-              <OrdersGrid items={proposals} emptyText="У вас ще немає пропозицій" />
+              <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
             )}
 
             {activeTab === 'search' && (
-              <OrdersGrid items={newOrders} emptyText="Нових замовлень не знайдено" />
+              <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
             )}
 
             {activeTab === 'all' && (
-              <OrdersGrid items={orders} emptyText="Немає замовлень" />
+              <OrdersGrid items={orders} emptyText="Нет заказов" />
             )}
 
           </section>
@@ -143,51 +140,91 @@ export default function ProOrders(){
   );
 }
 
-/* ---------- helper components ---------- */
 
-function OrdersGrid({ items, emptyText }){
-  if(!items || items.length === 0){
+function OrdersGrid({ items, emptyText }) {
+  if (!items || items.length === 0) {
     return <div className={styles.empty}>{emptyText}</div>;
   }
 
   return (
-    <div className={styles.grid}>
+    <div className={styles.list}>
       {items.map(it => (
-        <motion.article key={it.id} className={styles.card} whileHover={{ y: -6 }}>
-          <div className={styles.cardHead}>
-            <div className={styles.cardTitle}>{it.title}</div>
-            <div className={styles.cardMeta}>{it.city} · {it.urgency}</div>
-          </div>
-
-          <p className={styles.cardDesc}>{it.desc}</p>
-
-          <div className={styles.cardFooter}>
-            <div className={styles.tags}>
-              {it.tags.map(t => <span className={styles.chip} key={t}>{t}</span>)}
+  <motion.article key={it.id} style={{background: it.status === 'active' ? '#e2fcdc' : 'white'}} className={styles.card} whileHover={{ y: -6 }}>
+    {/* LEFT: media / thumbnails (если у тебя была большая колонка — оставляем) */}
+    <div className={styles.cardMedia}>
+      <div className={styles.mainThumb}>
+        <img src={it.images?.[0] ?? '/images/placeholder.jpg'} alt={it.title} />
+      </div>
+      {it.images && it.images.length > 1 && (
+        <div className={styles.thumbRow}>
+          {it.images.slice(0, 3).map((src, i) => (
+            <div key={i} className={styles.thumb}>
+              <img src={src} alt={`${it.title} ${i+1}`} />
             </div>
-<OrderLocation type="online" />
-            <div className={styles.cardActions}>
-              <button className={styles.ghost}>Чат</button>
-              <button className={styles.primary}>Откликнуться</button>
+          ))}
+          {it.images.length > 3 && (
+            <div className={styles.moreThumb}>+{it.images.length - 3}</div>
+          )}
+        </div>
+      )}
+    </div>
+
+    {/* CENTER: main content */}
+    <div className={styles.cardBody}>
+      <div className={styles.cardHeadRow}>
+        <h3 className={styles.cardTitle} title={it.title}>{it.title}</h3>
+        <div className={styles.cardMeta}>{it.city} · {it.urgency}</div>
+      </div>
+
+      {/* NEW: горизонтальная полоса мини-картинок между заголовком и описанием */}
+      {it.images && it.images.length > 0 && (
+        <div className={styles.thumbStrip} role="list" aria-label="Фото заказа">
+          {it.images.map((src, i) => (
+            <div className={styles.thumbItem} role="listitem" key={i}>
+              <img src={src} alt={`${it.title} фото ${i+1}`} />
             </div>
-          </div>
-        </motion.article>
-      ))}
+          ))}
+        </div>
+      )}
+
+      <p className={styles.cardDesc}>{it.desc}</p>
+
+      <div className={styles.metaRow}>
+        <div className={styles.tags}>
+          {it.tags.map(t => <span key={t} className={styles.chip}>{t}</span>)}
+        </div>
+
+        <div className={styles.locationWrap}>
+          <OrderLocation type={it.locationType} />
+        </div>
+      </div>
+    </div>
+
+    {/* RIGHT: actions */}
+    <div className={styles.cardActions}>
+      <button className={styles.ghost}>Чат</button>
+      <button className={styles.primary}>Откликнуться</button>
+      <button className={styles.secondary}>Детали</button>
+    </div>
+  </motion.article>
+))}
+
     </div>
   );
 }
 
+
 /* ---------- sample data ---------- */
 const sampleOrders = [
-  { id: 'o1', title: 'Протекает кран — требуется замена', desc: 'Необходимо заменить смеситель в ванной. Уточнить возможный подъезд.', price: 350, urgency: 'Сегодня', status: 'active', city: 'Брашов', tags: ['Сантехника','Выезд'] },
-  { id: 'o2', title: 'Установка люстры на 3 точки', desc: 'Монтаж люстры, проверка скрытой проводки.', price: 250, urgency: '2 дня', status: 'active', city: 'Брашов', tags: ['Электрика'] },
-  { id: 'o3', title: 'Сборка мебели IKEA — 2 шкафа', desc: 'Сборка двух шкафов PAX, двери и фурнитура в комплекте.', price: 180, urgency: 'Не срочно', status: 'done', city: 'Брашов', tags: ['Сборка'] },
+  { id: 'o1', images: ['/images/services/air.jpg'], title: 'Протекает кран — требуется замена', desc: 'Необходимо заменить смеситель в ванной. Уточнить возможный подъезд.', price: 350, urgency: 'Сегодня', status: 'active', city: 'Брашов', tags: ['Сантехника','Выезд'] },
+  { id: 'o2', images: ['/images/services/air.jpg'], title: 'Установка люстры на 3 точки', desc: 'Монтаж люстры, проверка скрытой проводки.', price: 250, urgency: '2 дня', status: 'active', city: 'Брашов', tags: ['Электрика'] },
+  { id: 'o3', images: ['/images/services/air.jpg'], title: 'Сборка мебели IKEA — 2 шкафа', desc: 'Сборка двух шкафов PAX, двери и фурнитура в комплекте.', price: 180, urgency: 'Не срочно', status: 'done', city: 'Брашов', tags: ['Сборка'] },
 ];
 
 const sampleProposals = [
-  { id: 'p1', title: 'Проблема с дверным замком', desc: 'Клиент пропонує 120 RON за замену', price: 120, urgency: 'Сегодня', city: 'Брашов', tags: ['Замки'] },
+  { id: 'p1', images: ['/images/services/air.jpg'], title: 'Проблема с дверным замком', desc: 'Клиент пропонує 120 RON за замену', price: 120, urgency: 'Сегодня', city: 'Брашов', tags: ['Замки'] },
 ];
 
 const sampleNewOrders = [
-  { id: 'n1', title: 'Поклеїти шпалери', desc: 'Квартира 40м² — потрібен майстер', price: 400, urgency: 'Цього тижня', city: 'Брашов', tags: ['Ремонт'] },
+  { id: 'n1', images: ['/images/services/air.jpg'], title: 'Поклеїти шпалери', desc: 'Квартира 40м² — потрібен майстер', price: 400, urgency: 'Цього тижня', city: 'Брашов', tags: ['Ремонт'] },
 ];
