@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './ProOrders.module.css';
 import OrderLocation from './OrderLocation';
+import ProDashboard from './ProDashboard';
 
 export default function ProOrders(){
   // sample data
@@ -26,6 +27,12 @@ export default function ProOrders(){
     { key: 'settings', label: 'Настройки', icon: '⚙️', count: null, href: '#settings' },
   ];
 
+  const [activeSection, setActiveSection] = useState('orders');
+
+  const handleChangeTab = (tab: string) => {
+    setActiveSection(tab);
+  }
+
   // tabs & data
   const [activeTab, setActiveTab] = useState('inwork'); // inwork | proposals | search | all | boost
   const orders = sampleOrders;
@@ -36,91 +43,97 @@ export default function ProOrders(){
     <div className={styles.page}>
       <div className={styles.container}>
         {/* HEADER (профиль вверху, занимает 2 колонки) */}
-        <header className={styles.header}>
-          <div className={styles.avatarBox}>
-            <img src={profile.avatar} alt="avatar" className={styles.avatar} />
-          </div>
-
-          <div className={styles.headerInfo}>
-            <div className={styles.nameRow}>
-              <h2 className={styles.name}>{profile.name}</h2>
-              <button className={styles.edit} aria-label="Редактировать профиль">✎</button>
+        <header className={styles.headerCard}>
+        <img src={profile.avatar} alt="avatar" className={styles.avatar} />
+        <div className={styles.headerInfo}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div className={styles.hName}>{profile.name}</div>
+              <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>#3831851</strong></div>
             </div>
-
-            <div className={styles.small}>Профиль {profile.id}</div>
-
-            <div className={styles.metaRow}>
-              <div className={styles.meta}>📍 {profile.city}</div>
-              <div className={styles.meta}>⭐ {profile.rating}</div>
+            <div className={styles.headerActions}>
+              <button className={styles.btnPrimary}>Редагувати</button>
+              <button className={styles.btnGhost}>Поділитись</button>
             </div>
           </div>
-        </header>
+
+          <div className={styles.badgeList}>
+            <span className={styles.badge}>{profile.city}</span>
+            <span className={styles.badge}>{profile.phone}</span>
+          </div>
+        </div>
+      </header>
 
         {/* MAIN: tabs + main content */}
-        <main className={styles.main}>
-          {/* Topbar (заголовок) */}
-          <div className={styles.topbarRow}>
-            <h1 className={styles.h1}>Заказы</h1>
-          </div>
+        {activeSection === 'orders' && (
+          <main className={styles.main}>
+            {/* Topbar (заголовок) */}
+            <div className={styles.topbarRow}>
+              <h1 className={styles.h1}>Заказы</h1>
+            </div>
 
-          {/* HORIZONTAL TABS (под topbar) */}
-          <nav className={styles.tabs} role="tablist" aria-label="Навигация заказов">
-            <button
-              role="tab"
-              className={`${styles.tab} ${activeTab==='inwork'?styles.active:''}`}
-              onClick={() => setActiveTab('inwork')}
-            >
-              В процессе
-            </button>
-            <button
-              role="tab"
-              className={`${styles.tab} ${activeTab==='proposals'?styles.active:''}`}
-              onClick={() => setActiveTab('proposals')}
-            >
-              Предложения
-            </button>
-            <button
-              role="tab"
-              className={`${styles.tab} ${activeTab==='search'?styles.active:''}`}
-              onClick={() => setActiveTab('search')}
-            >
-              Поиск заказов
-            </button>
-            <button
-              role="tab"
-              className={`${styles.tab} ${activeTab==='all'?styles.active:''}`}
-              onClick={() => setActiveTab('all')}
-            >
-              Все заказы
-            </button>
-          </nav>
+            {/* HORIZONTAL TABS (под topbar) */}
+            <nav className={styles.tabs} role="tablist" aria-label="Навигация заказов">
+              <button
+                role="tab"
+                className={`${styles.tab} ${activeTab==='inwork'?styles.active:''}`}
+                onClick={() => setActiveTab('inwork')}
+              >
+                В процессе
+              </button>
+              <button
+                role="tab"
+                className={`${styles.tab} ${activeTab==='proposals'?styles.active:''}`}
+                onClick={() => setActiveTab('proposals')}
+              >
+                Предложения
+              </button>
+              <button
+                role="tab"
+                className={`${styles.tab} ${activeTab==='search'?styles.active:''}`}
+                onClick={() => setActiveTab('search')}
+              >
+                Поиск заказов
+              </button>
+              <button
+                role="tab"
+                className={`${styles.tab} ${activeTab==='all'?styles.active:''}`}
+                onClick={() => setActiveTab('all')}
+              >
+                Все заказы
+              </button>
+            </nav>
 
-          {/* Content area */}
-          <section className={styles.contentCard}>
-            {activeTab === 'inwork' && (
-              <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
-            )}
+            {/* Content area */}
+            <section className={styles.contentCard}>
+              {activeTab === 'inwork' && (
+                <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
+              )}
 
-            {activeTab === 'proposals' && (
-              <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
-            )}
+              {activeTab === 'proposals' && (
+                <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
+              )}
 
-            {activeTab === 'search' && (
-              <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
-            )}
+              {activeTab === 'search' && (
+                <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
+              )}
 
-            {activeTab === 'all' && (
-              <OrdersGrid items={orders} emptyText="Нет заказов" />
-            )}
+              {activeTab === 'all' && (
+                <OrdersGrid items={orders} emptyText="Нет заказов" />
+              )}
 
-          </section>
-        </main>
+            </section>
+          </main>
+        )}
+
+        {activeSection === 'settings' && (
+          <ProDashboard />)}
 
         {/* RIGHT: quick navigation */}
         <aside className={styles.quickNav} aria-label="Быстрая навигация">
           <div className={styles.quickCard}>
             {quick.map(item => (
-              <Link key={item.key} href={item.href} className={styles.qItem}>
+              <Link key={item.key} href={item.href} className={styles.qItem} onClick={()=>handleChangeTab(item.key)}>
                 <div className={styles.qLeft} aria-hidden>{item.icon}</div>
                 <div className={styles.qCenter}>
                   <div className={styles.qLabel}>{item.label}</div>
