@@ -11,13 +11,19 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Sotlaora.Infrastructure.Data;
 using Sotlaora.Business.Entities;
+using Sotlaora.Business.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Sotlaora.Backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IConfiguration configuration, AppDbContext context) : ControllerBase
+    public class AuthController(IConfiguration configuration, AppDbContext context, UserManager<User> userManager) : ControllerBase
     {
+        
+        private readonly string _imagePath =
+                    Path.Combine(Directory.GetCurrentDirectory(), "..", "frontend", "public", "images", "profiles");
 
         [AllowAnonymous]
         public async Task<IActionResult> Authenticate([FromQuery] string state)
@@ -75,11 +81,60 @@ namespace Sotlaora.Backend.Controllers
             var name = payload.Name;
             var picture = payload.Picture;
 
-            var accessToken = GenerateAccessToken(0, email);
+            var user = new User{Email = email, UserName = name, Role = role == "pro" ? Role.Pro : Role.Client};
+            
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+
+            if (!string.IsNullOrEmpty(picture))
+            {
+                try
+                {
+                    using var httpClient = new HttpClient();
+                    var imageBytes = await httpClient.GetByteArrayAsync(picture);
+                    
+                    if (!Directory.Exists(_imagePath))
+                    {
+                        Directory.CreateDirectory(_imagePath);
+                    }
+                    
+                    var extension = Path.GetExtension(new Uri(picture).AbsolutePath);
+                    if (string.IsNullOrEmpty(extension))
+                    {
+                        extension = ".jpg";
+                    }
+                    
+                    var fileName = $"{user.Id}_profile{extension}";
+                    var filePath = Path.Combine(_imagePath, fileName);
+                    
+                    await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+                    
+                    picture = $"/images/profiles/{fileName}";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error downloading profile picture: {ex.Message}");
+                }
+            }
+
+            var accessToken = GenerateAccessToken(user.Id, email);
             var refreshToken = GenerateRefreshToken();
 
-            // context.Clients.Add(new User(email, name, role));
-            // await context.SaveChangesAsync();
+            context.RefreshTokens.Add(new RefreshToken
+            {
+                TokenHash = refreshToken,
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            });
+
+            context.Images.Add(new Image
+            {
+                Ref = picture,
+                EntityType = ImageEntityType.User,
+                EntityId = user.Id
+            });
+
+            await context.SaveChangesAsync();
 
             Response.Cookies.Append("access_token", accessToken, new CookieOptions
             {
@@ -141,7 +196,24 @@ namespace Sotlaora.Backend.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            // TODO: Implement logout logic
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var refreshTokens = context.RefreshTokens.Where(rt => rt.UserId == user.Id);
+            context.RefreshTokens.RemoveRange(refreshTokens);
+            await context.SaveChangesAsync();
+
+            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete("refresh_token");
+
             return Ok(new { message = "Logged out successfully" });
         }
 
@@ -149,8 +221,110 @@ namespace Sotlaora.Backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            // TODO: Implement token refresh logic
-            return Ok(new { token = "new_jwt_token_here" });
+            if (string.IsNullOrEmpty(request.RefreshToken))
+                return BadRequest(new { message = "Refresh token is required" });
+
+            var storedToken = await context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.TokenHash == request.RefreshToken);
+
+            if (storedToken == null || storedToken.ExpiresAt < DateTime.UtcNow 
+                || storedToken.IsRevoked || storedToken.IsUsed)
+                return Unauthorized(new { message = "Invalid or expired refresh token" });
+
+            var newAccessToken = GenerateAccessToken(storedToken.UserId, storedToken.User.Email!);
+            var newRefreshToken = GenerateRefreshToken();
+
+            storedToken.IsUsed = true;
+            storedToken.IsRevoked = true;
+
+            context.RefreshTokens.Update(storedToken);
+            context.RefreshTokens.Add(new RefreshToken
+            {
+                TokenHash = newRefreshToken,
+                UserId = storedToken.UserId,
+                ExpiresAt = DateTime.UtcNow.AddDays(7)
+            });
+
+            await context.SaveChangesAsync();
+
+            Response.Cookies.Append("access_token", newAccessToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+            });
+
+            Response.Cookies.Append("refresh_token", newRefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            return Ok(new { message = "Token refreshed successfully" });
+        }
+
+        [HttpGet("meShort")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUserShort()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            var user = await context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new UserDTO
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                UserName = user.UserName!,
+                Role = user.Role
+            });
+        }
+
+        [HttpGet("meLong")]
+        [Authorize]
+        public async Task<IActionResult> GetCurrentUserLong()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Pros
+                .Include(u => u.Orders)
+                .Include(u => u.Subcategories)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new ProDTO
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                UserName = user.UserName!,
+                Role = user.Role,
+                CreatedAt = user.CreatedAt,
+                Location = user.Location,
+                IsOnline = user.IsOnline,
+                LastSeen = user.LastSeen,
+                Subcategories = user.Subcategories.ToList(),
+                Orders = user.Orders.ToList()
+            });
         }
     }
 
