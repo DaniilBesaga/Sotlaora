@@ -2,7 +2,7 @@
 
 .container {
   max-width: 900px;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   background-color: #fff;
   font-family: system-ui, -apple-system, sans-serif;
   color: #374151; /* gray-700 */
@@ -144,4 +144,177 @@
 .subText {
   font-size: 14px;
   color: #6b7280;
+}
+
+.wrapper{
+  max-width: 920px;
+  margin: 18px auto;
+  padding: 6px;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+  color: #0b1220;
+}
+
+/* общий блок */
+.block{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  background: white;
+  padding: 14px 16px;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(12,18,30,0.03);
+  border: 1px solid rgba(12,18,30,0.02);
+  margin-bottom: 12px;
+}
+
+/* иконка слева (серый) */
+.leftIcon{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: #98A3B3;
+  flex: 0 0 42px;
+}
+
+/* тело блока */
+.blockBody{ flex:1; }
+
+/* заголовки и выравнивание */
+.blockRow{ display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+.blockTitle{ color:#6b7280; font-size:14px; min-width:150px; }
+.blockValue{ font-size:15px; color:#0b1220; }
+
+/* небольшие поля */
+.blockRowSmall{ color:#374151; margin-bottom:6px; }
+.inlineAdd{ display:flex; gap:12px; flex-wrap:wrap; color:#6b7280; }
+
+/* green inline link */
+.addLink{
+  background:transparent;
+  border:0;
+  color:#0b8f4a;
+  font-weight:700;
+  cursor:pointer;
+  padding:0;
+}
+
+/* section title */
+.sectionHeader{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.sectionTitle{ font-weight:800; color:#0b1220; font-size:15px; }
+.sectionTitleSmall{ font-weight:700; color:#0b1220; margin-bottom:8px; }
+
+/* бейджи категорий */
+.badges{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.badge{
+  background: #fff;
+  border: 1px solid #eef4fb;
+  padding:8px 12px;
+  border-radius: 999px;
+  font-weight:700;
+  color:#111827;
+  box-shadow: 0 2px 6px rgba(15,23,42,0.03);
+}
+.outlineBtn{
+  background:transparent;
+  border:1px dashed rgba(12,18,30,0.06);
+  padding:8px 12px;
+  border-radius:8px;
+  color:#6b7280;
+  cursor:pointer;
+}
+
+/* услуги (счетчики) */
+.servicesGrid{ display:flex; gap:8px; flex-wrap:wrap; }
+.serviceItem{
+  min-width:150px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  background:#fff;
+  border:1px solid rgba(12,18,30,0.04);
+  padding:8px 10px;
+  border-radius:10px;
+  align-items:center;
+}
+.serviceName{ font-weight:700; color:#374151; font-size:13px; padding-left: 15px;}
+.serviceCount{ color:#6b7280; font-size:13px; }
+
+/* небольшие подписи */
+.muted{ color:#6b7280; font-size:14px; }
+
+/* города */
+.cityList{ display:flex; gap:8px; }
+.cityBadge{ background:#fff; border:1px solid #eef4fb; padding:8px 10px; border-radius:999px; }
+
+/* payment */
+.paymentCard{ background:#f8fbff; padding:10px; border-radius:10px; border:1px solid rgba(12,18,30,0.03); }
+.paymentHead{ display:flex; flex-direction:column; gap:4px; }
+
+/* уведомления */
+.checkbox{ display:flex; gap:10px; align-items:center; margin-bottom:8px; font-size:14px; color:#111827; }
+.checkbox input{ width:16px; height:16px; }
+
+/* delete */
+.deleteRow{ display:flex; gap:12px; align-items:center; margin-top:6px; }
+.deleteBtn{ background:var(--accent-gradient); border:1px solid rgba(239,68,68,0.12); color:white; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+.delNote{ color:#6b7280; font-size:13px; }
+
+/* small text */
+.smallMuted{ color:#6b7280; font-size:13px; }
+
+/* responsive */
+@media (max-width:900px){
+  .block{ gap:12px; padding:12px; }
+  .leftIcon{ flex:0 0 36px; width:36px; height:36px; }
+  .badge{ padding:7px 10px; font-size:13px; }
+  .serviceItem{ min-width:140px; }
+}
+
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db;
+  transition: 0.25s;
+  border-radius: 18px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.25s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-gradient);
+}
+
+input:checked + .slider:before {
+  transform: translateX(16px);
 }

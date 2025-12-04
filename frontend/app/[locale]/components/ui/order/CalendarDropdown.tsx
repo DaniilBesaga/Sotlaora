@@ -137,7 +137,7 @@ export default function CalendarDropdown({ initialStart = null, onApply, onClose
             checked={time === "any"}
             onChange={() => setTime("any")}
           />
-          <span>В будь-який час</span>
+          <span>В любое время</span>
         </label>
 
         <label className={styles.radio}>

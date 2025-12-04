@@ -1,0 +1,256 @@
+.container {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 8px;
+  /* box-shadow: 0 2px 10px rgba(0,0,0,0.05); Можно раскомментировать для тени */
+}
+
+/* Навигация (такая же как раньше) */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 15px 20px;
+  font-size: 16px;
+  color: #333;
+  cursor: pointer;
+  position: relative;
+}
+
+.activeTab {
+  font-weight: 600;
+  color: #000;
+}
+
+.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #00a046;
+}
+
+.content {
+  padding: 0 10px 40px 10px;
+}
+
+.headerBlock {
+  margin-bottom: 30px;
+}
+
+.title {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Стили списка услуг */
+.categoryBlock {
+  margin-bottom: 40px;
+}
+
+.categoryTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+  color: #333;
+}
+
+.serviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+.serviceRow:last-child {
+  border-bottom: none;
+}
+
+/* При наведении подсвечиваем строку */
+.serviceRow:hover {
+  background-color: #fafafa;
+}
+
+/* Если услуга активна, делаем текст ярче */
+.activeRow .serviceName {
+  color: #000;
+  font-weight: 500;
+}
+
+.serviceInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.serviceName {
+  font-size: 16px;
+  color: #555;
+}
+
+/* Кастомный свитч (Toggle) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #00a046; /* Фирменный зеленый */
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* Контролы цены */
+.priceControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.inputGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currencyLabel {
+  position: absolute;
+  left: 10px;
+  color: #999;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.currencySymbol {
+  position: absolute;
+  right: 10px;
+  color: #333;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.priceInput {
+  width: 120px;
+  padding: 8px 25px 8px 30px; /* Отступы под "от" и "грн" */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.priceInput:focus {
+  border-color: #00a046;
+}
+
+.unitSelect {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.unitSelect:focus {
+  border-color: #00a046;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 600px) {
+  .serviceRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .priceControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .inputGroup, .priceInput {
+    flex-grow: 1;
+  }
+}
+
+.footerActions {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.orangeButton {
+  background-color: var(--accent-gradient);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.orangeButton:hover {
+  background-color: var(--accent-gradient);
+}

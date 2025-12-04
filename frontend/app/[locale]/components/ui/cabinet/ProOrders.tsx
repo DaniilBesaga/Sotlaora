@@ -8,6 +8,7 @@ import ProDashboard from './ProDashboard';
 import { LoginContext } from '../../context/LoginContext';
 import { useRouter } from 'next/navigation';
 import OrderStatusBadge from './OrderStatusBadge';
+import ChatList from './ChatList';
 
 export default function ProOrders(){
 
@@ -70,21 +71,21 @@ export default function ProOrders(){
       <div className={styles.container}>
         {/* HEADER (профиль вверху, занимает 2 колонки) */}
         <header className={styles.headerCard}>
-        <img src={profile.avatar} alt="avatar" className={styles.avatar} />
-        <div className={styles.headerInfo}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <div>
-              <div className={styles.hName}>{profile.name}</div>
-              <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>#3831851</strong></div>
+          <img src={profile.avatar} alt="avatar" className={styles.avatar} />
+          <div className={styles.headerInfo}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div className={styles.hName}>{profile.name}</div>
+                <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>#3831851</strong></div>
+              </div>
+            </div>
+
+            <div className={styles.badgeList}>
+              <span className={styles.badge}>{profile.city}</span>
+              <span className={styles.badge}>{profile.phone}</span>
             </div>
           </div>
-
-          <div className={styles.badgeList}>
-            <span className={styles.badge}>{profile.city}</span>
-            <span className={styles.badge}>{profile.phone}</span>
-          </div>
-        </div>
-      </header>
+        </header>
 
         {/* MAIN: tabs + main content */}
         {activeSection === 'orders' && (
@@ -150,6 +151,10 @@ export default function ProOrders(){
 
         {activeSection === 'settings' && (
           <ProDashboard />)}
+
+        {activeSection === 'messages' && (
+          <ChatList />)}
+          
 
         {/* RIGHT: quick navigation */}
         <aside className={styles.quickNav} aria-label="Быстрая навигация">

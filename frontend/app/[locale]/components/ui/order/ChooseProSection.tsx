@@ -41,7 +41,7 @@ export default function ChoosePerformerSection({
       <div className={styles.wrap}>
         <div className={styles.headerRow}>
           <div>
-            <h2 id="choose-title" className={styles.title}>Шаг 3 — Выберите исполнителя</h2>
+            <h2 id="choose-title" className={styles.title}>Шаг 3 — Перейдите к диалогу с исполнителем</h2>
             <p className={styles.subtitle}>Договоритесь о финальной стоимости и сроках. После — переходите в чат для обсуждения деталей.</p>
           </div>
         </div>
