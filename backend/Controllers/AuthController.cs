@@ -196,12 +196,7 @@ namespace Sotlaora.Backend.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var userId = userManager.GetUserId(User);
-
-            if (userId == null)
-                return Unauthorized();
-
-            var user = await context.Users.FindAsync(userId);
+            var user = await context.Users.FindAsync(User);
             if (user == null)
             {
                 return NotFound();
@@ -219,15 +214,16 @@ namespace Sotlaora.Backend.Controllers
 
         [HttpPost("refresh")]
         [AllowAnonymous]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        public async Task<IActionResult> RefreshToken()
         {
-            if (string.IsNullOrEmpty(request.RefreshToken))
-                return BadRequest(new { message = "Refresh token is required" });
+            if(!Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
+            {
+                return Unauthorized(new { message = "Refresh token is missing" });
+            }
 
             var storedToken = await context.RefreshTokens
                 .Include(rt => rt.User)
-                .FirstOrDefaultAsync(rt => rt.TokenHash == request.RefreshToken);
-
+                .FirstOrDefaultAsync(rt => rt.TokenHash == refreshToken);
             if (storedToken == null || storedToken.ExpiresAt < DateTime.UtcNow 
                 || storedToken.IsRevoked || storedToken.IsUsed)
                 return Unauthorized(new { message = "Invalid or expired refresh token" });
@@ -282,12 +278,16 @@ namespace Sotlaora.Backend.Controllers
                 return NotFound();
             }
 
+            var image = await context.Images
+                .FirstOrDefaultAsync(img => img.EntityType == ImageEntityType.User && img.EntityId.ToString() == userId);
+
             return Ok(new UserDTO
             {
                 Id = user.Id,
                 Email = user.Email!,
                 UserName = user.UserName!,
-                Role = user.Role
+                Role = user.Role,
+                ImageRef = image?.Ref
             });
         }
 

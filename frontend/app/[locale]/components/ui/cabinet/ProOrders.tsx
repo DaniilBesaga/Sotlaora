@@ -1,12 +1,38 @@
 'use client';
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './ProOrders.module.css';
 import OrderLocation from './OrderLocation';
 import ProDashboard from './ProDashboard';
+import { LoginContext } from '../../context/LoginContext';
+import { useRouter } from 'next/navigation';
+import OrderStatusBadge from './OrderStatusBadge';
 
 export default function ProOrders(){
+
+  // const {user, authenticated, getMe, logout, refresh} = use(LoginContext);
+
+  // const router = useRouter();
+
+  // useEffect(() => {
+  //   const check = async () => {
+  //     const result = await getMe()
+
+  //     if(result.status === 401){
+  //       const refreshStatus = await refresh();
+
+  //       if(refreshStatus === 200){
+  //         await getMe();
+  //       }
+  //       else {
+  //         router.push('/auth');
+  //       }
+  //     }
+  //   }
+  //   check();
+  // }, [authenticated, user]);
+  
   // sample data
   const profile = {
     name: 'Иван Петров',
@@ -50,10 +76,6 @@ export default function ProOrders(){
             <div>
               <div className={styles.hName}>{profile.name}</div>
               <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>#3831851</strong></div>
-            </div>
-            <div className={styles.headerActions}>
-              <button className={styles.btnPrimary}>Редагувати</button>
-              <button className={styles.btnGhost}>Поділитись</button>
             </div>
           </div>
 
@@ -162,11 +184,12 @@ function OrdersGrid({ items, emptyText }) {
   return (
     <div className={styles.list}>
       {items.map(it => (
-  <motion.article key={it.id} style={{background: it.status === 'active' ? '#e2fcdc' : 'white'}} className={styles.card} whileHover={{ y: -6 }}>
+  <motion.article key={it.id} className={styles.card} whileHover={{ y: -6 }}>
     {/* LEFT: media / thumbnails (если у тебя была большая колонка — оставляем) */}
     <div className={styles.cardMedia}>
       <div className={styles.mainThumb}>
         <img src={it.images?.[0] ?? '/images/placeholder.jpg'} alt={it.title} />
+    <OrderStatusBadge status={it.status} />
       </div>
       {it.images && it.images.length > 1 && (
         <div className={styles.thumbRow}>

@@ -35,8 +35,8 @@
 .tabs{ display:flex; gap:22px; border-bottom:1px solid rgba(12,18,30,0.06); padding-bottom:10px; }
 .tab{ background:none; border:0; padding:12px 0; cursor:pointer; font-weight:700; color:#374151; position:relative; font-size:15px; }
 .tab:hover{ color:#111827; }
-.tab.active{ color:#0b8f4a; }
-.tab.active::after{ content:""; position:absolute; left:0; right:0; bottom:-12px; height:3px; background:#0b8f4a; border-radius:3px 3px 0 0; }
+.tab.active{ color:var(--accent-gradient); }
+.tab.active::after{ content:""; position:absolute; left:0; right:0; bottom:-12px; height:3px; background:var(--accent-gradient); border-radius:3px 3px 0 0; }
 
 /* Content card under tabs */
 .contentCard{ background:#fff; padding:16px; border-radius:10px; box-shadow:0 8px 28px rgba(12,18,30,0.04); min-height:240px; }
@@ -145,6 +145,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  position: relative;
 }
 
 .mainThumb {
@@ -343,7 +344,7 @@
     align-items: center;
   }
 
-  .mainThumb { height: 160px; width: 45%; }
+  .mainThumb { height: 160px; width: 45%; position: relative;}
   .thumbRow { order: 2; }
 
   .cardActions { flex-direction: row; gap: 8px; }
@@ -397,3 +398,27 @@
   .thumbStrip { gap: 10px; }
   .thumbItem { flex: 0 0 88px; height: 64px; border-radius: 10px; }
 }
+
+/* статус-бейдж */
+.statusBadge {
+  position: absolute;
+  bottom: -50px;
+  left: 25px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #0b1220;
+  box-shadow: 0 6px 18px rgba(12,18,30,0.06);
+}
+
+/* иконка внутри бейджа */
+.statusIcon { display: inline-flex; color: currentColor; }
+
+/* варианты цветов */
+.status_active { background: linear-gradient(90deg,#e8fff1,#f7fff7); color: #065f46; border: 1px solid rgba(34,197,94,0.12); }
+.status_pending { background: linear-gradient(90deg,#fff9eb,#fffbf6); color: #92400e; border: 1px solid rgba(245,158,11,0.08); }
+.status_done { background: linear-gradient(90deg,#eef7ff,#f8fbff); color: #075985; border: 1px solid rgba(3,105,161,0.06); }
+.status_cancelled { background: linear-gradient(90deg,#fff2f2,#fffbfb); color: #981b1b; border: 1px solid rgba(239,68,68,0.06); }

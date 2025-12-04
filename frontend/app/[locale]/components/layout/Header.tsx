@@ -1,11 +1,32 @@
 'use client'
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import styles from './Header.module.css';
 import { useTranslations } from 'next-intl';
+import { LoginContext } from '../context/LoginContext';
 
 export default function Header() {
   const t = useTranslations('Header');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const {user, authenticated, getMe, logout, refresh} = use(LoginContext);
+
+  useEffect(() => {
+    const check = async () => {
+      const result = await getMe()
+
+      if(result.status === 401){
+        const refreshStatus = await refresh();
+
+        if(refreshStatus === 200){
+          await getMe();
+        }
+        else {
+          
+        }
+      }
+    }
+    check();
+  }, [authenticated, user]);
 
   return (
     <header className={styles.siteHeader} role="banner">
@@ -37,12 +58,18 @@ export default function Header() {
           </div>
 
           {/* Login icon */}
-          <a href='/auth' className={styles.iconBtn} aria-label="Login">
+          {authenticated === 'authenticated' && (
+            <button className={styles.iconBtn} aria-label={t('account')}>
+              <img src={user.ImageRef || '/images/default-profile.png'} alt="Profile" className={styles.profilePic} />
+            </button>
+          )}
+
+          {authenticated === 'unauthenticated' && (<a href='/auth' className={styles.iconBtn} aria-label="Login">
             <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" fill="none">
               <circle cx="12" cy="7" r="4" strokeWidth="2"/>
               <path d="M4 21c0-4 4-7 8-7s8 3 8 7" strokeWidth="2"/>
             </svg>
-          </a>
+          </a>)}
 
           {/* Chat icon */}
           <button className={styles.iconBtn} aria-label={t('chat')}>
