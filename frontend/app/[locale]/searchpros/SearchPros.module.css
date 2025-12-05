@@ -560,3 +560,397 @@
 .orderIcon {
   font-size: 18px;
 }
+
+/* SearchMastersSection.module.css */
+
+:root {
+  /* Yandex-like palette */
+  --bg-page: #ffffff;
+  --bg-secondary: #f3f3f5; /* Светло-серый фон для инпутов/тегов */
+  --text-primary: #212121;
+  --text-secondary: #808080;
+  --accent: #FCE000; /* Яркий желтый */
+  --accent-hover: #F5D000;
+  --accent-text: #212121;
+  --blue-link: #007aff;
+  
+  --radius-xl: 20px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.06);
+  --shadow-hover: 0 12px 32px rgba(0,0,0,0.12);
+  --font-main: 'YS Text', 'Inter', -apple-system, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: var(--font-main);
+  color: var(--text-primary);
+}
+
+/* --- HERO SEARCH BLOCK --- */
+.topCard {
+  background: var(--bg-page);
+  padding: 0 0 32px 0;
+  /* Убираем рамки у контейнера поиска, делаем его частью страницы */
+  box-shadow: none; 
+  border: none;
+}
+
+.topRow {
+  display: flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 6px;
+  /* Единый блок поиска */
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+
+.topRow:focus-within {
+  box-shadow: 0 0 0 3px rgba(252, 224, 0, 0.4);
+  background: #fff;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  color: var(--text-primary);
+}
+
+.locationInput {
+  border-left: 1px solid #e0e0e0;
+  flex: 0 0 25%;
+  min-width: 150px;
+}
+
+.searchBtn {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 12px 32px;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+  margin-left: 6px;
+}
+
+.searchBtn:hover {
+  background: var(--accent-hover);
+}
+
+.searchBtn:active {
+  transform: scale(0.98);
+}
+
+.filtersBtnMobile {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius-lg);
+  margin-left: 8px;
+  padding: 0 16px;
+  font-weight: 600;
+  display: none; /* Desktop hidden */
+}
+
+/* --- QUICK CHIPS --- */
+.quickChips {
+  margin-top: 20px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  /* Скрываем скроллбар */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.quickChips::-webkit-scrollbar { display: none; }
+
+.chipsRow {
+  display: flex;
+  gap: 10px;
+}
+
+.chip {
+  background: var(--bg-secondary);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  background: #e0e0e2;
+}
+
+.chipActive {
+  background: var(--text-primary);
+  color: #fff;
+}
+.chipActive:hover {
+  background: #000;
+}
+
+/* --- LAYOUT GRID --- */
+.grid {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  gap: 32px;
+  margin-top: 30px;
+  align-items: start;
+}
+
+/* --- FILTERS PANEL --- */
+.filtersPanel {
+  background: var(--bg-page);
+  /* Убираем границы, делаем "чистый" список */
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  position: sticky;
+  top: 20px;
+}
+
+.filtersTitle {
+  font-size: 22px;
+  margin-bottom: 24px;
+}
+
+.filterGroup {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 20px;
+}
+
+.filterGroup:last-child { border: none; }
+
+.fieldLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.inputNumber, .select {
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  font-weight: 500;
+  width: 100%;
+}
+.inputNumber:focus, .select:focus {
+  background: #fff;
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.checkboxLabel {
+  font-size: 15px;
+  padding: 4px 0;
+  color: #444;
+}
+.checkboxLabel input {
+  width: 18px; height: 18px; margin-right: 8px;
+  accent-color: var(--accent);
+}
+
+.actionsRow {
+  display: flex;
+  gap: 12px;
+}
+.applyBtn {
+  background: var(--accent);
+  color: var(--accent-text);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  padding: 14px;
+}
+.clearBtn {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  border: none;
+}
+
+/* --- RESULTS LIST --- */
+.resultsHeader {
+  margin-bottom: 20px;
+}
+.resultCount {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.sortSelect {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+/* --- PERFORMER CARD (MODERN) --- */
+.card {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  /* Мягкая тень вместо рамки */
+  box-shadow: var(--shadow-card);
+  border: 1px solid transparent;
+  transition: all 0.25s ease;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 20px;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(0,0,0,0.03);
+  z-index: 2;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px; /* Squircle */
+  object-fit: cover;
+}
+
+.performerMain {
+  width: 100%;
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.name {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.servicesText {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.priceBlock {
+  text-align: right;
+  min-width: 100px;
+}
+
+.priceValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.distanceText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.bio {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #444;
+  margin: 12px 0 16px;
+  max-width: 85%;
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: auto;
+}
+
+.ratingBadge {
+  background: var(--text-primary);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge {
+  background: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+}
+
+.chatBtn {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  border: none;
+  transition: background 0.2s;
+}
+.chatBtn:hover { background: #e0e0e2; }
+
+.bookBtn {
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  border: none;
+  box-shadow: 0 4px 12px rgba(252, 224, 0, 0.3);
+  transition: transform 0.1s;
+}
+.bookBtn:hover { transform: translateY(-2px); }
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+  .grid { grid-template-columns: 1fr; }
+  .filtersPanel { display: none; } /* Скрываем десктоп фильтры */
+  .filtersBtnMobile { display: inline-block; }
+  .topRow { flex-wrap: wrap; padding: 10px; border-radius: var(--radius-lg); }
+  .locationInput { border-left: none; border-top: 1px solid #eee; width: 100%; flex: 100%; margin-top: 8px; }
+  .searchBtn { width: 100%; margin: 10px 0 0 0; }
+  .card { flex-direction: column; }
+  .actions { width: 100%; margin-top: 16px; }
+  .chatBtn, .bookBtn { flex: 1; text-align: center; }
+  .priceBlock { text-align: left; margin-top: 4px; }
+  .titleRow { flex-direction: column-reverse; } /* Цена под именем на мобильном */
+  .bio { max-width: 100%; }
+}

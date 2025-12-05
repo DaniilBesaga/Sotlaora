@@ -2,42 +2,68 @@ import { Role } from "@/types/Role";
 import { createContext, useEffect, useState } from "react";
 
 interface UserDTO {
-    Id: number;
-    Email: string;
-    UserName: string;
-    Role: Role;
-    ImageRef?: string;
+    id: number;
+    email: string;
+    userName: string;
+    role: Role;
+    imageRef?: string;
+}
+
+interface UserDTOLong extends UserDTO {
+    createdAt: string;
+    location?: string;
+    isOnline: boolean;
+    lastSeen?: string;
+    subcategories: number[];
+    orders: number[];
 }
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
 
 const EmptyUser: UserDTO = {
-    Id: -1,
-    Email: "",
-    UserName: "",
-    Role: Role.Client,
-    ImageRef: undefined
+    id: -1,
+    email: "",
+    userName: "",
+    role: Role.Client,
+    imageRef: undefined
+};
+
+const EmptyUserLong: UserDTOLong = {
+    id: -1,
+    email: "",
+    userName: "",
+    role: Role.Client,
+    imageRef: undefined,
+    createdAt: "",
+    location: undefined,
+    isOnline: false,
+    lastSeen: undefined,
+    subcategories: [],
+    orders: []
 };
 
 type LoginContextType = {
   user: UserDTO;
+  userLong?: UserDTOLong;
   authenticated: AuthState;
-  getMe: () => Promise<{ ok: boolean; status: number }>;
+  getMe: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
+  getMeLong?: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
   logout: () => Promise<void>;
   refresh: () => Promise<number>;
 };
 
-const LoginContext = createContext<LoginContextType>({user: EmptyUser, authenticated: "loading", getMe: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0});
+const LoginContext = createContext<LoginContextType>({user: EmptyUser, userLong: EmptyUserLong, authenticated: "loading",  getMe: async () => ({ ok: false, status: 0 }), getMeLong: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0});
 
 const LoginProvider = ({children}: {children: React.ReactNode}) =>{
     const [user, setUser] = useState<UserDTO>(EmptyUser);
+    const [userLong, setUserLong] = useState<UserDTOLong>(EmptyUserLong);
     const [authenticated, setAuthenticated] = useState<AuthState>("loading");
 
     useEffect(() => {
         getMe()
     }, [])
 
-    const getMe = async () => {
+    const getMe = async (retry = false) => {
         try {
             const res = await fetch("http://localhost:5221/api/auth/meShort", {
                 method: "GET",
@@ -47,32 +73,71 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
                 },
             });
 
-            if (!res.ok) {
-                if (res.status === 401) {
-                    setUser(EmptyUser);
-                    setAuthenticated("unauthenticated");
-                    return { ok: false, status: 401 };
+            if (res.ok) {
+                const data = await res.json();
+                console.log(data)
+                if (data?.id && data?.email) {
+                    setUser(data);
+                    setAuthenticated("authenticated");
+                    return { ok: true, status: res.status };
                 }
-                throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            const data = await res.json();
-            
-            if (data && data.Id && data.Email && data.UserName) {
-                setUser(data);
-                setAuthenticated("authenticated");
-            } else {
-                setUser(EmptyUser);
-                setAuthenticated("unauthenticated");
-                return { ok: false, status: 401 };
+            if(res.status === 401 && !retry){
+                const refreshStatus = await refresh();
+                if(refreshStatus === 200){
+                    return await getMe(true);
+                }
             }
+
+            setUser(EmptyUser);
+            setAuthenticated("unauthenticated");
+            return { ok: false, status: 401 };
+
         } catch (error) {
             console.error("Authentication failed:", error);
             setUser(EmptyUser);
             setAuthenticated("unauthenticated");
             return { ok: false, status: 401 };
         }
-        return { ok: true, status: 200 };
+    }
+
+    const getMeLong = async (retry = false) => {
+        try {
+            const res = await fetch("http://localhost:5221/api/auth/meLong", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data?.id && data?.email) {
+                    setUserLong(data);
+                    setAuthenticated("authenticated");
+                    return { ok: true, status: res.status };
+                }
+            }
+
+            if(res.status === 401 && !retry){
+                const refreshStatus = await refresh();
+                if(refreshStatus === 200){
+                    return await getMeLong(true);
+                }
+            }
+
+            setUserLong(EmptyUserLong);
+            setAuthenticated("unauthenticated");
+            return { ok: false, status: 401 };
+
+        } catch (error) {
+            console.error("Authentication failed:", error);
+            setUserLong(EmptyUserLong);
+            setAuthenticated("unauthenticated");
+            return { ok: false, status: 401 };
+        }
     }
 
     const logout = async () => {
@@ -92,7 +157,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         return res.status;
     }
 
-    return <LoginContext.Provider value={{user, authenticated, getMe, logout, refresh}}>{children}</LoginContext.Provider>
+    return <LoginContext.Provider value={{user, userLong, authenticated, getMe, getMeLong, logout, refresh}}>{children}</LoginContext.Provider>
 }
 
 export {LoginContext, LoginProvider};

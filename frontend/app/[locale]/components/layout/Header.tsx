@@ -11,22 +11,23 @@ export default function Header() {
   const {user, authenticated, getMe, logout, refresh} = use(LoginContext);
 
   useEffect(() => {
-    const check = async () => {
-      const result = await getMe()
+    // const check = async () => {
+    //   const result = await getMe()
 
-      if(result.status === 401){
-        const refreshStatus = await refresh();
+    //   if(result.status === 401){
+    //     const refreshStatus = await refresh();
 
-        if(refreshStatus === 200){
-          await getMe();
-        }
-        else {
+    //     if(refreshStatus === 200){
+    //       await getMe();
+    //     }
+    //     else {
           
-        }
-      }
-    }
-    check();
-  }, [authenticated, user]);
+    //     }
+    //   }
+    // }
+    // check();
+    console.log( authenticated);
+  }, [authenticated]);
 
   return (
     <header className={styles.siteHeader} role="banner">
@@ -59,12 +60,12 @@ export default function Header() {
 
           {/* Login icon */}
           {authenticated === 'authenticated' && (
-            <button className={styles.iconBtn} aria-label={t('account')}>
-              <img src={user.ImageRef || '/images/default-profile.png'} alt="Profile" className={styles.profilePic} />
-            </button>
+            <a href='/cabinet' className={styles.iconBtn} aria-label={t('account')}>
+              <img src={user.imageRef || '/images/default-profile.png'} alt="Profile" className={styles.profilePic} />
+            </a>
           )}
 
-          {authenticated === 'unauthenticated' && (<a href='/auth' className={styles.iconBtn} aria-label="Login">
+          {(authenticated === 'unauthenticated' || authenticated === 'loading') && (<a href='/auth' className={styles.iconBtn} aria-label="Login">
             <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" fill="none">
               <circle cx="12" cy="7" r="4" strokeWidth="2"/>
               <path d="M4 21c0-4 4-7 8-7s8 3 8 7" strokeWidth="2"/>

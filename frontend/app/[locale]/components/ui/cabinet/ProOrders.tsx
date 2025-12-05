@@ -11,30 +11,51 @@ import OrderStatusBadge from './OrderStatusBadge';
 import ChatList from './ChatList';
 import EarningsPage from './Earnings';
 import NotificationsPage from './NotificationsPage';
+import CategorySelector from '../auth/CategorySelector';
 
 export default function ProOrders(){
 
-  // const {user, authenticated, getMe, logout, refresh} = use(LoginContext);
+  const {user, authenticated, getMeLong, userLong, logout, refresh} = use(LoginContext);
 
-  // const router = useRouter();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const check = async () => {
-  //     const result = await getMe()
+  const [loading, setLoading] = useState(false);
 
-  //     if(result.status === 401){
-  //       const refreshStatus = await refresh();
+  useEffect(() => {
+    // const check = async () => {
+    //   const result = await getMe()
 
-  //       if(refreshStatus === 200){
-  //         await getMe();
-  //       }
-  //       else {
-  //         router.push('/auth');
-  //       }
-  //     }
-  //   }
-  //   check();
-  // }, [authenticated, user]);
+    //   console.log(result)
+
+    //   if(result.status === 401){
+    //     const refreshStatus = await refresh();
+
+    //     if(refreshStatus === 200){
+    //       await getMe();
+    //     }
+    //     else {
+    //       router.push('/auth');
+    //     }
+    //   }
+    // }
+    // check();
+    if(authenticated === 'unauthenticated'){
+      router.push('/auth');
+    }
+
+    const fetchLong = async () => {
+      if (getMeLong) {
+        const result = await getMeLong(false)
+        console.log(userLong)
+        setLoading(false);
+      }
+    }
+
+    if (!getMeLong || loading) return;
+    
+    fetchLong();
+    
+  }, [authenticated]);
   
   // sample data
   const profile = {
@@ -68,8 +89,9 @@ export default function ProOrders(){
   const proposals = sampleProposals;
   const newOrders = sampleNewOrders;
 
-  return (
+  return ( authenticated === 'loading' ? <div>Loading...</div> :
     <div className={styles.page}>
+      {/* {userLong?.subcategories.length === 0 && <CategorySelector/>} */}
       <div className={styles.container}>
         {/* HEADER (профиль вверху, занимает 2 колонки) */}
         <header className={styles.headerCard}>

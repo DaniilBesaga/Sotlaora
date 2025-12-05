@@ -81,8 +81,45 @@ namespace Sotlaora.Backend.Controllers
             var name = payload.Name;
             var picture = payload.Picture;
 
-            var user = new User{Email = email, UserName = name, Role = role == "pro" ? Role.Pro : Role.Client};
-            
+            var existingUser = await context.Users.OfType<Pro>().FirstOrDefaultAsync(u => u.Email == email);
+
+            string accessToken = "";
+            string refreshToken = "";
+
+            if(existingUser != null)
+            {
+                accessToken = GenerateAccessToken(existingUser.Id, email);
+                refreshToken = GenerateRefreshToken();
+                Response.Cookies.Append("access_token", accessToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddMinutes(15)
+                });
+                
+                Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTimeOffset.UtcNow.AddDays(7)
+                });
+
+                context.RefreshTokens.Add(new RefreshToken
+                {
+                    TokenHash = refreshToken,
+                    UserId = existingUser.Id,
+                    ExpiresAt = DateTime.UtcNow.AddDays(7)
+                });
+
+                await context.SaveChangesAsync();
+
+                return Ok(new {email, name, picture});
+            }
+
+            var user = new Pro{Email = email, UserName = name, Role = role == "pro" ? Role.Pro : Role.Client, CreatedAt = DateTime.UtcNow};
+
             context.Users.Add(user);
             await context.SaveChangesAsync();
 
@@ -117,9 +154,6 @@ namespace Sotlaora.Backend.Controllers
                 }
             }
 
-            var accessToken = GenerateAccessToken(user.Id, email);
-            var refreshToken = GenerateRefreshToken();
-
             context.RefreshTokens.Add(new RefreshToken
             {
                 TokenHash = refreshToken,
@@ -139,16 +173,16 @@ namespace Sotlaora.Backend.Controllers
             Response.Cookies.Append("access_token", accessToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             });
             
             Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
@@ -196,7 +230,16 @@ namespace Sotlaora.Backend.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var user = await context.Users.FindAsync(User);
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .OfType<Pro>()
+                .FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
             {
                 return NotFound();
@@ -247,16 +290,16 @@ namespace Sotlaora.Backend.Controllers
             Response.Cookies.Append("access_token", newAccessToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(15)
             });
 
             Response.Cookies.Append("refresh_token", newRefreshToken, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.None,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
@@ -272,7 +315,12 @@ namespace Sotlaora.Backend.Controllers
             if (userId == null)
                 return Unauthorized();
 
-            var user = await context.Users.FindAsync(userId);
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .Include(u => u.Orders)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
             {
                 return NotFound();
@@ -302,7 +350,7 @@ namespace Sotlaora.Backend.Controllers
 
             if (!int.TryParse(userId, out var id)) return Unauthorized();
 
-            var user = await context.Pros
+            var user = await context.Users.OfType<Pro>()
                 .Include(u => u.Orders)
                 .Include(u => u.Subcategories)
                 .FirstOrDefaultAsync(u => u.Id == id);

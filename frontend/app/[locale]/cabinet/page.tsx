@@ -6,13 +6,13 @@ import ProOrders from "../components/ui/cabinet/ProOrders";
 
 export default async function Cabinet() {
 
-    // const res = await fetch(`http://localhost:5221/api/auth/meLong`, {cache: 'no-store'});
-    // const proData = await res.json();
+    const res = await fetch(`http://localhost:5221/api/category/with-subcategories`, {cache: 'no-store'});
+    const proData = await res.json();
 
 
     return(
         <div>
-            {/* {proData?.subcategories.length === 0 && <CategorySelector/>} */}
+            {proData?.subcategories.length === 0 && <CategorySelector/>}
             <ProOrders/>
         </div>
     )

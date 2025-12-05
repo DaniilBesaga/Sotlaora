@@ -212,6 +212,13 @@
   margin-right: 30px;
 }
 
+.profilePic {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .langBtn {
   padding: 6px 10px;
   background: var(--surface);
