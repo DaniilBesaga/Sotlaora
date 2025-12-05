@@ -1,0 +1,366 @@
+.container {
+  max-width: 900px;
+  padding: 40px 20px 80px 20px; /* Отступ снизу больше для футера */
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+  grid-column: 1 / span 2;
+}
+
+/* --- Заголовок и Баланс --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.balanceCard {
+  text-align: right;
+}
+
+.balanceLabel {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted, #64748b);
+  margin-bottom: 4px;
+}
+
+.balanceValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent1, #0ABAB5);
+  line-height: 1;
+}
+
+/* --- График (Chart) --- */
+.chartSection {
+  background: #fff;
+  border-radius: var(--card-radius, 14px);
+  padding: 24px;
+  box-shadow: 0 12px 36px rgba(12,18,30,0.06);
+  border: 1px solid rgba(15,23,42,0.04);
+  margin-bottom: 40px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.periodBadge {
+  background: rgba(15,23,42,0.05);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.barChart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 200px;
+  gap: 10px;
+  padding-top: 20px; /* Место для тултипа при ховере */
+}
+
+.barColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.barWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+}
+
+.barFill {
+  width: 100%;
+  max-width: 40px;
+  background: linear-gradient(180deg, var(--accent1, #0ABAB5), #069D98);
+  border-radius: 8px 8px 2px 2px;
+  transition: height 0.6s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s;
+  opacity: 0.8;
+  position: relative;
+  cursor: pointer;
+}
+
+.barFill:hover {
+  opacity: 1;
+  transform: scaleX(1.1);
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+
+.barFill:hover .tooltip {
+  opacity: 1;
+}
+
+.monthLabel {
+  font-size: 0.85rem;
+  color: var(--muted, #64748b);
+  font-weight: 500;
+}
+
+/* --- История транзакций --- */
+.historySection {
+  margin-bottom: 40px;
+}
+
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.transCard {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8));
+  border: 1px solid rgba(15,23,42,0.035);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(12,18,30,0.03);
+  transition: transform 0.2s;
+}
+
+.transCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(12,18,30,0.06);
+}
+
+.transIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(10, 186, 181, 0.1); /* Прозрачный accent */
+  color: var(--accent1, #0ABAB5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.transHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  gap: 10px;
+}
+
+.transTitle {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.transAmount {
+  font-weight: 700;
+  color: #10b981; /* Зеленый для дохода */
+  white-space: nowrap;
+}
+
+.transDesc {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.transMeta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+/* --- Блок вывода средств (Карта) --- */
+.withdrawSection {
+  margin-top: 40px;
+}
+
+.withdrawCard {
+  background: #1e293b; /* Темная карточка для контраста */
+  color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.4);
+}
+
+/* Декоративный фон для карты */
+.withdrawCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.cardLabel {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.cardLogos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.9;
+}
+
+.payLogo {
+  height: 20px;
+  width: auto;
+}
+
+.mcCircles {
+  display: flex;
+}
+.circleRed, .circleYellow {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+.circleRed { background: #eb001b; margin-right: -8px; opacity: 0.9; }
+.circleYellow { background: #f79e1b; opacity: 0.9; }
+
+.cardInputRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.selectedCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.1);
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.chip {
+  width: 32px;
+  height: 24px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 100%);
+  border-radius: 4px;
+  position: relative;
+}
+.chip::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 0; right: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.1);
+}
+
+.cardLast4 {
+  font-family: monospace;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+.withdrawBtn {
+  background: linear-gradient(135deg, var(--accent1, #0ABAB5), #069D98);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(6, 157, 152, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.withdrawBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(6, 157, 152, 0.4);
+}
+
+.secureText {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+}
+
+/* Мобильный адаптив */
+@media (max-width: 600px) {
+  .cardInputRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .withdrawBtn {
+    width: 100%;
+  }
+}

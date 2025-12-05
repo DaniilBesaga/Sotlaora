@@ -9,6 +9,8 @@ import { LoginContext } from '../../context/LoginContext';
 import { useRouter } from 'next/navigation';
 import OrderStatusBadge from './OrderStatusBadge';
 import ChatList from './ChatList';
+import EarningsPage from './Earnings';
+import NotificationsPage from './NotificationsPage';
 
 export default function ProOrders(){
 
@@ -152,8 +154,14 @@ export default function ProOrders(){
         {activeSection === 'settings' && (
           <ProDashboard />)}
 
+        {activeSection === 'earnings' && (
+          <EarningsPage />)}
+
         {activeSection === 'messages' && (
           <ChatList />)}
+
+        {activeSection === 'subscriptions' && (
+          <NotificationsPage />)}
           
 
         {/* RIGHT: quick navigation */}

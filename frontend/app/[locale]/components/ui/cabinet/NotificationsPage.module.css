@@ -1,0 +1,229 @@
+.container {
+  max-width: 900px;
+  padding: 40px 20px;
+  font-family: 'YS Text', 'Inter', sans-serif;
+  --primary: #FCE000;
+  --bg-card: #ffffff;
+  --text-main: #212121;
+  --text-gray: #808080;
+  --radius: 20px;
+  grid-column: 1 / span 2;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+}
+
+.markReadBtn {
+  background: none;
+  border: none;
+  color: #007AFF; /* Стандартный синий для ссылок-действий */
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.markReadBtn:hover {
+  text-decoration: underline;
+}
+
+/* List */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Card Notification */
+.card {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  position: relative;
+  transition: background 0.2s;
+}
+
+/* Подсветка непрочитанного сообщения (очень легкий фон) */
+.unread {
+  background: #fffdf5; /* Едва заметный теплый оттенок или просто белый */
+}
+
+/* Left Column (Icon) */
+.leftCol {
+  flex-shrink: 0;
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px; /* Squircle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+/* Цвета иконок */
+.iconAssigned {
+  background-color: #FFF5CC; /* Светло-желтый */
+  color: #CC9900;
+}
+
+.iconNew {
+  background-color: #E6F4FF; /* Светло-голубой */
+  color: #007AFF;
+}
+
+.iconSuccess {
+  background-color: #E6FFEA; /* Светло-зеленый */
+  color: #00AA22;
+}
+
+.iconSystem {
+  background-color: #F3F3F5;
+  color: var(--text-gray);
+}
+
+/* Content Column */
+.contentCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.itemTitle {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-main);
+  line-height: 1.3;
+}
+
+.time {
+  font-size: 12px;
+  color: var(--text-gray);
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.itemMessage {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+/* Buttons & Actions */
+.actionsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.btnPrimary {
+  background-color: var(--primary);
+  color: var(--text-main);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btnPrimary:hover {
+  background-color: #F5D000;
+}
+
+.btnSecondary {
+  background-color: #F3F3F5;
+  color: var(--text-main);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btnSecondary:hover {
+  background-color: #E8E8EA;
+}
+
+/* Бейдж суммы (для выполненных) */
+.amountBadge {
+  background-color: #E6FFEA;
+  color: #00AA22;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Синяя точка для непрочитанных */
+.unreadDot {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  background-color: #FF3333; /* Красный или Синий */
+  border-radius: 50%;
+}
+
+/* Mobile Tweaks */
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .iconBox {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .iconBox svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .actionsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btnPrimary, .btnSecondary {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .unreadDot {
+    top: 18px;
+    right: 16px;
+  }
+}
