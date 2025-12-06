@@ -47,6 +47,11 @@ namespace Sotlaora.Infrastructure.Configuration
                 .WithOne(o=>o.Client)
                 .HasForeignKey(o => o.ClientId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(u => u.Notifications)
+                .WithOne(n => n.User)
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

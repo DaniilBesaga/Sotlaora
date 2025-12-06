@@ -1,66 +1,59 @@
 "use client";
 
 import React, { use, useEffect, useMemo, useState } from "react";
-import styles from "./CategorySelector.module.css";
+import styles from "../../components/ui/auth/CategorySelector.module.css"; // Обратите внимание на имя файла
 import type { Category, Subcategory } from "@/types/Category";
-import { LoginContext } from "../../context/LoginContext";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { LoginContext } from "../../components/context/LoginContext";
 import { addSubcategoriesToPro } from "@/helpers/addSubcategoriesToPro";
-import { NotificationDTO, NotificationType } from "@/types/Notification";
 
 type Props = {
-  categories: Category[]; // passed from server component
-  onNext?: (selectedIds: number[]) => void;
+  categories: Category[]; // Передаются с серверного компонента или родителя
+  onBack?: () => void; // Опционально: кнопка "Назад" в самом верху
 };
 
-export default function CategorySelector({ categories, onNext }: Props) {
+export default function CategoryEditorClient({ categories, onBack }: Props) {
   const [query, setQuery] = useState("");
-  // hold ids for selected subcategories (numbers)
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  // either null (show all groups) or group id to view its subcategories
   const [openGroup, setOpenGroup] = useState<number | null>(null);
+  
+  // Состояние загрузки для кнопки сохранения
+  const [isSaving, setIsSaving] = useState(false);
 
-  // keep a local copy in case you want to mutate/filter client-side later
-  const [categoriesToUse, setCategoriesToUse] = useState<Category[]>(categories ?? []);
+  // Локальная копия категорий
+  const [categoriesToUse] = useState<Category[]>(categories ?? []);
 
-  const [isOpen, setIsOpen] = useState(true);
+  const { userLong } = use(LoginContext);
+  const router = useRouter();
 
-  const {userLong} = use(LoginContext)
-
+  // Загружаем уже выбранные категории пользователя при старте
   useEffect(() => {
     if (userLong !== undefined && userLong?.subcategories?.length > 0) {
-      setSelected(new Set(userLong.subcategories.map((sc: Subcategory) => sc.id)))
+      setSelected(new Set(userLong.subcategories.map((sc: Subcategory) => sc.id)));
     }
   }, [userLong]);
 
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await addSubcategoriesToPro(Array.from(selected));
 
-  const handleSelectedCategories = async () => {
-    if(selected.size === 0) {
-      return;
+      if (res.success) {
+        // Здесь можно добавить Toast уведомление об успехе
+        alert("Категории успешно обновлены!");
+        if (onBack) onBack(); // Если передана функция возврата
+      } else {
+        alert("Ошибка при сохранении.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Ошибка сети.");
+    } finally {
+      setIsSaving(false);
     }
-    const res = await addSubcategoriesToPro(Array.from(selected));
-    
-    if (res.success) {
-      // Здесь можно добавить Toast уведомление об успехе
-      alert("Категории успешно обновлены!");
-    } else {
-      alert("Ошибка при сохранении.");
-    }
-
   };
 
-  const path = usePathname()
-
-
-  useEffect(() => {
-    if (userLong?.subcategories.length === 0) {
-      setIsOpen(true);
-    }
-    else{
-      setIsOpen(false);
-    }
-  }, [userLong]);
-
+  // Логика выбора/фильтрации (осталась прежней)
   function toggleSubcat(id: number) {
     setSelected((s) => {
       const next = new Set(s);
@@ -106,7 +99,6 @@ export default function CategorySelector({ categories, onNext }: Props) {
     setOpenGroup(null);
   }
 
-  // helper to show label for a selected subcategory id
   function findSubLabel(id: number) {
     for (const g of categoriesToUse) {
       const s = g.subcategories.find((sc) => sc.id === id);
@@ -115,47 +107,34 @@ export default function CategorySelector({ categories, onNext }: Props) {
     return String(id);
   }
 
-  const sendNotification = async () => {
-    if(selected.size === 0) {
-      const newNotification: NotificationDTO = {
-        title: "Вы не выбрали категории",
-        message: "Вы не выбрали ни одной категории работ. Пожалуйста, выберите категории, чтобы получать предложения о работе.",
-        type: NotificationType.SetupRequired
-      };
-      try {
-        const response = await fetch('http://localhost:5221/api/notification', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newNotification),
-        });
-        if (!response.ok) {
-          throw new Error('Ошибка при отправке уведомления');
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
+  return (
+    <div className={styles.container} style={{margin: '0 auto'}}>
+      {/* Кнопка назад (опционально, если это вложенная страница) */}
+      <button onClick={()=>history.back()} className={styles.topBackBtn}>
+        ← Назад
+      </button>
 
-  return ( isOpen &&
-    <div className={styles.pageWrap}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Выбирете категории работ<button
-            className={styles.nextButton} style={{display: path.includes("categories-selector") ? 'none' : 'block'}}
+        <div className={styles.headerRow}>
+          <div>
+            <h1 className={styles.title}>Редактирование категорий</h1>
+            <p className={styles.subtitle}>
+              Отметьте услуги, которые вы предоставляете. Это поможет заказчикам найти вас.
+            </p>
+          </div>
+          
+          <button
+            className={styles.saveButton}
             type="button"
-            onClick={() => {setIsOpen(false); handleSelectedCategories(); sendNotification()}}
+            onClick={handleSave}
+            disabled={isSaving}
           >
-            {selected.size === 0 ? "Пропустить" : "Далее"}
+            {isSaving ? "Сохранение..." : "Сохранить изменения"}
           </button>
-          </h1>
-        <p className={styles.subtitle}>
-          Выбирете основную категорию, в которой планируете работать. Добавить или отредактировать
-          категории вы сможете позже.
-        </p>
+        </div>
 
-        <div className={styles.searchRow}>
+        {/* Поиск и выбранные теги */}
+        <div className={styles.searchRow} style={{marginTop: '20px'}}>
           <div className={styles.searchBox}>
             <svg className={styles.searchIcon} viewBox="0 0 24 24" width="18" height="18" aria-hidden>
               <path
@@ -170,7 +149,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
             </svg>
             <input
               className={styles.searchInput}
-              placeholder="Введите название категории"
+              placeholder="Поиск категории..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -185,7 +164,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
                   className={styles.pill}
                   onClick={() => toggleSubcat(id)}
                   type="button"
-                  aria-pressed={selected.has(id)}
+                  aria-pressed={true}
                 >
                   {label}
                   <span className={styles.pillX}>×</span>
@@ -196,7 +175,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
         </div>
 
         <div className={styles.panel}>
-          {/* breadcrumb / back */}
+          {/* Навигация внутри групп */}
           <div className={styles.groupHeader}>
             {openGroup !== null ? (
               <>
@@ -218,19 +197,19 @@ export default function CategorySelector({ categories, onNext }: Props) {
                       checked={isGroupAllChecked(categoriesToUse.find((g) => g.id === openGroup)!)}
                       onChange={() => toggleGroupAll(categoriesToUse.find((g) => g.id === openGroup)!)}
                     />
-                    <span>Все предложения в категории</span>
+                    <span>Выбрать всё</span>
                   </label>
                 </div>
               </>
             ) : (
               <>
-                <div className={styles.groupTitle}>Категории</div>
+                <div className={styles.groupTitle}>Все категории</div>
                 <div className={styles.rowRight} />
               </>
             )}
           </div>
 
-          {/* all groups view */}
+          {/* Список групп */}
           {openGroup === null && (
             <div className={styles.groupsGrid}>
               {filteredGroups.map((group) => (
@@ -259,16 +238,14 @@ export default function CategorySelector({ categories, onNext }: Props) {
                       ))}
                       {group.subcategories.length === 0 && <div className={styles.noMatch}>Ничего не найдено</div>}
                     </div>
-                  ) 
-                  }
+                  )}
                 </div>
               ))}
-
               {filteredGroups.length === 0 && <div className={styles.noResults}>По запросу ничего не найдено</div>}
             </div>
           )}
 
-          {/* single group view */}
+          {/* Список подкатегорий одной группы */}
           {openGroup !== null && (
             <div className={styles.singleGroupList}>
               {categoriesToUse.find((g) => g.id === openGroup)?.subcategories.map((it) => (
@@ -284,8 +261,18 @@ export default function CategorySelector({ categories, onNext }: Props) {
             </div>
           )}
         </div>
-
         
+        {/* Дублирующая кнопка сохранения внизу для удобства */}
+        <div className={styles.footerRow}>
+             <button
+            className={styles.saveButton}
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? "Сохранение..." : "Сохранить изменения"}
+          </button>
+        </div>
       </div>
     </div>
   );

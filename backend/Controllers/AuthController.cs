@@ -370,7 +370,12 @@ namespace Sotlaora.Backend.Controllers
                 Location = user.Location,
                 IsOnline = user.IsOnline,
                 LastSeen = user.LastSeen,
-                Subcategories = user.Subcategories.ToList(),
+                Subcategories = user.Subcategories.ToList().Select(sc => new SubcategoryDTO
+                {
+                    Id = sc.Id,
+                    Title = sc.Title,
+                    Slug = sc.Slug
+                }).ToList(),
                 Orders = user.Orders.ToList()
             });
         }

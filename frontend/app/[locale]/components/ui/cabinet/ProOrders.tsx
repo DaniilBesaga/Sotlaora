@@ -152,24 +152,40 @@ export default function ProOrders(){
             </nav>
 
             {/* Content area */}
-            <section className={styles.contentCard}>
-              {activeTab === 'inwork' && (
-                <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
-              )}
+            <section className={userLong?.subcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
+            {userLong?.subcategories.length === 0 ? (
+              <div className={styles.emptyNotice} role="status" aria-live="polite">
+                <div className={styles.emptyNoticeRow}>
+                  <div className={styles.emptyContent}>
+                    <p className={styles.emptyText}>
+                      Пока вы не укажете категории и подкатегории, мы не сможем отправлять вам релевантные заказы.
+                      Перейдите в <a href="/cabinet/categories-selector" className={styles.infoLink}>настройки категорий</a> и отметьте те услуги, которые вы выполняете.
+                    </p>
 
-              {activeTab === 'proposals' && (
-                <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
-              )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {activeTab === 'inwork' && (
+                  <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
+                )}
 
-              {activeTab === 'search' && (
-                <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
-              )}
+                {activeTab === 'proposals' && (
+                  <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
+                )}
 
-              {activeTab === 'all' && (
-                <OrdersGrid items={orders} emptyText="Нет заказов" />
-              )}
+                {activeTab === 'search' && (
+                  <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
+                )}
 
-            </section>
+                {activeTab === 'all' && (
+                  <OrdersGrid items={orders} emptyText="Нет заказов" />
+                )}
+              </>
+            )}
+          </section>
+
           </main>
         )}
 

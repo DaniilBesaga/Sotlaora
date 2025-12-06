@@ -12,7 +12,7 @@ namespace Sotlaora.Business.Models
         public string? Location { get; set; }
         public bool IsOnline { get; set; }
         public DateTime? LastSeen { get; set; }
-        public List<Subcategory> Subcategories { get; set; } = new List<Subcategory>();
+        public List<SubcategoryDTO> Subcategories { get; set; } = new List<SubcategoryDTO>();
         public List<Order> Orders { get; set; } = new List<Order>();
     }
 

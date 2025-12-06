@@ -84,6 +84,7 @@
 .label {
   color: #6b7280; /* gray-500 */
   margin-right: 4px;
+  display: inline-block !important;
 }
 
 .value {
@@ -99,6 +100,7 @@
   padding: 0;
   cursor: pointer;
   font-size: inherit;
+  display: inline-block;
 }
 
 .addLink:hover {
@@ -317,4 +319,498 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(16px);
+}
+
+/* --- Стили для страницы редактирования услуг --- */
+.cardSection {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  /* Легкая тень или рамка для визуального разделения */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+  border: 1px solid #eee;
+}
+
+.dangerZone {
+  border-color: #ffebee;
+  background-color: #fffafa;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.editBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.editBtn:hover {
+  color: #ff6b00;
+  background-color: #fff3e0;
+}
+
+.hintText {
+  font-size: 13px;
+  color: #888;
+  margin-top: 5px;
+}
+
+
+.editContainer {
+  max-width: 900px;
+  padding: 0;
+  margin: 40px auto;
+  background: #fff;
+  grid-column: 1 / span 2;
+}
+
+.pageTitle {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  font-weight: 400; /* Более тонкий шрифт как на скрине */
+  color: var(--accent-gradient);
+}
+
+.helperTextSmall {
+  color: #777;
+  font-size: 13px; /* Уменьшенный текст */
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.sectionBlock {
+  margin-top: 20px;
+}
+
+.labelSimple {
+  display: block;
+  font-size: 1rem;
+  color: var(--accent-gradient);
+  margin-bottom: 8px;
+}
+
+.textareaMain {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+  font-size: 14px;
+}
+
+.charCount {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.subHeader {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #333;
+}
+
+/* Категория (без рамки, чистый стиль) */
+.categoryGroup {
+  margin-bottom: 20px;
+}
+
+.categoryHeaderClean {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.catHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.catIconCircle {
+  width: 36px;
+  height: 36px;
+  background-color: #f2994a; /* Оранжевый круг */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+}
+
+.catTitleBold {
+  font-weight: 700;
+  font-size: 16px;
+  color: #000;
+}
+
+.catSubText {
+  font-size: 13px;
+  color: #888;
+}
+
+/* --- СЕТКА (GRID) ДЛЯ УСЛУГ --- */
+.servicesGrid {
+  display: grid;
+  /* Две колонки, равной ширины */
+  grid-template-columns: 1fr 1fr; 
+  /* Расстояние между колонками и строками */
+  gap: 10px 40px; 
+  padding-left: 0;
+}
+
+.serviceItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.customCheckbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #00a046; /* Зеленая галочка */
+}
+
+.serviceNameText {
+  font-size: 14px;
+  color: #333;
+}
+
+/* --- БЛОК РЕДАКТИРОВАНИЯ (Зеленый) --- */
+.serviceEditBox {
+  background-color: #f1f8f3; /* Светло-зеленый фон как на фото */
+  border: 1px solid #e0eadd;
+  border-radius: 6px;
+  padding: 10px;
+  width: 100%;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.textareaService {
+  width: 100%;
+  height: 80px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #fff;
+  resize: none;
+}
+
+.charCountRight {
+  text-align: right;
+  font-size: 12px;
+  color: #999;
+  margin: 4px 0 8px 0;
+}
+
+.saveBtnSmall {
+  background-color: #ff5400; /* Яркий оранжевый */
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.saveBtnSmall:hover {
+  background-color: #e04a00;
+}
+
+.backBtnLink {
+  background: none;
+  border: none;
+  color: #00a046;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.backBtnLink:hover {
+  text-decoration: underline;
+}
+
+/* Адаптив для мобильных: одна колонка */
+@media (max-width: 768px) {
+  .servicesGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+
+
+
+/* --- Modal Styles --- */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Затемнение фона */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(4px); /* Эффект размытия фона (современно) */
+}
+
+.modalContent {
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh; /* Чтобы не вылезало на мобильных */
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modalTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #212121;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.2s;
+  display: flex;
+}
+
+.closeBtn:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.formScroll {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* --- Form Elements --- */
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.input, .textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f3f4f6; /* Серый фон инпутов */
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 15px;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.input:focus, .textarea:focus {
+  background: #fff;
+  border-color: #FCE000; /* Желтый акцент при фокусе */
+  box-shadow: 0 0 0 3px rgba(252, 224, 0, 0.2);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Gender Switcher */
+.genderSwitch {
+  display: flex;
+  background: #f3f4f6;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.genderBtn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.genderBtnActive {
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Actions */
+.modalActions {
+  padding: 20px 24px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.saveBtnFull {
+  width: 100%;
+  background: var(--accent-gradient);
+  color: #000;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.saveBtnFull:hover {
+  background: #f5d000;
+}
+
+.cancelBtn {
+  width: 100%;
+  background: transparent;
+  color: #666;
+  padding: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancelBtn:hover {
+  color: #333;
+}
+
+
+/* Группа для инпута и кнопок */
+.inlineEditGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+/* Сам инпут */
+.inlineInput {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  width: 180px; /* Фиксированная ширина или 100% */
+  outline: none;
+  font-family: inherit;
+  transition: border 0.2s;
+}
+
+.inlineInput:focus {
+  border-color: #00a046; /* Зеленый акцент при фокусе */
+}
+
+/* Кнопки действий (галочка и крестик) */
+.saveIconBtn, .cancelIconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saveIconBtn {
+  background-color: #e6ffea;
+  color: #00a046;
+}
+
+.saveIconBtn:hover {
+  background-color: #d0fcd7;
+}
+
+.cancelIconBtn {
+  background-color: #fff0f0;
+  color: #d32f2f;
+}
+
+.cancelIconBtn:hover {
+  background-color: #ffe0e0;
 }

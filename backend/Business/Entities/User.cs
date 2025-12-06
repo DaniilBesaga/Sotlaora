@@ -19,5 +19,6 @@ namespace Sotlaora.Business.Entities
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

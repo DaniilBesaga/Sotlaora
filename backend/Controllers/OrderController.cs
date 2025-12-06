@@ -65,6 +65,31 @@ namespace Sotlaora.Controllers
                 file.EntityId = insertedId;
             }    
 
+            //Notifictate everyone about new order
+
+            var notification = new Notification
+            {
+                Title = "New Order Posted",
+                Message = $"A new order '{orderFull.Title}' has been posted.",
+                Type = Business.Enums.NotificationType.NewOrder,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow,
+                UserId = orderFull.ProId, // Assuming ClientId is the user to notify
+                Meta = new Business.Models.NotificationMetadata
+                {
+                    OrderId = orderFull.Id,
+                    ClientName = _context.Users.Find(orderFull.ClientId)?.UserName ?? "Unknown",
+                    Category = string.Join(", ", orderFull.Subcategories?.Select(s => s.Title) ?? []),
+                    Amount = orderFull.Price.ToString(""),
+                }
+            };
+
+            foreach (var pro in _context.Users.OfType<Pro>().Where(sc=> sc.Subcategories.Any(s => order.Subcategories.Contains(s.Id))))
+            {
+                notification.UserId = pro.Id;
+                _context.Notifications.Add(notification);
+            }
+
             _context.SaveChanges();
             return CreatedAtAction("post order", new { id = orderFull.Id }, orderFull);
         }

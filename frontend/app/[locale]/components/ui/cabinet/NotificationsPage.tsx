@@ -45,6 +45,25 @@ const NotificationsPage = () => {
       message: 'Мы обновили условия работы сервиса. Пожалуйста, ознакомьтесь.',
       time: '3 дня назад',
       isUnread: false,
+    },
+    {
+      id: 5,
+      type: 'urgent', // СРОЧНОЕ (Красное)
+      title: 'Подтвердите выезд к клиенту',
+      message: 'Заказ #3991102 на завтра. Клиент ждет подтверждения, иначе заказ будет передан другому мастеру через 30 минут.',
+      time: 'Только что',
+      isUnread: true,
+      meta: {
+        orderId: '3991102'
+      }
+    },
+    {
+      id: 6,
+      type: 'setup_required', // НАПОМИНАНИЕ О НАСТРОЙКЕ (Оранжевое/Предупреждение)
+      title: 'Вы не выбрали категории услуг',
+      message: 'Ваш профиль не виден заказчикам. Чтобы получать заказы, укажите, какие услуги вы выполняете.',
+      time: '1 час назад',
+      isUnread: true,
     }
   ]);
 
@@ -79,6 +98,25 @@ const NotificationsPage = () => {
             </svg>
           </div>
         );
+      case 'urgent':
+        return (
+          <div className={`${styles.iconBox} ${styles.iconUrgent}`}>
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+        );
+
+      // НОВЫЙ ТИП: Настройка (Список с восклицанием или шестеренка)
+      case 'setup_required':
+        return (
+          <div className={`${styles.iconBox} ${styles.iconSetup}`}>
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+        );
+
       default:
         return (
           <div className={`${styles.iconBox} ${styles.iconSystem}`}>
@@ -135,6 +173,17 @@ const NotificationsPage = () => {
 
                 {item.type === 'completed' && item.meta?.amount && (
                   <span className={styles.amountBadge}>{item.meta.amount}</span>
+                )}
+
+                {item.type === 'urgent' && (
+                    <>
+                      <button className={styles.btnDanger}>Подтвердить</button>
+                      <button className={styles.btnSecondary}>Связаться</button>
+                    </>
+                )}
+
+                {item.type === 'setup_required' && (
+                    <button className={styles.btnPrimary}>Выбрать категории</button>
                 )}
                 
               </div>

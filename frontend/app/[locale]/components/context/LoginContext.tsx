@@ -1,3 +1,4 @@
+import { Subcategory } from "@/types/Category";
 import { Role } from "@/types/Role";
 import { createContext, useEffect, useState } from "react";
 
@@ -14,7 +15,7 @@ interface UserDTOLong extends UserDTO {
     location?: string;
     isOnline: boolean;
     lastSeen?: string;
-    subcategories: number[];
+    subcategories: Subcategory[];
     orders: number[];
 }
 

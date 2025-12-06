@@ -20,6 +20,7 @@ namespace Sotlaora.Infrastructure.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Pro> Pros { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
