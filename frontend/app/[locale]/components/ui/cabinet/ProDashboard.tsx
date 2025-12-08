@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, Phone, User, Hammer, AlignLeft, Bell, Trash, Pencil, Check, X } from 'lucide-react';
 import styles from './ProDashboard.module.css';
 import PortfolioPanel from './Portfolio';
@@ -8,6 +8,7 @@ import PricesPanel from './PricesPanel';
 import ServiceDescriptionEdit from './ServiceDescription';
 import PersonalDataEdit from './PersonalDataEdit';
 import CategorySelector from '../auth/CategorySelector';
+import { Gender, UserProfileDTO } from '@/types/UserProfile';
 // Импортируем компонент для редактирования услуг
 
 export default function ProDashboard() {
@@ -32,13 +33,48 @@ export default function ProDashboard() {
   const [profileData, setProfileData] = useState({
     city: 'Тимишоара',
     birthDate: '',
-    gender: '',
-    about: ''
+    gender: Gender.Male,
+    about: '',
+    phoneNumber: ''
   });
 
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const res = await fetch('/api/user/profileShort', { method: 'GET' });
+      const data = await res.json();
+      setProfileData({
+        city: data.city || 'Тимишоара',
+        birthDate: data.dateOfBirth || '',
+        gender: data.gender,
+        about: data.bio || '',
+        phoneNumber: data.phoneNumber || ''
+      });
+    }
+    fetchUserProfile();
+  }, []);
+
   // Функция сохранения данных из формы
-  const handlePersonalDataSave = (newData) => {
+  const handlePersonalDataSave = async (newData) => {
+    const userProfileNew: UserProfileDTO = {
+      city: newData.city,
+      dateOfBirth: newData.birthDate,
+      gender: newData.gender,
+      bio: newData.about,
+      phoneNumber: newData.phoneNumber
+    };
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userProfileNew)
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      alert('Ошибка при сохранении данных: ' + (result.message || 'Неизвестная ошибка'));
+      return;
+    }
+
     setProfileData(prev => ({ ...prev, ...newData }));
+
     setEditingSection(null); // Закрываем модальное окно
   };
 
@@ -56,17 +92,35 @@ export default function ProDashboard() {
   
 
   // Состояния для телефона
-  const [phone, setPhone] = useState('+380980564592');
+  const [phoneNumber, setPhoneNumber] = useState(profileData.phoneNumber);
   const [isEditingContacts, setIsEditingContacts] = useState(false);
   const [tempPhone, setTempPhone] = useState('');
 
   const handleEditClick = () => {
-    setTempPhone(phone); // Копируем текущий номер во временную переменную
+    setTempPhone(profileData.phoneNumber); // Копируем текущий номер во временную переменную
     setIsEditingContacts(true);
   };
 
-  const handleSaveClick = () => {
-    setPhone(tempPhone); // Сохраняем
+  const handleSaveClick = async() => {
+    const userProfileNew: UserProfileDTO = {
+      city: profileData.city,
+      dateOfBirth: profileData.birthDate,
+      gender: profileData.gender,
+      bio: profileData.about,
+      phoneNumber: tempPhone
+    };
+    const res = await fetch('/api/user/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userProfileNew)
+    });
+    const result = await res.json();
+    if (!res.ok) {
+      alert('Ошибка при сохранении данных: ' + (result.message || 'Неизвестная ошибка'));
+      return;
+    }
+
+    setPhoneNumber(tempPhone);
     setIsEditingContacts(false);
     // Тут можно отправить запрос на сервер
   };
@@ -145,7 +199,7 @@ export default function ProDashboard() {
                   </div>
                 ) : (
                   // Режим просмотра
-                  <span className={styles.value}>{phone}</span>
+                  <span className={styles.value}>{phoneNumber}</span>
                 )}
                 
               </div>
@@ -194,7 +248,7 @@ export default function ProDashboard() {
                   <span className={styles.label}>Пол: </span>
                   {profileData.gender ? (
                     <span className={styles.value}>
-                      {profileData.gender === 'male' ? 'Мужской' : 'Женский'}
+                      {profileData.gender === Gender.Male ? 'Мужской' : 'Женский'}
                     </span>
                   ) : (
                     <button className={styles.addLink} onClick={() => setEditingSection('personal')}>

@@ -28,8 +28,8 @@ export default function CategorySelector({ categories, onNext }: Props) {
   const {userLong} = use(LoginContext)
 
   useEffect(() => {
-    if (userLong !== undefined && userLong?.subcategories?.length > 0) {
-      setSelected(new Set(userLong.subcategories.map((sc: Subcategory) => sc.id)))
+    if (userLong !== undefined && userLong?.prosubcategories?.length > 0) {
+      setSelected(new Set(userLong.prosubcategories.map((sc: Subcategory) => sc.id)))
     }
   }, [userLong]);
 
@@ -53,10 +53,11 @@ export default function CategorySelector({ categories, onNext }: Props) {
 
 
   useEffect(() => {
-    if (userLong?.subcategories.length === 0) {
+    const hasSeenSelector = localStorage.getItem("has_seen_category_selector");
+
+    if (userLong?.prosubcategories.length === 0 && !hasSeenSelector) {
       setIsOpen(true);
-    }
-    else{
+    } else {
       setIsOpen(false);
     }
   }, [userLong]);
@@ -120,7 +121,8 @@ export default function CategorySelector({ categories, onNext }: Props) {
       const newNotification: NotificationDTO = {
         title: "Вы не выбрали категории",
         message: "Вы не выбрали ни одной категории работ. Пожалуйста, выберите категории, чтобы получать предложения о работе.",
-        type: NotificationType.SetupRequired
+        type: NotificationType.SetupRequired,
+        slug: ""
       };
       try {
         const response = await fetch('http://localhost:5221/api/notification', {
@@ -145,7 +147,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
         <h1 className={styles.title}>Выбирете категории работ<button
             className={styles.nextButton} style={{display: path.includes("categories-selector") ? 'none' : 'block'}}
             type="button"
-            onClick={() => {setIsOpen(false); handleSelectedCategories(); sendNotification()}}
+            onClick={() => {localStorage.setItem("has_seen_category_selector", "true");setIsOpen(false); handleSelectedCategories(); sendNotification()}}
           >
             {selected.size === 0 ? "Пропустить" : "Далее"}
           </button>

@@ -37,7 +37,7 @@ builder.Services.AddIdentity<User, AppRole>()
 
 builder.Services.AddDbContext<AppDbContext>(o =>
 {
-    o.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection"));
+    o.UseNpgsql(builder.Configuration.GetConnectionString("DbConnection"), x=>x.UseNetTopologySuite());
 });
 
 builder.Services.AddAuthentication(options =>

@@ -6,5 +6,6 @@ namespace Sotlaora.Business.Entities
         User = 0,
         Order = 1,
         Pro = 2,
+        ProPortfolio = 3
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Sotlaora.Business.Entities;
+using Sotlaora.Business.Entities.UserMetadata;
 
 namespace Sotlaora.Infrastructure.Configuration
 {
@@ -52,6 +53,11 @@ namespace Sotlaora.Infrastructure.Configuration
                 .WithOne(n => n.User)
                 .HasForeignKey(n => n.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.HasOne(u => u.UserProfile)
+                .WithOne(pp => pp.User)
+                .HasForeignKey<UserProfile>(pp => pp.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

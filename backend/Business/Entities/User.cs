@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Sotlaora.Business.Entities.UserMetadata;
 
 namespace Sotlaora.Business.Entities
 {
@@ -15,6 +16,12 @@ namespace Sotlaora.Business.Entities
         public bool IsOnline { get; set; }
 
         public DateTime? LastSeen { get; set; }
+
+
+        public int? UserProfileId { get; set; }
+        public UserProfile? UserProfile { get; set; }
+
+        
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();

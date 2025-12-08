@@ -2,6 +2,7 @@ export interface NotificationDTO {
   title: string;
   message: string;
   type: NotificationType;
+  slug: string;
 }
 
 export enum NotificationType {
@@ -11,4 +12,23 @@ export enum NotificationType {
     Completed = 3,
     Urgent = 4,
     SetupRequired = 5
+}
+
+export interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  createdAt: string;
+  slug: string;
+  userId: number;
+  meta: NotificationMetadata;
+}
+
+export interface NotificationMetadata {
+  orderId?: number;
+  clientName?: string;
+  category?: string;
+  amount?: string;
 }

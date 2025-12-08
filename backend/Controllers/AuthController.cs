@@ -352,7 +352,7 @@ namespace Sotlaora.Backend.Controllers
 
             var user = await context.Users.OfType<Pro>()
                 .Include(u => u.Orders)
-                .Include(u => u.Subcategories)
+                .Include(u => u.ProSubcategories)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -370,11 +370,11 @@ namespace Sotlaora.Backend.Controllers
                 Location = user.Location,
                 IsOnline = user.IsOnline,
                 LastSeen = user.LastSeen,
-                Subcategories = user.Subcategories.ToList().Select(sc => new SubcategoryDTO
+                ProSubcategories = user.ProSubcategories.ToList().Select(ps => new SubcategoryDTO
                 {
-                    Id = sc.Id,
-                    Title = sc.Title,
-                    Slug = sc.Slug
+                    Id = ps.Subcategory.Id,
+                    Title = ps.Subcategory.Title,
+                    Slug = ps.Subcategory.Slug
                 }).ToList(),
                 Orders = user.Orders.ToList()
             });

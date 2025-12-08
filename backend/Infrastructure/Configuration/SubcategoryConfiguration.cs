@@ -31,9 +31,6 @@ namespace Sotlaora.Infrastructure.Configuration
                    .HasForeignKey(s => s.CategoryId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(s => s.Pros)
-                   .WithMany(p => p.Subcategories);
-
             builder.HasMany(s => s.Orders)
                    .WithMany(o => o.Subcategories);
                    

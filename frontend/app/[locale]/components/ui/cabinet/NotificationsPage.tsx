@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './NotificationsPage.module.css';
 
 const NotificationsPage = () => {
@@ -67,9 +67,43 @@ const NotificationsPage = () => {
     }
   ]);
 
-  const markAllRead = () => {
+  useEffect(() => {
+    const fetchAllNotifications = async () => {
+      try {
+        const response = await fetch('http://localhost:5221/api/notification/all', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data)
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке уведомлений:', error);
+      }
+    };
+
+    fetchAllNotifications();
+  }, []);
+
+  const markAllRead = async ()=>{
     setNotifications(prev => prev.map(n => ({ ...n, isUnread: false })));
-  };
+    try {
+      const response = await fetch('http://localhost:5221/api/notification/read-all', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if(response.ok){
+        setNotifications(prev => prev.map(n => ({ ...n, isUnread: false })));
+      }
+    } catch (error) {
+      console.error('Ошибка при отправке запроса на отметку всех уведомлений как прочитанных:', error);
+    }
+  }
 
   // Рендер иконки в зависимости от типа
   const renderIcon = (type) => {

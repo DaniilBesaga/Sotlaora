@@ -11,7 +11,8 @@ namespace Sotlaora.Business.Entities
         public int CategoryId { get; set; }
         public Category Category { get; set; } = null!;
 
-        public ICollection<Pro> Pros { get; set; } = new List<Pro>();
+        public ICollection<ProSubcategory> ProSubcategories { get; set; } = new List<ProSubcategory>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<ProPortfolio> ProPortfolios { get; set; } = new List<ProPortfolio>();
     }
 }

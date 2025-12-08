@@ -152,8 +152,8 @@ export default function ProOrders(){
             </nav>
 
             {/* Content area */}
-            <section className={userLong?.subcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
-            {userLong?.subcategories.length === 0 ? (
+            <section className={userLong?.prosubcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
+            {userLong?.prosubcategories.length === 0 ? (
               <div className={styles.emptyNotice} role="status" aria-live="polite">
                 <div className={styles.emptyNoticeRow}>
                   <div className={styles.emptyContent}>

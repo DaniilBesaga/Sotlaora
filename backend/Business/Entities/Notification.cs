@@ -11,6 +11,7 @@ namespace Sotlaora.Business.Entities
         public NotificationType Type { get; set; } // e.g., "urgent", "info", "setup_required"
         public bool IsRead { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Slug { get; set; } = string.Empty;
 
         public int UserId { get; set; }
         public User User { get; set; } = null!;

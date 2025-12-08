@@ -15,7 +15,7 @@ interface UserDTOLong extends UserDTO {
     location?: string;
     isOnline: boolean;
     lastSeen?: string;
-    subcategories: Subcategory[];
+    prosubcategories: Subcategory[];
     orders: number[];
 }
 
@@ -39,7 +39,7 @@ const EmptyUserLong: UserDTOLong = {
     location: undefined,
     isOnline: false,
     lastSeen: undefined,
-    subcategories: [],
+    prosubcategories: [],
     orders: []
 };
 

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sotlaora.Business.Entities;
+using Sotlaora.Business.Entities.UserMetadata;
+using Sotlaora.Business.Models;
 using Sotlaora.Infrastructure.Configuration;
 
 namespace Sotlaora.Infrastructure.Data
@@ -22,6 +24,10 @@ namespace Sotlaora.Infrastructure.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<ProSubcategory> ProSubcategories { get; set; }
+        public DbSet<ProPortfolio> ProPortfolios { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -34,12 +40,18 @@ namespace Sotlaora.Infrastructure.Data
             builder.ApplyConfiguration(new ReviewConfiguration());
             builder.ApplyConfiguration(new SubcategoryConfiguration());
             builder.ApplyConfiguration(new UserConfiguration());
+            builder.ApplyConfiguration(new NotificationConfiguration());
 
+            builder.ApplyConfiguration(new ProSubcategoryConfiguration());
+            builder.ApplyConfiguration(new ProPortfolioConfiguration());
+            builder.ApplyConfiguration(new UserProfileConfiguration());
+            
             builder.Entity<User>()
                 .HasDiscriminator<string>("UserType")
                 .HasValue<User>("Client")
                 .HasValue<Pro>("Pro");
 
+            builder.Owned<NotificationMetadata>();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

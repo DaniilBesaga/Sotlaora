@@ -16,10 +16,20 @@ namespace Backend.Controllers
     {
         // GET: api/notification
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetNotifications()
+        public async Task<ActionResult<IEnumerable<Notification>>> GetNotifications()
         {
-            // TODO: Implement notification retrieval logic
-            return Ok(new List<object>());
+            var user = await userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var notifications = context.Notifications
+                .Where(n => n.UserId == user.Id)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToList();
+            return Ok(notifications);
         }
 
         // GET: api/notification/{id}
@@ -61,6 +71,29 @@ namespace Backend.Controllers
             await context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
+        }
+
+        [HttpPatch("read-all")]
+        public async Task< IActionResult> ReadAllNotifications ()
+        {
+            var user = await userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var notifications = context.Notifications
+                .Where(n => n.UserId == user.Id && !n.IsRead);
+
+            foreach (var notification in notifications)
+            {
+                notification.IsRead = true;
+            }
+
+            await context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         // PUT: api/notification/{id}/read

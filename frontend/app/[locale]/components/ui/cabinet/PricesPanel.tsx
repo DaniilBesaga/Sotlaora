@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import styles from './PricesPanel.module.css';
+import { LoginContext } from '../../context/LoginContext';
 
 const PricesPanel = () => {
   const [activeTab, setActiveTab] = useState('prices');
@@ -70,10 +71,24 @@ const PricesPanel = () => {
     }));
   };
 
-  return (
-    <div className={styles.container}>
-      {/* Навигация */}
+  const {userLong} = use(LoginContext)
 
+  return (
+    
+    <div className={styles.container}>
+      {userLong?.prosubcategories.length === 0 ? (
+              <div className={styles.emptyNotice} role="status" aria-live="polite">
+                <div className={styles.emptyNoticeRow}>
+                  <div className={styles.emptyContent}>
+                    <p className={styles.emptyText}>
+                      Пока вы не укажете категории и подкатегории, мы не сможем отправлять вам релевантные заказы.
+                      Перейдите в <a href="/cabinet/categories-selector" className={styles.infoLink}>настройки категорий</a> и отметьте те услуги, которые вы выполняете.
+                    </p>
+
+                  </div>
+                </div>
+              </div>
+      ) : (
       <div className={styles.content}>
         <div className={styles.headerBlock}>
           <h2 className={styles.title}>Стоимость работ</h2>
@@ -117,8 +132,6 @@ const PricesPanel = () => {
                       >
                         <option value="за услугу">за услугу</option>
                         <option value="за час">за час</option>
-                        <option value="за м²">за м²</option>
-                        <option value="за п.м.">за п.м.</option>
                         <option value="за шт.">за шт.</option>
                       </select>
                     </div>
@@ -135,6 +148,7 @@ const PricesPanel = () => {
         </div>
 
       </div>
+      )}
     </div>
   );
 };

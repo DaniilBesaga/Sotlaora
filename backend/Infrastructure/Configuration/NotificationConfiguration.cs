@@ -30,6 +30,9 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
 
         builder.Property(x => x.IsRead)
             .HasDefaultValue(true);
+        
+        builder.Property(x=>x.Slug)
+            .HasMaxLength(200);
 
         builder.HasOne(x => x.User)
             .WithMany(n=>n.Notifications)
@@ -43,7 +46,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         {
             meta.ToJson(); // Указывает EF что это JSON
 
-            meta.Property(m=>m.OrderId).HasColumnName("order_id");
+            meta.Property(m=>m.OrderId).HasJsonPropertyName("order_id");
             meta.Property(m => m.ClientName).HasJsonPropertyName("client_name");
             meta.Property(m => m.Category).HasJsonPropertyName("category");
             meta.Property(m => m.Amount).HasJsonPropertyName("amount");

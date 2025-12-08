@@ -1,6 +1,8 @@
 using Backend.Business.Models;
 using Microsoft.AspNetCore.Mvc;
 using Sotlaora.Business.Entities;
+using Sotlaora.Business.Enums;
+using Sotlaora.Business.Models;
 using Sotlaora.Infrastructure.Data;
 using System.Collections.Generic;
 
@@ -67,28 +69,30 @@ namespace Sotlaora.Controllers
 
             //Notifictate everyone about new order
 
-            var notification = new Notification
+            foreach (var pro in _context.Users.OfType<Pro>()
+                .Where(sc => sc.ProSubcategories.Any(s => order.Subcategories.Contains(s.SubcategoryId))))
             {
-                Title = "New Order Posted",
-                Message = $"A new order '{orderFull.Title}' has been posted.",
-                Type = Business.Enums.NotificationType.NewOrder,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow,
-                UserId = orderFull.ProId, // Assuming ClientId is the user to notify
-                Meta = new Business.Models.NotificationMetadata
+                var notification = new Notification
                 {
-                    OrderId = orderFull.Id,
-                    ClientName = _context.Users.Find(orderFull.ClientId)?.UserName ?? "Unknown",
-                    Category = string.Join(", ", orderFull.Subcategories?.Select(s => s.Title) ?? []),
-                    Amount = orderFull.Price.ToString(""),
-                }
-            };
+                    Title = "New Order Posted",
+                    Message = $"A new order '{orderFull.Title}' has been posted.",
+                    Type = NotificationType.NewOrder,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UserId = pro.Id,
+                    Slug = $"new-order-{orderFull.Id}",
+                    Meta = new NotificationMetadata
+                    {
+                        OrderId = orderFull.Id,
+                        ClientName = pro.UserName,
+                        Category = string.Join(", ", orderFull.Subcategories.Select(s => s.Title)),
+                        Amount = orderFull.Price.ToString("")
+                    }
+                };
 
-            foreach (var pro in _context.Users.OfType<Pro>().Where(sc=> sc.Subcategories.Any(s => order.Subcategories.Contains(s.Id))))
-            {
-                notification.UserId = pro.Id;
                 _context.Notifications.Add(notification);
             }
+
 
             _context.SaveChanges();
             return CreatedAtAction("post order", new { id = orderFull.Id }, orderFull);
