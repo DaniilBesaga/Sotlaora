@@ -15,7 +15,8 @@ export interface UserProfile {
 
 export enum Gender {
     Male = 0,
-    Female = 1
+    Female = 1,
+    Unspecified = 2
 }
 
 export interface UserProfileDTO {

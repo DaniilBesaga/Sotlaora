@@ -1,3 +1,5 @@
+using Sotlaora.Business.Enums.UserMetadata;
+
 namespace Sotlaora.Business.Models
 {
     public class UserProfileDTO

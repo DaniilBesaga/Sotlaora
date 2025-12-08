@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sotlaora.Business.Entities;
 using Sotlaora.Business.Entities.UserMetadata;
+using Sotlaora.Business.Enums.UserMetadata;
 using Sotlaora.Business.Models;
 using Sotlaora.Infrastructure.Data;
 using System.Collections.Generic;
@@ -105,9 +106,9 @@ namespace Sotlaora.Controllers
             {
                 City = UserProfile?.City,
                 PhoneNumber = UserProfile?.PhoneNumber,
-                DateOfBirth = (DateTime)(UserProfile?.DateOfBirth),
+                DateOfBirth = (UserProfile?.DateOfBirth) ?? DateTime.MinValue,
                 Bio = UserProfile?.Bio,
-                Gender = UserProfile?.Gender,
+                Gender = UserProfile?.Gender ?? Gender.Unspecified,
             });
         }
 
@@ -136,7 +137,40 @@ namespace Sotlaora.Controllers
             userProfile.PhoneNumber = userProfileDto.PhoneNumber ?? userProfile.PhoneNumber;
             userProfile.DateOfBirth = userProfileDto.DateOfBirth != default ? userProfileDto.DateOfBirth : userProfile.DateOfBirth;
             userProfile.Bio = userProfileDto.Bio ?? userProfile.Bio;
-            userProfile.Gender = userProfileDto.Gender ?? userProfile.Gender;
+            userProfile.Gender = userProfileDto.Gender != Gender.Unspecified ? userProfileDto.Gender : Gender.Unspecified;
+
+            if (user.UserProfile == null)
+            {
+                context.UserProfiles.Add(userProfile);
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPut("update-phone")]
+        public async Task<IActionResult> UpdateUserProfile([FromBody] string phone)
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userProfile = user.UserProfile ?? new UserProfile { UserId = user.Id };
+
+            userProfile.PhoneNumber = phone;
 
             if (user.UserProfile == null)
             {
@@ -191,7 +225,7 @@ namespace Sotlaora.Controllers
         }
 
         [HttpPut("update-prices")]
-        public async Task<IActionResult> UpdateUserPrices([FromBody] List<ServicePricesDTO> servicePricesDTOs)
+        public async Task<IActionResult> UpdateUserPrices([FromBody] List<ServicePricesWithCategory> servicePricesDTOs)
         {
             var userId = userManager.GetUserId(User);
 
@@ -213,18 +247,91 @@ namespace Sotlaora.Controllers
 
             foreach (var priceDto in servicePricesDTOs)
             {
-                context.ProSubcategories.Add(new ProSubcategory
+                foreach (var servicePrice in priceDto.ServicePrices)
                 {
-                    SubcategoryId = priceDto.SubcategoryDTO.Id,
-                    Price = priceDto.Price,
-                    PriceType = priceDto.PriceType,
-                    ProId = user.Id
-                });
+                    context.ProSubcategories.Add(new ProSubcategory
+                    {
+                        SubcategoryId = servicePrice.SubcategoryDTO.Id,
+                        Price = servicePrice.Price,
+                        PriceType = servicePrice.PriceType,
+                        ProId = user.Id
+                    });
+                }
             }
 
             await context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [HttpPost("create-portfolio")]
+        public async Task<IActionResult> CreateProPortfolio([FromBody] ProPortfolioDTO portfolioDto)
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var portfolio = new ProPortfolio
+            {
+                Description = portfolioDto.Description,
+                YoutubeLink = portfolioDto.YoutubeLink,
+                SubcategoryId = portfolioDto.SubcategoryId,
+                ProId = user.Id
+            };
+            context.ProPortfolios.Add(portfolio);
+            await context.SaveChangesAsync();
+            var insertedId = portfolio.Id;
+            return Ok(new { insertedId });
+        }
+
+        [HttpGet("portfolios")]
+        public async Task<IActionResult> GetProPortfolios()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var portfolios = await context.ProPortfolios
+                .Where(p => p.ProId == user.Id)
+                .Select(p => new ProPortfolioDTO
+                {
+                    Description = p.Description,
+                    YoutubeLink = p.YoutubeLink,
+                    SubcategoryId = p.SubcategoryId,
+                    ImageFileId = context.Images
+                        .Where(i => i.EntityId == p.Id)
+                        .Select(i => i.Id)
+                        .FirstOrDefault(),
+                    ImageRef = context.Images
+                        .Where(i => i.EntityId == p.Id)
+                        .Select(i => i.Ref)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return Ok(portfolios);
         }
     }
 }

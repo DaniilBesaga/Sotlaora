@@ -33,7 +33,7 @@ export default function ProDashboard() {
   const [profileData, setProfileData] = useState({
     city: 'Тимишоара',
     birthDate: '',
-    gender: Gender.Male,
+    gender: Gender.Unspecified,
     about: '',
     phoneNumber: ''
   });
@@ -45,7 +45,7 @@ export default function ProDashboard() {
       setProfileData({
         city: data.city || 'Тимишоара',
         birthDate: data.dateOfBirth || '',
-        gender: data.gender,
+        gender: data.gender || Gender.Unspecified,
         about: data.bio || '',
         phoneNumber: data.phoneNumber || ''
       });
@@ -60,7 +60,7 @@ export default function ProDashboard() {
       dateOfBirth: newData.birthDate,
       gender: newData.gender,
       bio: newData.about,
-      phoneNumber: newData.phoneNumber
+      phoneNumber: phoneNumber
     };
     const res = await fetch('/api/user/profile', {
       method: 'PUT',
@@ -102,17 +102,11 @@ export default function ProDashboard() {
   };
 
   const handleSaveClick = async() => {
-    const userProfileNew: UserProfileDTO = {
-      city: profileData.city,
-      dateOfBirth: profileData.birthDate,
-      gender: profileData.gender,
-      bio: profileData.about,
-      phoneNumber: tempPhone
-    };
-    const res = await fetch('/api/user/profile', {
+    const phoneNumber = tempPhone.trim();
+    const res = await fetch('/api/user/update-phone', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userProfileNew)
+      body: JSON.stringify(phoneNumber)
     });
     const result = await res.json();
     if (!res.ok) {
@@ -248,7 +242,7 @@ export default function ProDashboard() {
                   <span className={styles.label}>Пол: </span>
                   {profileData.gender ? (
                     <span className={styles.value}>
-                      {profileData.gender === Gender.Male ? 'Мужской' : 'Женский'}
+                      {profileData.gender === Gender.Female ? 'Женский' : 'Мужской'}
                     </span>
                   ) : (
                     <button className={styles.addLink} onClick={() => setEditingSection('personal')}>
