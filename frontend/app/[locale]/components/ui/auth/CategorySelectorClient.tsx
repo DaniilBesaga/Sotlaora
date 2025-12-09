@@ -28,8 +28,8 @@ export default function CategorySelector({ categories, onNext }: Props) {
   const {userLong} = use(LoginContext)
 
   useEffect(() => {
-    if (userLong !== undefined && userLong?.prosubcategories?.length > 0) {
-      setSelected(new Set(userLong.prosubcategories.map((sc: Subcategory) => sc.id)))
+    if (userLong !== undefined && userLong?.proSubcategories?.length > 0) {
+      setSelected(new Set(userLong.proSubcategories.map((sc: Subcategory) => sc.id)))
     }
   }, [userLong]);
 
@@ -55,7 +55,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
   useEffect(() => {
     const hasSeenSelector = localStorage.getItem("has_seen_category_selector");
 
-    if (userLong?.prosubcategories.length === 0 && !hasSeenSelector) {
+    if (userLong?.proSubcategories.length === 0 && !hasSeenSelector) {
       setIsOpen(true);
     } else {
       setIsOpen(false);
@@ -131,6 +131,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(newNotification),
+          "credentials": "include"
         });
         if (!response.ok) {
           throw new Error('Ошибка при отправке уведомления');

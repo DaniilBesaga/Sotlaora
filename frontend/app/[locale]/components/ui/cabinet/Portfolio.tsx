@@ -18,6 +18,7 @@ const PortfolioPanel: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include"
         });
         const data = await res.json();
         console.log("Fetched portfolios:", data);
@@ -32,11 +33,12 @@ const PortfolioPanel: React.FC = () => {
   useEffect(() => {
     const fetchSubcategories = async () => {
       try {
-        const res = await fetch("http://localhost:5221/api/categories/with-subcategories", {
+        const res = await fetch("http://localhost:5221/api/category/with-subcategories", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include"
         });
         const data = await res.json();
         setSubcategories(data);
@@ -58,7 +60,7 @@ const PortfolioPanel: React.FC = () => {
   const [subcategories, setSubcategories] = useState<Category[]>([]);
   
   const [formData, setFormData] = useState<FileFormData>({
-    category: 'Услуги для животных',
+    category: '',
     subcategory: 'Уход за собаками',
     description: ''
   });
@@ -89,7 +91,7 @@ const PortfolioPanel: React.FC = () => {
 
     // Reset form data for new file (optional, depends on UX preference)
     setFormData({
-      category: 'Услуги для животных',
+      category: '',
       subcategory: 'Уход за собаками',
       description: ''
     });
@@ -152,6 +154,7 @@ const PortfolioPanel: React.FC = () => {
     try {
       const res = await fetch("http://localhost:5221/api/image/upload", {
         method: "POST",
+        credentials: "include",
         body: dataToSend,      
       });
 
@@ -161,6 +164,7 @@ const PortfolioPanel: React.FC = () => {
       
         const res = await fetch("http://localhost:5221/api/user/create-portfolio", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -284,6 +288,7 @@ const PortfolioPanel: React.FC = () => {
                       onChange={(e) => setFormData({...formData, category: e.target.value})}
                       disabled
                     >
+                      <option value={formData.category === '' ? 'Выберите категорию' : formData.category}>{formData.category === '' ? 'Выберите категорию' : formData.category}</option>
                     </select>
                   </div>
                 </div>
@@ -294,7 +299,7 @@ const PortfolioPanel: React.FC = () => {
                     <select 
                       className={styles.select}
                       value={formData.subcategory}
-                      onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                      onChange={(e) => handleSubcategoryChange(e)}
                     >
                       {subcategories.length > 0 && subcategories.map((cat) => (
                         cat.subcategories.map((subcat) => (

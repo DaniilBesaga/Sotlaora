@@ -60,7 +60,7 @@ export default function Header() {
 
           {/* Login icon */}
           {authenticated === 'authenticated' && (
-            <a href='/cabinet' className={styles.iconBtn} aria-label={t('account')}>
+            <a href='/cabinet' className={styles.iconBtn} aria-label="Profile">
               <img src={user.imageRef || '/images/default-profile.png'} alt="Profile" className={styles.profilePic} />
             </a>
           )}

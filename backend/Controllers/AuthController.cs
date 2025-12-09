@@ -379,6 +379,12 @@ namespace Sotlaora.Backend.Controllers
                 Orders = user.Orders.ToList()
             });
         }
+
+        [HttpGet("{id:int}")] // <--- ADD :int HERE
+        public async Task<IActionResult> GetUserById(int id) 
+        { 
+            return Ok();
+        }
     }
 
     public class RegisterRequest

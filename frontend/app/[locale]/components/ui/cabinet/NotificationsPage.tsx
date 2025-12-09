@@ -70,11 +70,12 @@ const NotificationsPage = () => {
   useEffect(() => {
     const fetchAllNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:5221/api/notification/all', {
+        const response = await fetch('http://localhost:5221/api/notification', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
+          "credentials": "include"
         });
         if (response.ok) {
           const data = await response.json();
@@ -96,6 +97,7 @@ const NotificationsPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        "credentials": "include"
       });
       if(response.ok){
         setNotifications(prev => prev.map(n => ({ ...n, isUnread: false })));

@@ -40,15 +40,16 @@ export default function ProDashboard() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const res = await fetch('/api/user/profileShort', { method: 'GET' });
+      const res = await fetch('http://localhost:5221/api/user/profileShort', { method: 'GET', credentials: "include" });
       const data = await res.json();
       setProfileData({
         city: data.city || 'Тимишоара',
         birthDate: data.dateOfBirth || '',
-        gender: data.gender || Gender.Unspecified,
+        gender: data.gender ? Gender[data.gender as keyof typeof Gender] : Gender.Unspecified,
         about: data.bio || '',
         phoneNumber: data.phoneNumber || ''
       });
+      console.log(data)
     }
     fetchUserProfile();
   }, []);
@@ -62,10 +63,11 @@ export default function ProDashboard() {
       bio: newData.about,
       phoneNumber: phoneNumber
     };
-    const res = await fetch('/api/user/profile', {
+    const res = await fetch('http://localhost:5221/api/user/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userProfileNew)
+      body: JSON.stringify(userProfileNew),
+      "credentials": "include"
     });
     const result = await res.json();
     if (!res.ok) {
@@ -228,9 +230,9 @@ export default function ProDashboard() {
                 
                 <div className={styles.infoBlock}>
                   <span className={styles.label}>Дата рождения: </span>
-                  {profileData.birthDate ? (
-                    <span className={styles.value}>{profileData.birthDate}</span>
-                  ) : (
+                    {profileData.birthDate && profileData.birthDate !== '0001-01-01T00:00:00' && new Date(profileData.birthDate).getFullYear() > 1 ? (
+                    <span className={styles.value}>{new Date(profileData.birthDate).toLocaleDateString()}</span>
+                    ) : (
                     /* Кнопка Добавить тоже открывает модалку */
                     <button className={styles.addLink} onClick={() => setEditingSection('personal')}>
                       Добавить
@@ -240,9 +242,9 @@ export default function ProDashboard() {
                 
                 <div className={styles.infoBlock}>
                   <span className={styles.label}>Пол: </span>
-                  {profileData.gender ? (
+                  {profileData.gender !== Gender.Unspecified ? (
                     <span className={styles.value}>
-                      {profileData.gender === Gender.Female ? 'Женский' : 'Мужской'}
+                      {profileData.gender === Gender.Male ? 'Мужской' : 'Женский'}
                     </span>
                   ) : (
                     <button className={styles.addLink} onClick={() => setEditingSection('personal')}>
@@ -250,7 +252,6 @@ export default function ProDashboard() {
                     </button>
                   )}
                 </div>
-                
                 <div className={styles.infoBlock}>
                   <span className={styles.label}>О себе: </span>
                   {profileData.about ? (

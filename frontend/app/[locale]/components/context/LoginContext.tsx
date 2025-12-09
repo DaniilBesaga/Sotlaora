@@ -15,7 +15,7 @@ interface UserDTOLong extends UserDTO {
     location?: string;
     isOnline: boolean;
     lastSeen?: string;
-    prosubcategories: Subcategory[];
+    proSubcategories: Subcategory[];
     orders: number[];
 }
 
@@ -39,7 +39,7 @@ const EmptyUserLong: UserDTOLong = {
     location: undefined,
     isOnline: false,
     lastSeen: undefined,
-    prosubcategories: [],
+    proSubcategories: [],
     orders: []
 };
 
@@ -76,7 +76,6 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             if (res.ok) {
                 const data = await res.json();
-                console.log(data)
                 if (data?.id && data?.email) {
                     setUser(data);
                     setAuthenticated("authenticated");

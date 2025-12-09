@@ -19,43 +19,31 @@ export default function ProOrders(){
 
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // const check = async () => {
-    //   const result = await getMe()
-
-    //   console.log(result)
-
-    //   if(result.status === 401){
-    //     const refreshStatus = await refresh();
-
-    //     if(refreshStatus === 200){
-    //       await getMe();
-    //     }
-    //     else {
-    //       router.push('/auth');
-    //     }
-    //   }
-    // }
-    // check();
-    if(authenticated === 'unauthenticated'){
-      router.push('/auth');
+    // 1. Handle Redirect
+    if (authenticated === 'unauthenticated') {
+        router.push('/auth');
+        return;
     }
 
+    // 2. Fetch Data
     const fetchLong = async () => {
-      if (getMeLong) {
-        const result = await getMeLong(false)
-        console.log(userLong)
-        setLoading(false);
-      }
-    }
+        // Only fetch if we are authenticated and the function exists
+        if (authenticated === 'authenticated' && getMeLong) {
+            await getMeLong(false);
+            setLoading(false);
+        }
+    };
 
-    if (!getMeLong || loading) return;
+    // 3. Execution logic
+    // Ensure we don't fetch if still loading auth state
+    if (authenticated === 'authenticated') {
+        fetchLong();
+    }
     
-    fetchLong();
-    
-  }, [authenticated]);
+}, [authenticated]); // Dependency array is correct for this logic
   
   // sample data
   const profile = {
@@ -89,7 +77,7 @@ export default function ProOrders(){
   const proposals = sampleProposals;
   const newOrders = sampleNewOrders;
 
-  return ( authenticated === 'loading' ? <div>Loading...</div> :
+  return ( (authenticated === 'loading' && loading) ? <div>Loading...</div> :
     <div className={styles.page}>
       {/* {userLong?.subcategories.length === 0 && <CategorySelector/>} */}
       <div className={styles.container}>
@@ -152,8 +140,8 @@ export default function ProOrders(){
             </nav>
 
             {/* Content area */}
-            <section className={userLong?.prosubcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
-            {userLong?.prosubcategories.length === 0 ? (
+            <section className={userLong?.proSubcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
+            {userLong?.proSubcategories.length === 0 ? (
               <div className={styles.emptyNotice} role="status" aria-live="polite">
                 <div className={styles.emptyNoticeRow}>
                   <div className={styles.emptyContent}>

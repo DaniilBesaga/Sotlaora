@@ -30,7 +30,7 @@ const PricesPanel = () => {
 
   const updatePrices = async () => {
     try {
-      const response = await fetch('/api/user/prices', {
+      const response = await fetch('/api/user/update-prices', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const PricesPanel = () => {
   return (
     
     <div className={styles.container}>
-      {userLong?.prosubcategories.length === 0 ? (
+      {userLong?.proSubcategories.length === 0 ? (
               <div className={styles.emptyNotice} role="status" aria-live="polite">
                 <div className={styles.emptyNoticeRow}>
                   <div className={styles.emptyContent}>

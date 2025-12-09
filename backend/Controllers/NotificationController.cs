@@ -6,6 +6,8 @@ using Sotlaora.Business.Models;
 using Sotlaora.Business.Entities;
 using Microsoft.AspNetCore.Identity;
 using Sotlaora.Infrastructure.Data;
+using backend.Business.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Controllers
 {
@@ -25,11 +27,22 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            var notifications = context.Notifications
+            var notifications = await context.Notifications
                 .Where(n => n.UserId == user.Id)
-                .OrderByDescending(n => n.CreatedAt)
-                .ToList();
+                .Select(n => new NotificatioFullDTO
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Message = n.Message,
+                    Slug = n.Slug,
+                    Type = n.Type,
+                    IsRead = n.IsRead,
+                    CreatedAt = n.CreatedAt
+                })
+                .ToListAsync();
+
             return Ok(notifications);
+
         }
 
         // GET: api/notification/{id}

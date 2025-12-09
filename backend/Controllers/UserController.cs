@@ -106,7 +106,7 @@ namespace Sotlaora.Controllers
             {
                 City = UserProfile?.City,
                 PhoneNumber = UserProfile?.PhoneNumber,
-                DateOfBirth = (UserProfile?.DateOfBirth) ?? DateTime.MinValue,
+                DateOfBirth = UserProfile?.DateOfBirth ?? default,
                 Bio = UserProfile?.Bio,
                 Gender = UserProfile?.Gender ?? Gender.Unspecified,
             });
