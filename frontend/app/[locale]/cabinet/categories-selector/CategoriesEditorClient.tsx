@@ -28,8 +28,8 @@ export default function CategoryEditorClient({ categories, onBack }: Props) {
 
   // Загружаем уже выбранные категории пользователя при старте
   useEffect(() => {
-    if (userLong !== undefined && userLong?.subcategories?.length > 0) {
-      setSelected(new Set(userLong.subcategories.map((sc: Subcategory) => sc.id)));
+    if (userLong !== undefined && userLong?.proSubcategories?.length > 0) {
+      setSelected(new Set(userLong.proSubcategories.map((sc: Subcategory) => sc.id)));
     }
   }, [userLong]);
 

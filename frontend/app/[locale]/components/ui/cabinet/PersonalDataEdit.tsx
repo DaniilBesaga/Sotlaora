@@ -6,7 +6,7 @@ export default function PersonalDataEdit({ onSave, onCancel, initialData }) {
   // Инициализация состояния (в реальности данные придут из пропса initialData)
   const [formData, setFormData] = useState({
     city: initialData?.city || 'Тимишоара',
-    birthDate: initialData?.birthDate || '',
+    birthDate: initialData?.birthDate !== "0001-01-01" ? initialData?.birthDate : '',
     gender: initialData?.gender || '', // 'male', 'female'
     about: initialData?.about || ''
   });

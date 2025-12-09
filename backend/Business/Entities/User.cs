@@ -18,8 +18,8 @@ namespace Sotlaora.Business.Entities
         public DateTime? LastSeen { get; set; }
 
 
-        public int? UserProfileId { get; set; }
-        public UserProfile? UserProfile { get; set; }
+        public int UserProfileId { get; set; }
+        public UserProfile UserProfile { get; set; } = null!;
 
         
 

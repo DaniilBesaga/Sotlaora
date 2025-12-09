@@ -6,7 +6,7 @@ namespace Sotlaora.Business.Models
     {
         public string PhoneNumber { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
         public Gender Gender { get; set; }
         public string Bio { get; set; } = string.Empty;
     }

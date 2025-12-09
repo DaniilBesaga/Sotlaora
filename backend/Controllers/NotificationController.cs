@@ -83,7 +83,8 @@ namespace Backend.Controllers
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
+            // return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
+            return Ok(new { notification.Id });
         }
 
         [HttpPatch("read-all")]

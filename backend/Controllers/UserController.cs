@@ -106,7 +106,7 @@ namespace Sotlaora.Controllers
             {
                 City = UserProfile?.City,
                 PhoneNumber = UserProfile?.PhoneNumber,
-                DateOfBirth = UserProfile?.DateOfBirth ?? default,
+                DateOfBirth = UserProfile?.DateOfBirth ?? null,
                 Bio = UserProfile?.Bio,
                 Gender = UserProfile?.Gender ?? Gender.Unspecified,
             });
@@ -146,11 +146,11 @@ namespace Sotlaora.Controllers
 
             await context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { userProfile });
         }
 
         [HttpPut("update-phone")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] string phone)
+        public async Task<IActionResult> UpdateUserPhonenumber([FromBody] string phone)
         {
             var userId = userManager.GetUserId(User);
 
@@ -168,7 +168,11 @@ namespace Sotlaora.Controllers
                 return NotFound();
             }
 
-            var userProfile = user.UserProfile ?? new UserProfile { UserId = user.Id };
+            var userProfile = user.UserProfile ?? new UserProfile 
+                { 
+                    UserId = user.Id,
+                    DateOfBirth = DateOnly.MinValue  
+                };
 
             userProfile.PhoneNumber = phone;
 
@@ -243,7 +247,7 @@ namespace Sotlaora.Controllers
                 return NotFound();
             }
 
-            user.ProSubcategories.Clear();
+            context.ProSubcategories.RemoveRange(user.ProSubcategories);
 
             foreach (var priceDto in servicePricesDTOs)
             {

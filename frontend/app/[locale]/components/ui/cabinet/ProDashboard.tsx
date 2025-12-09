@@ -63,7 +63,7 @@ export default function ProDashboard() {
       bio: newData.about,
       phoneNumber: phoneNumber
     };
-    const res = await fetch('http://localhost:5221/api/user/profile', {
+    const res = await fetch('http://localhost:5221/api/user/update-profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userProfileNew),
@@ -91,7 +91,9 @@ export default function ProDashboard() {
     return <CategorySelector />;
   }
 
-  
+  useEffect(() => {
+    setPhoneNumber(profileData.phoneNumber);
+  }, [profileData]);
 
   // Состояния для телефона
   const [phoneNumber, setPhoneNumber] = useState(profileData.phoneNumber);
@@ -105,10 +107,11 @@ export default function ProDashboard() {
 
   const handleSaveClick = async() => {
     const phoneNumber = tempPhone.trim();
-    const res = await fetch('/api/user/update-phone', {
+    const res = await fetch('http://localhost:5221/api/user/update-phone', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(phoneNumber)
+      body: JSON.stringify(phoneNumber),
+      "credentials": "include"
     });
     const result = await res.json();
     if (!res.ok) {

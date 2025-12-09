@@ -353,6 +353,7 @@ namespace Sotlaora.Backend.Controllers
             var user = await context.Users.OfType<Pro>()
                 .Include(u => u.Orders)
                 .Include(u => u.ProSubcategories)
+                    .ThenInclude(ps => ps.Subcategory)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)

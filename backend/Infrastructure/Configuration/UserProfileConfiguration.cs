@@ -44,16 +44,6 @@ namespace Sotlaora.Infrastructure.Configuration
                 .IsRequired(false)
                 .HasColumnType("geography (point, 4326)");
 
-            builder.Property(up => up.UserId)
-                .IsRequired();
-
-            builder.HasOne(up => up.User)
-                .WithOne()
-                .HasForeignKey<UserProfile>(up => up.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasIndex(up => up.UserId)
-                .IsUnique();
         }
     }
 }
