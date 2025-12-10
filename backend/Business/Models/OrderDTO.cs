@@ -14,12 +14,13 @@ namespace Backend.Business.Models
         public string AdditionalComment { get; set; } = string.Empty;
 
         public DateTime? DeadlineDate { get; set; }
-        public string? DesiredTimeStart { get; set; }
-        public string? DesiredTimeEnd { get; set; }
+        public TimeOnly? DesiredTimeStart { get; set; }
+        public TimeOnly? DesiredTimeEnd { get; set; }
 
         public List<int> Subcategories { get; set; } = new List<int>();
 
-        public List<int> ImageFileIds { get; set; } = new List<int>();
+        public List<string> ImageFileRefs { get; set; } = new List<string>();
+        public OrderStatus Status { get; set; }
         public int ClientId { get; set; }
     }
 }

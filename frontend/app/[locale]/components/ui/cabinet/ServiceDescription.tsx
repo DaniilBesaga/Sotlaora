@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, use } from 'react';
 import styles from './ProDashboard.module.css';
 import { ChevronDown, ChevronUp, Pencil } from 'lucide-react'; // Added Pencil
 import { SubcategoryWithCountBio } from '@/types/Category';
+import { LoginContext } from '../../context/LoginContext';
 
 interface Service {
   id: number;
@@ -25,6 +26,8 @@ export default function ServiceDescriptionEdit() {
 
   const bioInputRef = useRef<HTMLTextAreaElement>(null); // Ref to focus textarea
 
+  const {authorizedFetch} = use(LoginContext);
+
   // Focus the textarea when edit mode is enabled
   useEffect(() => {
     if (isBioEditing && bioInputRef.current) {
@@ -35,12 +38,8 @@ export default function ServiceDescriptionEdit() {
   useEffect(() => {
     const fetchSubcategories = async () => {
       try {
-        const response = await fetch('http://localhost:5221/api/user/get-pro-services-details', {
+        const response = await authorizedFetch('http://localhost:5221/api/user/get-pro-services-details', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: "include"
         });
         const data = await response.json();
         setSubcategories(data);
@@ -53,7 +52,7 @@ export default function ServiceDescriptionEdit() {
           services: data.subcategoryDTOs.map((sub: any) => ({
             id: sub.id,
             name: sub.title,
-            checked: false, // You might want to map this from API if user already has services selected
+            checked: sub.description && sub.description.trim() !== '', // Check if description exists
             desc: sub.description || ''
           }))
         }];
@@ -96,13 +95,10 @@ export default function ServiceDescriptionEdit() {
 
   const saveAboutMe = async() => {
     try {
-      const response = await fetch('http://localhost:5221/api/user/update-bio', {
+      const bio = aboutMe.trim();
+      const response = await authorizedFetch('http://localhost:5221/api/user/update-bio', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: "include",
-        body: JSON.stringify({ aboutMe })
+        body: JSON.stringify( bio )
       });
       if (response.ok) {
         alert('Информация о себе успешно сохранена!');
@@ -132,13 +128,11 @@ export default function ServiceDescriptionEdit() {
           return;
       }
 
-      const response = await fetch('http://localhost:5221/api/user/update-services-descriptions', {
+      const servicesDescriptions = servicesToSave;
+
+      const response = await authorizedFetch('http://localhost:5221/api/user/update-services-descriptions', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: "include",
-        body: JSON.stringify({ servicesDescriptions: servicesToSave })
+        body: JSON.stringify( servicesDescriptions)
       });
       if (response.ok) {
         alert('Описания услуг успешно сохранены!');
@@ -220,11 +214,19 @@ export default function ServiceDescriptionEdit() {
                     <input 
                       type="checkbox" 
                       checked={service.checked} 
+                      disabled={service.desc !== ''}
                       onChange={() => toggleService(cat.id, service.id)}
                       className={styles.customCheckbox}
                     />
                     <span className={styles.serviceNameText}>{service.name}</span>
                   </label>
+                  
+                  {/* Show preview if service has description but is not checked */}
+                  {!service.checked && service.desc && service.desc.trim() !== '' && (
+                    <span style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px', display: 'block' }}>
+                      {service.desc.substring(0, 50)}...
+                    </span>
+                  )}
 
                   {service.checked && (
                     <div className={styles.serviceEditBox}>

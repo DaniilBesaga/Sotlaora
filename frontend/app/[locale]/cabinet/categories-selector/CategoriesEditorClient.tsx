@@ -23,15 +23,26 @@ export default function CategoryEditorClient({ categories, onBack }: Props) {
   // Локальная копия категорий
   const [categoriesToUse] = useState<Category[]>(categories ?? []);
 
-  const { userLong } = use(LoginContext);
+  const { authenticated, authorizedFetch} = use(LoginContext);
   const router = useRouter();
 
-  // Загружаем уже выбранные категории пользователя при старте
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    if (userLong !== undefined && userLong?.proSubcategories?.length > 0) {
-      setSelected(new Set(userLong.proSubcategories.map((sc: Subcategory) => sc.id)));
-    }
-  }, [userLong]);
+      const fetchData = async () => {
+        const res = await authorizedFetch('http://localhost:5221/api/auth/meLong', {
+          method: 'GET',
+        });
+        const data = await res.json();
+
+        const proSubcategories : Subcategory[] = data.proSubcategories || [];
+        const selectedIds = new Set<number>(proSubcategories.map((sc) => sc.id));
+
+        setSelected(selectedIds);
+        setLoading(false);
+      };
+      fetchData();
+  }, [authenticated]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -107,7 +118,7 @@ export default function CategoryEditorClient({ categories, onBack }: Props) {
     return String(id);
   }
 
-  return (
+  return ( loading ? <div>Загрузка...</div> :
     <div className={styles.container} style={{margin: '0 auto'}}>
       {/* Кнопка назад (опционально, если это вложенная страница) */}
       <button onClick={()=>history.back()} className={styles.topBackBtn}>

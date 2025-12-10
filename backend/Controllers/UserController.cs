@@ -168,8 +168,9 @@ namespace Sotlaora.Controllers
 
             if (!int.TryParse(userId, out var id)) return Unauthorized();
 
-            var user = await context.Users
+            var user = await context.Users.OfType<Pro>()
                 .Include(u => u.UserProfile)
+                .Include(u => u.ProSubcategories)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -195,7 +196,7 @@ namespace Sotlaora.Controllers
                         Description = ps.Description
                     })
                     .ToList(),
-                TotalCount = context.Subcategories.Count(),
+                TotalCount = user.ProSubcategories.Count(),
                 FilledSubcategoriesCount = context.ProSubcategories.Count(ps => ps.Description != string.Empty)
             });
         }
@@ -480,7 +481,7 @@ namespace Sotlaora.Controllers
         }
 
         [HttpPatch("update-services-descriptions")]
-        public async Task<IActionResult> UpdateServicesDescriptions([FromBody] List<SubcategoryDTOWithDesc> servicesDescriptions)
+        public async Task<IActionResult> UpdateServicesDescriptions([FromBody] List<UpdateServiceDescriptionDto> servicesDescriptions)
         {
             var userId = userManager.GetUserId(User);
 
@@ -501,11 +502,11 @@ namespace Sotlaora.Controllers
             foreach (var serviceDesc in servicesDescriptions)
             {
                 var proSubcategory = user.ProSubcategories
-                    .FirstOrDefault(ps => ps.SubcategoryId == serviceDesc.Id);
+                    .FirstOrDefault(ps => ps.SubcategoryId == serviceDesc.SubcategoryId);
 
                 if (proSubcategory != null)
                 {
-                    proSubcategory.Description = serviceDesc.Description;
+                    proSubcategory.Description = serviceDesc.Description ?? "";
                 }
             }
 

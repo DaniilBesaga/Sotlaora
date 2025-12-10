@@ -1,6 +1,5 @@
 
 export async function addSubcategoriesToPro(subcategoryIds: number[]) {
-    console.log(subcategoryIds)
     const res = await fetch("http://localhost:5221/api/user/set-subcategories", {
         method: "POST",
         headers: {

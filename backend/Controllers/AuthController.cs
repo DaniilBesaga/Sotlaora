@@ -371,12 +371,15 @@ namespace Sotlaora.Backend.Controllers
                 Location = user.Location,
                 IsOnline = user.IsOnline,
                 LastSeen = user.LastSeen,
+                ImageRef = (await context.Images
+                                .FirstOrDefaultAsync(img => img.EntityType == ImageEntityType.User && img.EntityId.ToString() == userId))?.Ref,
                 ProSubcategories = user.ProSubcategories.ToList().Select(ps => new SubcategoryDTO
                 {
                     Id = ps.Subcategory.Id,
                     Title = ps.Subcategory.Title,
                     Slug = ps.Subcategory.Slug
                 }).ToList(),
+                PhoneNumber = user.PhoneNumber,
                 Orders = user.Orders.ToList()
             });
         }

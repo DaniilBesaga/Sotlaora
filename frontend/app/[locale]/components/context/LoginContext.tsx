@@ -17,6 +17,7 @@ interface UserDTOLong extends UserDTO {
     lastSeen?: string;
     proSubcategories: Subcategory[];
     orders: number[];
+    phoneNumber: string;
 }
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
@@ -26,7 +27,7 @@ const EmptyUser: UserDTO = {
     email: "",
     userName: "",
     role: Role.Client,
-    imageRef: undefined
+    imageRef: undefined,
 };
 
 const EmptyUserLong: UserDTOLong = {
@@ -40,7 +41,8 @@ const EmptyUserLong: UserDTOLong = {
     isOnline: false,
     lastSeen: undefined,
     proSubcategories: [],
-    orders: []
+    orders: [],
+    phoneNumber: ""
 };
 
 type LoginContextType = {
@@ -51,9 +53,10 @@ type LoginContextType = {
   getMeLong?: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
   logout: () => Promise<void>;
   refresh: () => Promise<number>;
+  authorizedFetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 };
 
-const LoginContext = createContext<LoginContextType>({user: EmptyUser, userLong: EmptyUserLong, authenticated: "loading",  getMe: async () => ({ ok: false, status: 0 }), getMeLong: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0});
+const LoginContext = createContext<LoginContextType>({user: EmptyUser, userLong: EmptyUserLong, authenticated: "loading",  getMe: async () => ({ ok: false, status: 0 }), getMeLong: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0, authorizedFetch: async () => new Response()});
 
 const LoginProvider = ({children}: {children: React.ReactNode}) =>{
     const [user, setUser] = useState<UserDTO>(EmptyUser);
@@ -62,6 +65,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
     useEffect(() => {
         getMe()
+        getMeLong()
     }, [])
 
     const getMe = async (retry = false) => {
@@ -157,7 +161,28 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         return res.status;
     }
 
-    return <LoginContext.Provider value={{user, userLong, authenticated, getMe, getMeLong, logout, refresh}}>{children}</LoginContext.Provider>
+    const authorizedFetch = async (input: RequestInfo, init?: RequestInit) => {
+        const response = await fetch(input, {
+            ...init,
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json',
+                ...(init?.headers || {})
+            },
+        });
+        if (response.status === 401) {
+            const refreshStatus = await refresh();
+            if (refreshStatus === 200) {
+                return await fetch(input, {
+                    ...init,
+                    credentials: "include",
+                });
+            }
+        }
+        return response;
+    }
+
+    return <LoginContext.Provider value={{user, userLong, authenticated, getMe, getMeLong, logout, refresh, authorizedFetch}}>{children}</LoginContext.Provider>
 }
 
 export {LoginContext, LoginProvider};

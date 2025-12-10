@@ -12,6 +12,7 @@ export interface ProDTO {
     lastSeen?: Date;
     subcategories: any[];
     orders: any[];
+    imageRef?: string;
 }
 
 export interface ProProfileDTO {

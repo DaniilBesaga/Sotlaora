@@ -21,40 +21,27 @@ export default function ProOrders(){
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // 1. Handle Redirect
-    if (authenticated === 'unauthenticated') {
-        router.push('/auth');
-        return;
-    }
-
-    // 2. Fetch Data
-    const fetchLong = async () => {
-        // Only fetch if we are authenticated and the function exists
-        if (authenticated === 'authenticated' && getMeLong) {
-            await getMeLong(false);
-            setLoading(false);
-        }
-    };
-
-    // 3. Execution logic
-    // Ensure we don't fetch if still loading auth state
-    if (authenticated === 'authenticated') {
-        fetchLong();
-    }
-    
-}, [authenticated]); // Dependency array is correct for this logic
+  
   
   // sample data
-  const profile = {
+  const [profile, setProfile] = useState({
     name: 'Иван Петров',
-    id: '№3831851',
+    id: '',
     city: 'Тимишоара, ул. Ласло Петефи 10',
     email: 'ivan@example.com',
     phone: '+40 712 345 678',
     avatar: '/images/pros/1.jpg',
     rating: 4.9,
-  };
+  });
+
+  useEffect(() => {
+    
+    if (authenticated === 'authenticated' && userLong !== undefined) {
+        setProfile(prevProfile => ({ ...prevProfile, name: userLong.userName || prevProfile.name, avatar: userLong.imageRef || prevProfile.avatar, id: `#${userLong.id}`,
+        city: userLong.location || 'Timisoara', phone: userLong.phoneNumber || prevProfile.phone }));
+    }
+    console.log(userLong)
+  }, [userLong]);
 
   // quick nav (правый столбец)
   const quick = [
@@ -88,13 +75,13 @@ export default function ProOrders(){
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div>
                 <div className={styles.hName}>{profile.name}</div>
-                <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>#3831851</strong></div>
+                <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>{profile.id}</strong></div>
               </div>
             </div>
 
             <div className={styles.badgeList}>
               <span className={styles.badge}>{profile.city}</span>
-              <span className={styles.badge}>{profile.phone}</span>
+              {profile.phone && <span className={styles.badge}>{profile.phone}</span>}
             </div>
           </div>
         </header>

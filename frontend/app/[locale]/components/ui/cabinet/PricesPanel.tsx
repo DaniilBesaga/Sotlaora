@@ -6,7 +6,7 @@ import { PriceType, ServicePricesWithCategory } from '@/types/ServicePrices';
 const PricesPanel = () => {
   const [activeTab, setActiveTab] = useState('prices');
   const [pricesData, setPricesData] = useState<ServicePricesWithCategory[]>([]);
-  const {userLong} = use(LoginContext)
+  const {userLong, authorizedFetch} = use(LoginContext)
 
   useEffect(() => {
     if(userLong?.proSubcategories.length === 0) {
@@ -14,12 +14,8 @@ const PricesPanel = () => {
     }
     const fetchUserPrices = async () => {
       try {
-        const response = await fetch('http://localhost:5221/api/user/prices', {
+        const response = await authorizedFetch('http://localhost:5221/api/user/prices', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          "credentials": "include"
         });
         const data = await response.json();
         
@@ -35,13 +31,9 @@ const PricesPanel = () => {
 
   const updatePrices = async () => {
     try {
-      const response = await fetch('http://localhost:5221/api/user/update-prices', {
+      const response = await authorizedFetch('http://localhost:5221/api/user/update-prices', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(pricesData),
-        "credentials": "include"
       });
       const data = await response.json();
       console.log('Updated user prices:', data);

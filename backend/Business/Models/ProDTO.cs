@@ -11,6 +11,8 @@ namespace Sotlaora.Business.Models
         public DateTime CreatedAt { get; set; }
         public string? Location { get; set; }
         public bool IsOnline { get; set; }
+        public string? ImageRef { get; set; }
+        public string? PhoneNumber { get; set; }
         public DateTime? LastSeen { get; set; }
         public List<SubcategoryDTO> ProSubcategories { get; set; } = new List<SubcategoryDTO>();
         public List<Order> Orders { get; set; } = new List<Order>();

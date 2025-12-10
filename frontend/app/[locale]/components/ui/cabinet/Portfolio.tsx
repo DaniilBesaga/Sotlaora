@@ -1,6 +1,7 @@
 import React, { useState, useRef, ChangeEvent, DragEvent, useEffect, use } from 'react';
 import styles from './PortfolioPanel.module.css';
 import { Category } from '@/types/Category';
+import { LoginContext } from '../../context/LoginContext';
 
 interface FileFormData {
   category: string;
@@ -10,15 +11,13 @@ interface FileFormData {
 
 const PortfolioPanel: React.FC = () => {
 
+  const { authorizedFetch } = use(LoginContext);
+
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        const res = await fetch("http://localhost:5221/api/user/portfolios", {
+        const res = await authorizedFetch("http://localhost:5221/api/user/portfolios", {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include"
         });
         const data = await res.json();
         console.log("Fetched portfolios:", data);
@@ -33,12 +32,8 @@ const PortfolioPanel: React.FC = () => {
   useEffect(() => {
     const fetchSubcategories = async () => {
       try {
-        const res = await fetch("http://localhost:5221/api/category/with-subcategories", {
+        const res = await authorizedFetch("http://localhost:5221/api/category/with-subcategories", {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include"
         });
         const data = await res.json();
         setSubcategories(data);
@@ -152,9 +147,8 @@ const PortfolioPanel: React.FC = () => {
     console.log("Ready to upload:", Object.fromEntries(dataToSend));
 
     try {
-      const res = await fetch("http://localhost:5221/api/image/upload", {
+      const res = await authorizedFetch("http://localhost:5221/api/image/upload", {
         method: "POST",
-        credentials: "include",
         body: dataToSend,      
       });
 
@@ -162,12 +156,8 @@ const PortfolioPanel: React.FC = () => {
       
       if(dataImage.insertedIds.length > 0){
       
-        const res = await fetch("http://localhost:5221/api/user/create-portfolio", {
+        const res = await authorizedFetch("http://localhost:5221/api/user/create-portfolio", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
             Description: formData.description,
             YoutubeLink: videoLink,

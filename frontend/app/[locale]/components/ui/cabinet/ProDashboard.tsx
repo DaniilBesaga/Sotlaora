@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Mail, Phone, User, Hammer, AlignLeft, Bell, Trash, Pencil, Check, X } from 'lucide-react';
 import styles from './ProDashboard.module.css';
 import PortfolioPanel from './Portfolio';
@@ -10,12 +10,15 @@ import PersonalDataEdit from './PersonalDataEdit';
 import CategorySelector from '../auth/CategorySelector';
 import { Gender } from '@/types/UserProfile';
 import { ProProfileDTO } from '@/types/ProDTO';
+import { LoginContext } from '../../context/LoginContext';
 // Импортируем компонент для редактирования услуг
 
 export default function ProDashboard() {
   const [activeTab, setActiveTab] = useState('general');
   // Состояние для отслеживания, какая секция редактируется
   const [editingSection, setEditingSection] = useState('');
+
+  const {authorizedFetch} = use(LoginContext);
 
   const categoriesList = [
     'Сантехник', 'Електрик', 'Муж на час', 'Столяр', 
@@ -44,7 +47,7 @@ export default function ProDashboard() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const res = await fetch('http://localhost:5221/api/user/profileShort', { method: 'GET', credentials: "include" });
+      const res = await authorizedFetch('http://localhost:5221/api/user/profileShort', { method: 'GET' });
       const data = await res.json();
       setProfileData({
         city: data.city || 'Тимишоара',
@@ -70,11 +73,9 @@ export default function ProDashboard() {
       bio: newData.bio,
       phoneNumber: phoneNumber,
     };
-    const res = await fetch('http://localhost:5221/api/user/update-profile', {
+    const res = await authorizedFetch('http://localhost:5221/api/user/update-profile', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userProfileNew),
-      "credentials": "include"
     });
     const result = await res.json();
     if (!res.ok) {
@@ -114,11 +115,9 @@ export default function ProDashboard() {
 
   const handleSaveClick = async() => {
     const phoneNumber = tempPhone.trim();
-    const res = await fetch('http://localhost:5221/api/user/update-phone', {
+    const res = await authorizedFetch('http://localhost:5221/api/user/update-phone', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(phoneNumber),
-      "credentials": "include"
     });
     const result = await res.json();
     if (!res.ok) {

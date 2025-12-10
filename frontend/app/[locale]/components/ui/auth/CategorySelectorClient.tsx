@@ -25,7 +25,7 @@ export default function CategorySelector({ categories, onNext }: Props) {
 
   const [isOpen, setIsOpen] = useState(true);
 
-  const {userLong} = use(LoginContext)
+  const {userLong, authorizedFetch} = use(LoginContext)
 
   useEffect(() => {
     if (userLong !== undefined && userLong?.proSubcategories?.length > 0) {
@@ -125,13 +125,9 @@ export default function CategorySelector({ categories, onNext }: Props) {
         slug: ""
       };
       try {
-        const response = await fetch('http://localhost:5221/api/notification', {
+        const response = await authorizedFetch('http://localhost:5221/api/notification', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newNotification),
-          "credentials": "include"
+          body: JSON.stringify(newNotification)
         });
         if (!response.ok) {
           throw new Error('Ошибка при отправке уведомления');

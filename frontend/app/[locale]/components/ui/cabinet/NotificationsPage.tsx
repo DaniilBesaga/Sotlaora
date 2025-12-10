@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import styles from './NotificationsPage.module.css';
+import { LoginContext } from '../../context/LoginContext';
 
 const NotificationsPage = () => {
   // Имитация данных
@@ -70,12 +71,8 @@ const NotificationsPage = () => {
   useEffect(() => {
     const fetchAllNotifications = async () => {
       try {
-        const response = await fetch('http://localhost:5221/api/notification', {
+        const response = await authorizedFetch('http://localhost:5221/api/notification', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          "credentials": "include"
         });
         if (response.ok) {
           const data = await response.json();
@@ -89,15 +86,13 @@ const NotificationsPage = () => {
     fetchAllNotifications();
   }, []);
 
+  const { authorizedFetch } = use(LoginContext);
+
   const markAllRead = async ()=>{
     setNotifications(prev => prev.map(n => ({ ...n, isUnread: false })));
     try {
-      const response = await fetch('http://localhost:5221/api/notification/read-all', {
+      const response = await authorizedFetch('http://localhost:5221/api/notification/read-all', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        "credentials": "include"
       });
       if(response.ok){
         setNotifications(prev => prev.map(n => ({ ...n, isUnread: false })));
