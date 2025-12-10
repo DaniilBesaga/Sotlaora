@@ -1,3 +1,6 @@
+import { Gender } from "./UserProfile";
+import { SubcategoryDTOWithDesc } from "./Category";
+
 export interface ProDTO {
     id: string;
     email: string;
@@ -9,4 +12,15 @@ export interface ProDTO {
     lastSeen?: Date;
     subcategories: any[];
     orders: any[];
+}
+
+export interface ProProfileDTO {
+    phoneNumber: string;
+    city: string;
+    dateOfBirth?: string;
+    gender: Gender;
+    bio: string;
+    subcategoryDTOs: SubcategoryDTOWithDesc[];
+    totalCount: number;
+    filledSubcategoriesCount: number;
 }

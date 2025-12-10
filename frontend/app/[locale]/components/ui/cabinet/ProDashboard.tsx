@@ -8,7 +8,8 @@ import PricesPanel from './PricesPanel';
 import ServiceDescriptionEdit from './ServiceDescription';
 import PersonalDataEdit from './PersonalDataEdit';
 import CategorySelector from '../auth/CategorySelector';
-import { Gender, UserProfileDTO } from '@/types/UserProfile';
+import { Gender } from '@/types/UserProfile';
+import { ProProfileDTO } from '@/types/ProDTO';
 // Импортируем компонент для редактирования услуг
 
 export default function ProDashboard() {
@@ -30,12 +31,15 @@ export default function ProDashboard() {
     { id: 'price', label: 'Стоимость работ' },
   ];
 
-  const [profileData, setProfileData] = useState({
+  const [profileData, setProfileData] = useState<ProProfileDTO>({
     city: 'Тимишоара',
-    birthDate: '',
+    dateOfBirth: '',
     gender: Gender.Unspecified,
-    about: '',
-    phoneNumber: ''
+    bio: '',
+    phoneNumber: '',
+    subcategoryDTOs: [],
+    totalCount: 0,
+    filledSubcategoriesCount: 0
   });
 
   useEffect(() => {
@@ -44,10 +48,13 @@ export default function ProDashboard() {
       const data = await res.json();
       setProfileData({
         city: data.city || 'Тимишоара',
-        birthDate: data.dateOfBirth || '',
+        dateOfBirth: data.dateOfBirth || '',
         gender: data.gender ? Gender[data.gender as keyof typeof Gender] : Gender.Unspecified,
-        about: data.bio || '',
-        phoneNumber: data.phoneNumber || ''
+        bio: data.bio || '',
+        phoneNumber: data.phoneNumber || '',
+        subcategoryDTOs: data.subcategoryDTOs || [],
+        totalCount: data.totalCount || 0,
+        filledSubcategoriesCount: data.filledSubcategoriesCount || 0
       });
       console.log(data)
     }
@@ -56,12 +63,12 @@ export default function ProDashboard() {
 
   // Функция сохранения данных из формы
   const handlePersonalDataSave = async (newData) => {
-    const userProfileNew: UserProfileDTO = {
+    const userProfileNew = {
       city: newData.city,
-      dateOfBirth: newData.birthDate,
+      dateOfBirth: newData.dateOfBirth,
       gender: newData.gender,
-      bio: newData.about,
-      phoneNumber: phoneNumber
+      bio: newData.bio,
+      phoneNumber: phoneNumber,
     };
     const res = await fetch('http://localhost:5221/api/user/update-profile', {
       method: 'PUT',
@@ -257,8 +264,8 @@ export default function ProDashboard() {
                 </div>
                 <div className={styles.infoBlock}>
                   <span className={styles.label}>О себе: </span>
-                  {profileData.about ? (
-                    <p className={styles.bioText}>{profileData.about}</p>
+                  {profileData.bio ? (
+                    <p className={styles.bioText}>{profileData.bio}</p>
                   ) : (
                     <button className={styles.addLink} onClick={() => setEditingSection('personal')}>
                       Добавить
@@ -282,7 +289,7 @@ export default function ProDashboard() {
             <div className={styles.row}>
               <AlignLeft className={styles.icon} />
               <div>
-                <p className={styles.subText}>0/8 услуг заполнено</p>
+                <p className={styles.subText}>{profileData.filledSubcategoriesCount}/{profileData.totalCount} услуг заполнено</p>
                 <p className={styles.hintText}>Заполните описание, чтобы привлечь больше клиентов.</p>
               </div>
             </div>
@@ -300,8 +307,8 @@ export default function ProDashboard() {
               <Hammer className={styles.icon} />
               <div style={{ width: '100%' }}>
                 <div className={styles.tagsWrapper}>
-                  {categoriesList.map((cat, index) => (
-                    <span key={index} className={styles.tag}>{cat}</span>
+                  {profileData.subcategoryDTOs.map((cat, index) => (
+                    <span key={index} className={styles.tag}>{cat.title}</span>
                   ))}
                 </div>
               </div>

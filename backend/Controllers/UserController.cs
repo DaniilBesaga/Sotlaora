@@ -1,3 +1,4 @@
+using backend.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,6 +59,79 @@ namespace Sotlaora.Controllers
             return Ok(new { UserId = userId, SubcategoryIds = subcategoryIds });
         }
 
+        [HttpGet("get-pro-services-details")]
+        public async Task<IActionResult> GetProServicesDetails()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .Include(u => u.ProSubcategories)
+                .ThenInclude(ps => ps.Subcategory)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var subcategoryDtos = user.ProSubcategories
+                .Select(ps => new SubcategoryDTOWithDesc
+                {
+                    Id = ps.Subcategory.Id,
+                    Title = ps.Subcategory.Title,
+                    Slug = ps.Subcategory.Slug,
+                    Description = ps.Description
+                })
+                .ToList();
+
+            return Ok(new SubcategoryDTOWithCountBio
+            {
+                SubcategoryDTOs = subcategoryDtos,
+                Count = subcategoryDtos.Count,
+                Bio = user.UserProfile?.Bio ?? string.Empty
+            });
+        }
+
+        [HttpGet("get-pro-subcategories")]
+        public async Task<IActionResult> GetProSubcategories()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .Include(u => u.ProSubcategories)
+                .ThenInclude(ps => ps.Subcategory)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var subcategoryDtos = user.ProSubcategories
+                .Select(ps => new SubcategoryDTOWithDesc
+                {
+                    Id = ps.Subcategory.Id,
+                    Title = ps.Subcategory.Title,
+                })
+                .ToList();
+
+            return Ok(new SubcategoryDTOWithCountBio
+            {
+                SubcategoryDTOs = subcategoryDtos,
+                Count = subcategoryDtos.Count,
+            });
+        }
+
         [HttpPost("delete-account")]
         public async Task<IActionResult> DeleteAccount()
         {
@@ -78,7 +152,10 @@ namespace Sotlaora.Controllers
             context.Images.RemoveRange(images);
             await context.SaveChangesAsync();
 
-            return Ok();
+            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete("refresh_token");
+
+            return Ok("User account deleted successfully");
         }
 
         [HttpGet("profileShort")]
@@ -109,6 +186,17 @@ namespace Sotlaora.Controllers
                 DateOfBirth = UserProfile?.DateOfBirth ?? null,
                 Bio = UserProfile?.Bio,
                 Gender = UserProfile?.Gender ?? Gender.Unspecified,
+                SubcategoryDTOs = context.ProSubcategories
+                    .Where(ps => ps.ProId == user.Id)
+                    .Select(ps => new SubcategoryDTOWithDesc
+                    {
+                        Id = ps.Subcategory.Id,
+                        Title = ps.Subcategory.Title,
+                        Description = ps.Description
+                    })
+                    .ToList(),
+                TotalCount = context.Subcategories.Count(),
+                FilledSubcategoriesCount = context.ProSubcategories.Count(ps => ps.Description != string.Empty)
             });
         }
 
@@ -171,7 +259,8 @@ namespace Sotlaora.Controllers
             var userProfile = user.UserProfile ?? new UserProfile 
                 { 
                     UserId = user.Id,
-                    DateOfBirth = DateOnly.MinValue  
+                    DateOfBirth = DateOnly.MinValue,
+                    Gender = Gender.Unspecified
                 };
 
             userProfile.PhoneNumber = phone;
@@ -183,7 +272,7 @@ namespace Sotlaora.Controllers
 
             await context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { userProfile });
         }
 
         [HttpGet("prices")]
@@ -247,25 +336,39 @@ namespace Sotlaora.Controllers
                 return NotFound();
             }
 
-            context.ProSubcategories.RemoveRange(user.ProSubcategories);
+            var existing = user.ProSubcategories.ToList();
 
             foreach (var priceDto in servicePricesDTOs)
             {
                 foreach (var servicePrice in priceDto.ServicePrices)
                 {
-                    context.ProSubcategories.Add(new ProSubcategory
+                    var subcatId = servicePrice.SubcategoryDTO.Id;
+                    
+                    var current = existing.FirstOrDefault(ps => ps.SubcategoryId == subcatId);
+
+                    if (current != null)
                     {
-                        SubcategoryId = servicePrice.SubcategoryDTO.Id,
-                        Price = servicePrice.Price,
-                        PriceType = servicePrice.PriceType,
-                        ProId = user.Id
-                    });
+                        // обновляем существующую запись
+                        current.Price = servicePrice.Price;
+                        current.PriceType = servicePrice.PriceType;
+                    }
+                    else
+                    {
+                        // создаем новую запись
+                        user.ProSubcategories.Add(new ProSubcategory
+                        {
+                            SubcategoryId = subcatId,
+                            Price = servicePrice.Price,
+                            PriceType = servicePrice.PriceType,
+                            ProId = user.Id
+                        });
+                    }
                 }
             }
 
             await context.SaveChangesAsync();
 
-            return Ok();
+            return Ok("Prices updated successfully");
         }
 
         [HttpPost("create-portfolio")]
@@ -336,6 +439,79 @@ namespace Sotlaora.Controllers
                 .ToListAsync();
 
             return Ok(portfolios);
+        }
+
+        [HttpPatch("update-bio")]
+        public async Task<IActionResult> UpdateBio([FromBody] string bio)
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userProfile = user.UserProfile ?? new UserProfile 
+                { 
+                    UserId = user.Id,
+                    DateOfBirth = DateOnly.MinValue,
+                };
+
+            userProfile.Bio = bio;
+
+            if (user.UserProfile == null)
+            {
+                user.UserProfile = userProfile;
+                context.UserProfiles.Add(userProfile);
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok("Bio updated successfully");
+        }
+
+        [HttpPatch("update-services-descriptions")]
+        public async Task<IActionResult> UpdateServicesDescriptions([FromBody] List<SubcategoryDTOWithDesc> servicesDescriptions)
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .Include(u => u.ProSubcategories)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            foreach (var serviceDesc in servicesDescriptions)
+            {
+                var proSubcategory = user.ProSubcategories
+                    .FirstOrDefault(ps => ps.SubcategoryId == serviceDesc.Id);
+
+                if (proSubcategory != null)
+                {
+                    proSubcategory.Description = serviceDesc.Description;
+                }
+            }
+
+            await context.SaveChangesAsync();
+
+            return Ok("Service descriptions updated successfully");
         }
     }
 }
