@@ -1,5 +1,6 @@
 using Backend.Business.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Sotlaora.Business.Entities;
 using Sotlaora.Business.Enums;
 using Sotlaora.Business.Models;
@@ -50,10 +51,12 @@ namespace Sotlaora.Controllers
                 Location = order.Location,
                 AdditionalComment = order.AdditionalComment,
                 DeadlineDate = order.DeadlineDate,
-                DesiredTimeStart = string.IsNullOrEmpty(order.DesiredTimeStart) ? null : TimeOnly.Parse(order.DesiredTimeStart),
-                DesiredTimeEnd = string.IsNullOrEmpty(order.DesiredTimeEnd) ? null : TimeOnly.Parse(order.DesiredTimeEnd),
+                DesiredTimeStart = order.DesiredTimeStart,
+                DesiredTimeEnd = order.DesiredTimeEnd,
                 Subcategories = order.Subcategories?.Select(id => _context.Subcategories.Find(id)).Where(s => s != null).ToList(),
-                ClientId = order.ClientId
+                ClientId = order.ClientId,
+                Status = order.ProId != 0 ? OrderStatus.UnderReview : OrderStatus.Active,
+                ProId = order.ProId
             };
             _context.Orders.Add(orderFull);
             _context.SaveChanges();
@@ -96,6 +99,15 @@ namespace Sotlaora.Controllers
 
             _context.SaveChanges();
             return CreatedAtAction("post order", new { id = orderFull.Id }, orderFull);
+        }
+
+        [HttpGet("get-all-without-pro")]
+        public async Task<IActionResult> GetAllOrdersWithoutPro()
+        {
+            var orderFull = await _context.Orders
+                .Where(o => o.ProId == 0)
+                .ToListAsync();
+            return Ok(orderFull);
         }
 
         [HttpPut("{id}")]

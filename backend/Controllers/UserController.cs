@@ -514,5 +514,28 @@ namespace Sotlaora.Controllers
 
             return Ok("Service descriptions updated successfully");
         }
+
+        [HttpGet("get-all-orders")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users.OfType<Pro>()
+                .Include(u => u.ProSubcategories)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var orders = user.AssignedOrders.ToList();
+            return Ok(orders);
+        }
     }
 }

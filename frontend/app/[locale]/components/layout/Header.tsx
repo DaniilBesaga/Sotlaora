@@ -8,7 +8,7 @@ export default function Header() {
   const t = useTranslations('Header');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const {user, authenticated, getMe, logout, refresh} = use(LoginContext);
+  const {user, authenticated, getMe, logout, refresh, userLong} = use(LoginContext);
 
   useEffect(() => {
     // const check = async () => {
@@ -61,7 +61,7 @@ export default function Header() {
           {/* Login icon */}
           {authenticated === 'authenticated' && (
             <a href='/cabinet' className={styles.iconBtn} aria-label="Profile">
-              <img src={user.imageRef || '/images/default-profile.png'} alt="Profile" className={styles.profilePic} />
+              <img src={(user.imageRef === undefined && userLong?.imageRef === undefined) ?  '/images/default-profile.png' : (user.imageRef || userLong?.imageRef)} alt="Profile" className={styles.profilePic} />
             </a>
           )}
 

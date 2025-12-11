@@ -50,23 +50,40 @@ export interface Order {
 }
 
 export interface OrderDTO {
+  id: number;
   
-  title: string | "";
-  description: string | "";
+  title: string;
+  description: string;
 
   postedAt: Date;
   price: number;
 
   location: Location;
 
-  additionalComment: string | "";
+  additionalComment: string;
 
-  deadlineDate?: string | Date;
+  deadlineDate?: Date;
 
-  desiredTimeStart?: string; 
-  desiredTimeEnd?: string;   
+  desiredTimeStart?: string; // TimeOnly from C# - format: "HH:mm:ss"
+  desiredTimeEnd?: string;   // TimeOnly from C# - format: "HH:mm:ss"
 
   subcategories: number[];
 
+  imageFileRefs: string[];
+  imageFileIds: number[];
+
+  status: OrderStatus;
+
   clientId: number;
+}
+
+export interface ProCard {
+  id: number;
+  proId: number;
+  userName: string;
+  description: string;
+  imageRef: string;
+  subcategoriesDTO: Subcategory[];
+  location: string;
+  price?: number;
 }

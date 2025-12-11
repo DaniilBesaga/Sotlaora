@@ -6,6 +6,7 @@ namespace Backend.Business.Models
 {
     public class OrderDTO
     {
+        public int Id { get; set;}
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime PostedAt { get; set; }
@@ -20,7 +21,10 @@ namespace Backend.Business.Models
         public List<int> Subcategories { get; set; } = new List<int>();
 
         public List<string> ImageFileRefs { get; set; } = new List<string>();
+        public List<int> ImageFileIds { get; set; } = new List<int>();
+        
         public OrderStatus Status { get; set; }
         public int ClientId { get; set; }
+        public int ProId { get; set; }
     }
 }

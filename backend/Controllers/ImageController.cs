@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Sotlaora.Business.Entities;
 using Sotlaora.Infrastructure.Data;
 using System.IO;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace Sotlaora.Backend.Controllers
                     fileNames.Add(filePath);
                 }
 
-                var images = new List<Business.Entities.Image>();
+                var images = new List<Image>();
 
                 foreach (var file in files)
                 {
@@ -50,7 +51,7 @@ namespace Sotlaora.Backend.Controllers
                         await file.CopyToAsync(stream);
                     }
 
-                    var image = new Business.Entities.Image
+                    var image = new Image
                     {
                         Ref = file.FileName,
                     };

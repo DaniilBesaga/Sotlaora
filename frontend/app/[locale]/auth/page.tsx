@@ -53,7 +53,7 @@ export default function AuthFullBg() {
           {/* Role switch */}
           <div className={styles.roleSwitch} role="tablist" aria-label="Выбор роли">
             <button
-              className={`${styles.role} ${role === "customer" ? styles.activeRole : ""}`}
+              className={`${styles.role} ${role === "client" ? styles.activeRole : ""}`}
               onClick={() => setRole("client")}
               role="tab"
               aria-selected={role === "client"}

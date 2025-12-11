@@ -1,5 +1,7 @@
 import { Subcategory } from "@/types/Category";
 import { Role } from "@/types/Role";
+import { get } from "http";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 interface UserDTO {
@@ -50,22 +52,33 @@ type LoginContextType = {
   userLong?: UserDTOLong;
   authenticated: AuthState;
   getMe: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
+  getMeLongClient: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
   getMeLong?: (retry: boolean) => Promise<{ ok: boolean; status: number }>;
   logout: () => Promise<void>;
   refresh: () => Promise<number>;
   authorizedFetch: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
 };
 
-const LoginContext = createContext<LoginContextType>({user: EmptyUser, userLong: EmptyUserLong, authenticated: "loading",  getMe: async () => ({ ok: false, status: 0 }), getMeLong: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0, authorizedFetch: async () => new Response()});
+const LoginContext = createContext<LoginContextType>({user: EmptyUser, userLong: EmptyUserLong, authenticated: "loading",  getMe: async () => ({ ok: false, status: 0 }), getMeLongClient: async () => ({ ok: false, status: 0 }), getMeLong: async () => ({ ok: false, status: 0 }), logout: async () => {}, refresh: async () => 0, authorizedFetch: async () => new Response()});
 
 const LoginProvider = ({children}: {children: React.ReactNode}) =>{
     const [user, setUser] = useState<UserDTO>(EmptyUser);
     const [userLong, setUserLong] = useState<UserDTOLong>(EmptyUserLong);
     const [authenticated, setAuthenticated] = useState<AuthState>("loading");
 
+    const path = usePathname()
+    const router = useRouter()
+
     useEffect(() => {
-        getMe()
-        getMeLong()
+        if(user.id === -1 && userLong.id === -1){
+            if(path.includes('/cabinet-c')) {
+                getMeLongClient()
+            } else if(!path.includes('/auth')) 
+            {
+                getMe()
+                getMeLong()
+            }
+        }
     }, [])
 
     const getMe = async (retry = false) => {
@@ -96,6 +109,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             setUser(EmptyUser);
             setAuthenticated("unauthenticated");
+            router.push('/auth')
             return { ok: false, status: 401 };
 
         } catch (error) {
@@ -134,6 +148,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             setUserLong(EmptyUserLong);
             setAuthenticated("unauthenticated");
+            router.push('/auth')
             return { ok: false, status: 401 };
 
         } catch (error) {
@@ -161,6 +176,45 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         return res.status;
     }
 
+    const getMeLongClient = async (retry = false) => {
+        try {
+            const res = await fetch("http://localhost:5221/api/client/meLong", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data?.id && data?.email) {
+                    setUserLong(data);
+                    setAuthenticated("authenticated");
+                    return { ok: true, status: res.status };
+                }
+            }
+
+            if(res.status === 401 && !retry){
+                const refreshStatus = await refresh();
+                if(refreshStatus === 200){
+                    return await getMeLongClient(true);
+                }
+            }
+
+            setUserLong(EmptyUserLong);
+            router.push('/auth')
+            setAuthenticated("unauthenticated");
+            return { ok: false, status: 401 };
+
+        } catch (error) {
+            console.error("Authentication failed:", error);
+            setUserLong(EmptyUserLong);
+            setAuthenticated("unauthenticated");
+            return { ok: false, status: 401 };
+        }
+    }
+
     const authorizedFetch = async (input: RequestInfo, init?: RequestInit) => {
         const response = await fetch(input, {
             ...init,
@@ -182,7 +236,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         return response;
     }
 
-    return <LoginContext.Provider value={{user, userLong, authenticated, getMe, getMeLong, logout, refresh, authorizedFetch}}>{children}</LoginContext.Provider>
+    return <LoginContext.Provider value={{user, userLong, authenticated, getMe, getMeLongClient, getMeLong, logout, refresh, authorizedFetch}}>{children}</LoginContext.Provider>
 }
 
 export {LoginContext, LoginProvider};

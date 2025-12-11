@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
@@ -7,24 +7,8 @@ import {
   Wallet, Shield, Star, RotateCcw, Calendar, Clock 
 } from 'lucide-react';
 import styles from './UserCabinet.module.css';
-
-// --- 1. YOUR DTO INTERFACE ---
-export interface OrderDTO {
-  id: string; // Added ID for React keys
-  title: string | "";
-  description: string | "";
-  postedAt: Date;
-  price: number;
-  location: string; // e.g., "AtPros", "AtClients", "Online"
-  deadlineDate?: string | Date;
-  subcategories: number[]; // e.g., [1, 5]
-  
-  // UI specific fields (optional, for frontend state)
-  status: 'searching' | 'in_progress' | 'completed' | 'cancelled';
-  images?: string[];
-  proposalsCount?: number;
-  rating?: number;
-}
+import { Location, OrderDTO, OrderStatus } from '@/types/Order';
+import { LoginContext } from '../components/context/LoginContext';
 
 // --- MOCK HELPER: Subcategory ID to Name mapping ---
 const getSubcategoryName = (id: number) => {
@@ -41,47 +25,84 @@ const getSubcategoryName = (id: number) => {
 // --- 2. UPDATED MOCK DATA ---
 const ALL_ORDERS: OrderDTO[] = [
   {
-    id: 'o1',
+    id: 1,
     title: 'General house cleaning 60m²',
     description: 'Need a full cleanup after renovation. Must bring own vacuum and supplies.',
     postedAt: new Date('2023-10-25T10:00:00'),
     price: 250,
-    location: 'AtClients', // "At Client's place"
+    location: Location.AtClients, // "At Client's place"
     deadlineDate: new Date('2023-10-28'),
     subcategories: [1, 5], // Cleaning, Repairs
-    status: 'searching',
-    images: ['/images/services/air.jpg', '/images/services/cleaning.jpg'],
-    proposalsCount: 3
+    status: OrderStatus.Active,
+    imageFileRefs: ['/images/services/air.jpg', '/images/services/cleaning.jpg'],
+    additionalComment: '',
+    desiredTimeStart: '',
+    desiredTimeEnd: '',
+    clientId: 123,
+    imageFileIds: [45, 46]
   },
   {
-    id: 'o2',
+    id: 2,
     title: 'Fix kitchen socket',
     description: 'Socket sparks when using the kettle. Need replacement.',
     postedAt: new Date('2023-10-24T14:30:00'),
     price: 100,
-    location: 'AtClients',
+    location: Location.AtClients,
     deadlineDate: new Date('2023-10-25'), // Urgent/Today
     subcategories: [3], // Electrician
-    status: 'in_progress',
-    images: ['/images/services/gas.jpg'],
-    proposalsCount: 1
+    status: OrderStatus.Taken,
+    imageFileRefs: ['/images/services/gas.jpg'],
+    additionalComment: '',
+    desiredTimeStart: '',
+    desiredTimeEnd: '',
+    clientId: 123,
+    imageFileIds: [45, 46]
   },
   {
-    id: 'h1',
+    id: 3,
     title: 'Assemble PAX Wardrobe',
     description: 'Two meter wide wardrobe from IKEA.',
     postedAt: new Date('2023-09-10T09:00:00'),
     price: 180,
-    location: 'AtClients',
+    location: Location.AtClients,
     subcategories: [4], // Furniture
-    status: 'completed',
-    images: ['/images/services/furniture.jpg'],
-    rating: 5,
-    proposalsCount: 5
+    status: OrderStatus.Completed,
+    imageFileRefs: ['/images/services/furniture.jpg'],
+    additionalComment: '',
+    desiredTimeStart: '',
+    desiredTimeEnd: '',
+    clientId: 123,
+    imageFileIds: [45, 46]
   }
 ];
 
 export default function UserCabinet() {
+
+  const {getMeLongClient, authorizedFetch, userLong, authenticated} = use(LoginContext)
+
+  const [profile, setProfile] = useState({
+      name: 'Иван Петров',
+      id: '',
+      city: 'Тимишоара, ул. Ласло Петефи 10',
+      email: 'ivan@example.com',
+      phone: '+40 712 345 678',
+      avatar: '/images/pros/1.jpg',
+      rating: 4.9,
+    });
+
+  useEffect(() => {
+      getMeLongClient(false);
+  }, []);
+
+  useEffect(() => {
+      
+    if (authenticated === 'authenticated' && userLong !== undefined) {
+        setProfile(prevProfile => ({ ...prevProfile, name: userLong.userName || prevProfile.name, avatar: userLong.imageRef || prevProfile.avatar, id: `#${userLong.id}`,
+        city: userLong.location || 'Timisoara', phone: userLong.phoneNumber || prevProfile.phone }));
+    }
+    console.log(userLong)
+  }, [userLong]);
+
   const [activeTab, setActiveTab] = useState<'active' | 'history' | 'drafts'>('active');
 
   const displayedOrders = ALL_ORDERS.filter(order => {
@@ -91,7 +112,6 @@ export default function UserCabinet() {
   });
 
   // ... (Keep Profile state & Quick Nav array same as before) ...
-  const [profile] = useState({ name: 'Anna I.', id: '#CLIENT-8821', city: 'Brașov', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80', balance: '0 RON' });
   const quick = [{ key: 'create', label: 'Create Order', icon: <Plus size={18}/>, href: '/create-order', highlight: true }, { key: 'messages', label: 'Messages', icon: <MessageCircle size={18}/>, count: 2, href: '#messages' }, { key: 'wallet', label: 'Wallet', icon: <Wallet size={18}/>, href: '#wallet' }, { key: 'settings', label: 'Settings', icon: <Settings size={18}/>, href: '#settings' }];
 
   return (
@@ -107,7 +127,6 @@ export default function UserCabinet() {
             </div>
             <div className={styles.badgeList}>
               <span className={styles.badge}><MapPin size={14}/> {profile.city}</span>
-              <span className={styles.badge} style={{color:'#0b8f4a'}}>Balance: {profile.balance}</span>
             </div>
           </div>
         </header>
@@ -169,7 +188,7 @@ export default function UserCabinet() {
 
 // --- 3. UPDATED CARD COMPONENT ---
 function ClientOrderCard({ item }: { item: OrderDTO }) {
-  const isHistory = item.status === 'completed' || item.status === 'cancelled';
+  const isHistory = item.status === OrderStatus.Completed || item.status === OrderStatus.Cancelled;
 
   // Helper: Format Date
   const formatDate = (date: Date | string) => {
@@ -189,9 +208,9 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
       {/* LEFT: Image & Status */}
       <div className={styles.cardMedia}>
         <div className={styles.mainThumb}>
-          <img src={item.images?.[0] ?? '/images/placeholder.jpg'} alt={item.title} className={item.status === 'cancelled' ? styles.imgGrayscale : ''} />
+          <img src={item.imageFileRefs?.[0] ?? '/images/placeholder.jpg'} alt={item.title} className={item.status === OrderStatus.Cancelled ? styles.imgGrayscale : ''} />
           {/* Simple status badge logic */}
-          <div className={`${styles.statusBadge} ${item.status === 'in_progress' ? styles.status_active : styles.status_pending}`}>
+          <div className={`${styles.statusBadge} ${item.status === OrderStatus.Taken ? styles.status_active : styles.status_pending}`}>
              {item.status.replace('_', ' ')}
           </div>
         </div>
@@ -201,7 +220,7 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
       <div className={styles.cardBody}>
         <div className={styles.cardHeadRow}>
            <h3 className={styles.cardTitle}>{item.title}</h3>
-           {item.rating && <div className={styles.ratingBadge}><Star size={12} fill="#fbbf24" stroke="none"/> {item.rating}.0</div>}
+           {/* {item.rating && <div className={styles.ratingBadge}><Star size={12} fill="#fbbf24" stroke="none"/> {item.rating}.0</div>} */}
         </div>
 
         {/* METADATA ROW (New Info) */}
@@ -239,9 +258,9 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
 
       {/* RIGHT: Actions */}
       <div className={styles.cardActions}>
-        {item.status === 'searching' && <button className={styles.primary}>Proposals ({item.proposalsCount})</button>}
-        {item.status === 'in_progress' && <button className={styles.primary}>Chat</button>}
-        {item.status === 'completed' && <button className={styles.primary}>Review</button>}
+        {item.status === OrderStatus.WaitingForPayment && <button className={styles.primary}>Proposals 1</button>}
+        {item.status === OrderStatus.Taken && <button className={styles.primary}>Chat</button>}
+        {item.status === OrderStatus.Completed && <button className={styles.primary}>Review</button>}
         {!isHistory && <button className={styles.ghost}>Edit</button>}
         <button className={styles.secondary}>Details</button>
       </div>

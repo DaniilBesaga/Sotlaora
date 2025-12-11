@@ -1,12 +1,14 @@
 'use client'
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, use } from "react";
 import styles from "./CreateOrder.module.css";
 import { CompareSection } from "../components/ui/order/CompareSection";
 import ChoosePerformerSection from "../components/ui/order/ChooseProSection";
 import CalendarDropdown from "../components/ui/order/CalendarDropdown";
-import { Location, Order, OrderDTO, OrderStatus } from "@/types/Order";
+import { Location, Order, OrderDTO, OrderStatus, ProCard } from "@/types/Order";
 import { Category } from "@/types/Category";
 import CategoryModal from "../components/ui/order/CategoryModal";
+import { body, u } from "motion/react-client";
+import { LoginContext } from "../components/context/LoginContext";
 
 const prosData = [
   {
@@ -82,6 +84,9 @@ const emptyOrder: OrderDTO = {
 };
 
 export default function OrderFormModern() {
+
+  const {authorizedFetch} = use(LoginContext)
+
   const [selected, setSelected] = useState<[]>([]); // массив id
   const [compareOpen, setCompareOpen] = useState(false);
   const MAX = 4;
@@ -162,6 +167,8 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
   const [allCategories, setAllCategories] = useState([]);
 
+  const [prosCards, setProsCards] = useState<ProCard[]>([]);
+
   const filtered = categories.filter(c => c.title.toLowerCase().includes(catQuery.toLowerCase()));
 
   function submit(e) {
@@ -171,7 +178,9 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
   }
 
   function pickCategory(c) { console.log('pick', c); }
-  function pickSub(s) { setSelectedSub(s); }
+  const pickSub = (s) => { 
+    setSelectedSub(s); 
+  }
 
   function handleFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const list = Array.from(e.target.files || []);
@@ -202,6 +211,33 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
       timeEnd: data.timeEnd
     });
   }
+
+  useEffect(() => {
+    if(selectedCategories.length === 0){
+      return;
+    }
+
+    const subcategoriesId = selectedCategories.map(cat => cat.id);
+    
+    const timeoutId = setTimeout(() => {
+      const getPros = async () => {
+        const res = await fetch("http://localhost:5221/api/pro/get-all-pros-by-subcategory", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(subcategoriesId)
+        });
+        const data = await res.json();
+        setProsCards(data);
+        console.log('Fetched pros for selected categories:', data);
+        // setProsData(data);
+      }
+      getPros();
+    }, 1000); // Wait 500ms after last change before making the call
+    
+    return () => clearTimeout(timeoutId);
+  }, [selectedCategories])
 
   const writeFilesAsync = async (files: File[])=>{
     //get orders count

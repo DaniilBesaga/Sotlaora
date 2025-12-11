@@ -1,9 +1,11 @@
 using Backend.Business.Models;
+using Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sotlaora.Business.Entities;
+using Sotlaora.Business.Models;
 using Sotlaora.Infrastructure.Data;
 
 namespace Sotlaora.Controllers
@@ -34,6 +36,7 @@ namespace Sotlaora.Controllers
 
             var orders = context.Orders.AsNoTracking().Where(o => o.ClientId == user.Id).Select(o => new OrderDTO
             {
+                Id = o.Id,
                 Title = o.Title,
                 Description = o.Description,
                 PostedAt = o.PostedAt,
@@ -120,7 +123,27 @@ namespace Sotlaora.Controllers
                 ImageRef = (await context.Images
                                 .FirstOrDefaultAsync(img => img.EntityType == ImageEntityType.User && img.EntityId.ToString() == userId))?.Ref,
                 PhoneNumber = user.PhoneNumber,
-                Orders = user.Orders.ToList()
+                Orders = user.Orders.ToList().Select(o => new OrderDTO
+                {
+                    Title = o.Title,
+                    Description = o.Description,
+                    PostedAt = o.PostedAt,
+                    Price = o.Price,
+                    Location = o.Location,
+                    AdditionalComment = o.AdditionalComment,
+                    DeadlineDate = o.DeadlineDate,
+                    DesiredTimeStart = o.DesiredTimeStart,
+                    DesiredTimeEnd = o.DesiredTimeEnd,
+                    Subcategories = [.. o.Subcategories.Select(sc => sc.Id)],
+                    ImageFileRefs = [.. context.Images
+                        .Where(img => img.EntityId == o.Id && img.EntityType == ImageEntityType.Order)
+                        .Select(img => img.Ref)],
+                    ImageFileIds = [.. context.Images
+                        .Where(img => img.EntityId == o.Id && img.EntityType == ImageEntityType.Order)
+                        .Select(img => img.Id)],
+                    ClientId = o.ClientId,
+                    Status = o.Status
+                }).ToList()
             });
         }
     }

@@ -81,14 +81,14 @@ namespace Sotlaora.Backend.Controllers
             var name = payload.Name;
             var picture = payload.Picture;
 
-            var existingUser = await context.Users.OfType<Pro>().FirstOrDefaultAsync(u => u.Email == email);
+            var existingUser = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
             string accessToken = "";
             string refreshToken = "";
 
             if(existingUser != null)
             {
-                accessToken = GenerateAccessToken(existingUser.Id, email);
+                accessToken = GenerateAccessToken(existingUser.Id, email, existingUser.Role);
                 refreshToken = GenerateRefreshToken();
                 Response.Cookies.Append("access_token", accessToken, new CookieOptions
                 {
@@ -154,6 +154,9 @@ namespace Sotlaora.Backend.Controllers
                 }
             }
 
+            accessToken = GenerateAccessToken(user.Id, email, user.Role);
+            refreshToken = GenerateRefreshToken();
+
             context.RefreshTokens.Add(new RefreshToken
             {
                 TokenHash = refreshToken,
@@ -189,7 +192,7 @@ namespace Sotlaora.Backend.Controllers
             return Ok(new {email, name, picture});
         }
 
-        private string GenerateAccessToken(int id, string email)
+        private string GenerateAccessToken(int id, string email, Role role)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -198,6 +201,7 @@ namespace Sotlaora.Backend.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(ClaimTypes.Role, role.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -271,7 +275,7 @@ namespace Sotlaora.Backend.Controllers
                 || storedToken.IsRevoked || storedToken.IsUsed)
                 return Unauthorized(new { message = "Invalid or expired refresh token" });
 
-            var newAccessToken = GenerateAccessToken(storedToken.UserId, storedToken.User.Email!);
+            var newAccessToken = GenerateAccessToken(storedToken.UserId, storedToken.User.Email!, storedToken.User.Role);
             var newRefreshToken = GenerateRefreshToken();
 
             storedToken.IsUsed = true;
