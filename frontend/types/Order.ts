@@ -1,3 +1,5 @@
+import { SubcategoryDTO } from "./ServicePrices";
+
 export enum OrderStatus {
   Active = "Active",
   Taken = "Taken",
@@ -75,6 +77,7 @@ export interface OrderDTO {
   status: OrderStatus;
 
   clientId: number;
+  proId: number;
 }
 
 export interface ProCard {
@@ -83,7 +86,9 @@ export interface ProCard {
   userName: string;
   description: string;
   imageRef: string;
-  subcategoriesDTO: Subcategory[];
+  subcategoriesDTO: SubcategoryDTO[];
   location: string;
   price?: number;
+  rating: number;
+  reviewsCount: number;
 }

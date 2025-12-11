@@ -1,4 +1,5 @@
 using backend.Business.Models;
+using Backend.Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -516,6 +517,7 @@ namespace Sotlaora.Controllers
         }
 
         [HttpGet("get-all-orders")]
+        [Authorize]
         public async Task<IActionResult> GetAllOrders()
         {
             var userId = userManager.GetUserId(User);
@@ -535,7 +537,27 @@ namespace Sotlaora.Controllers
             }
 
             var orders = user.AssignedOrders.ToList();
-            return Ok(orders);
+            
+            var ordersDTO = context.Orders.AsNoTracking().Where(o => o.ProId == user.Id).Select(o => new OrderDTO
+            {
+                Title = o.Title,
+                Description = o.Description,
+                PostedAt = o.PostedAt,
+                Price = o.Price,
+                Location = o.Location,
+                AdditionalComment = o.AdditionalComment,
+                DeadlineDate = o.DeadlineDate,
+                DesiredTimeStart = o.DesiredTimeStart,
+                DesiredTimeEnd = o.DesiredTimeEnd,
+                Subcategories = o.Subcategories.Select(sc => sc.Id).ToList(),
+                ImageFileRefs = context.Images
+                    .Where(img => img.EntityId == o.Id && img.EntityType == ImageEntityType.Order)
+                    .Select(img => img.Ref)
+                    .ToList(),
+                ClientId = o.ClientId,
+                Status = o.Status
+            }).ToList();
+            return Ok(ordersDTO);
         }
     }
 }

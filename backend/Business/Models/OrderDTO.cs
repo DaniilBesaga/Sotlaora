@@ -6,7 +6,6 @@ namespace Backend.Business.Models
 {
     public class OrderDTO
     {
-        public int Id { get; set;}
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public DateTime PostedAt { get; set; }
@@ -25,6 +24,6 @@ namespace Backend.Business.Models
         
         public OrderStatus Status { get; set; }
         public int ClientId { get; set; }
-        public int ProId { get; set; }
+        public int? ProId { get; set; }
     }
 }

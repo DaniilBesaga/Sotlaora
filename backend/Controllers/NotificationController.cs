@@ -28,7 +28,7 @@ namespace Backend.Controllers
             }
 
             var notifications = await context.Notifications
-                .Where(n => n.UserId == user.Id)
+                .Where(n => n.UserId == user.Id || n.UserId == null)
                 .Select(n => new NotificatioFullDTO
                 {
                     Id = n.Id,

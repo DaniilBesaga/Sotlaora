@@ -1,4 +1,6 @@
 using Backend.Business.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sotlaora.Business.Entities;
@@ -11,27 +13,22 @@ namespace Sotlaora.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrderController : ControllerBase
+    [Authorize(Roles = "Client")]
+    public class OrderController(UserManager<User> userManager, AppDbContext context) : ControllerBase
     {
         private readonly string _imagePath =
             Path.Combine(Directory.GetCurrentDirectory(), "..", "frontend", "public", "images");
-        private readonly AppDbContext _context;
-
-        public OrderController(AppDbContext context)
-        {
-            _context = context;
-        }
 
         [HttpGet]
         public ActionResult<IEnumerable<Order>> GetOrders()
         {
-            return Ok(_context.Orders.ToList());
+            return Ok(context.Orders.ToList());
         }
 
         [HttpGet("{id}")]
         public ActionResult<Order> GetOrder(int id)
         {
-            var order = _context.Orders.Find(id);
+            var order = context.Orders.Find(id);
             if (order == null)
             {
                 return NotFound();
@@ -42,6 +39,21 @@ namespace Sotlaora.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody]OrderDTO order)
         {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
             Order orderFull = new()
             {
                 Title = order.Title,
@@ -53,26 +65,50 @@ namespace Sotlaora.Controllers
                 DeadlineDate = order.DeadlineDate,
                 DesiredTimeStart = order.DesiredTimeStart,
                 DesiredTimeEnd = order.DesiredTimeEnd,
-                Subcategories = order.Subcategories?.Select(id => _context.Subcategories.Find(id)).Where(s => s != null).ToList(),
-                ClientId = order.ClientId,
+                Subcategories = order.Subcategories?.Select(id => context.Subcategories.Find(id)).Where(s => s != null).ToList(),
+                ClientId = user.Id,
                 Status = order.ProId != 0 ? OrderStatus.UnderReview : OrderStatus.Active,
-                ProId = order.ProId
+                ProId = order.ProId == null ? null : order.ProId
             };
-            _context.Orders.Add(orderFull);
-            _context.SaveChanges();
+            context.Orders.Add(orderFull);
+            context.SaveChanges();
             
             var insertedId = orderFull.Id;
 
-            var images = _context.Images.Where(x=>order.ImageFileIds.Contains(x.Id)).ToList();
+            var images = context.Images.Where(x=>order.ImageFileIds.Contains(x.Id)).ToList();
 
             foreach (var file in images)
             {
                 file.EntityId = insertedId;
             }    
 
+            if(orderFull.ProId != null)
+            {
+                var notificationToPro = new Notification
+                {
+                    Title = "New Order Proposal",
+                    Message = $"You have received a new order proposal '{orderFull.Title}'.",
+                    Type = NotificationType.Assigned,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UserId = orderFull.ProId.Value,
+                    Slug = $"order-proposal-{orderFull.Id}",
+                    Meta = new NotificationMetadata
+                    {
+                        OrderId = orderFull.Id,
+                        ClientName = context.Users.Find(orderFull.ClientId)?.UserName ?? "Client",
+                        Category = string.Join(", ", orderFull.Subcategories.Select(s => s.Title)),
+                        Amount = orderFull.Price.ToString("")
+                    }
+                };
+
+                context.Notifications.Add(notificationToPro);
+                return Ok( new { id = orderFull.Id });
+            }
+
             //Notifictate everyone about new order
 
-            foreach (var pro in _context.Users.OfType<Pro>()
+            foreach (var pro in context.Users.OfType<Pro>()
                 .Where(sc => sc.ProSubcategories.Any(s => order.Subcategories.Contains(s.SubcategoryId))))
             {
                 var notification = new Notification
@@ -82,7 +118,6 @@ namespace Sotlaora.Controllers
                     Type = NotificationType.NewOrder,
                     IsRead = false,
                     CreatedAt = DateTime.UtcNow,
-                    UserId = pro.Id,
                     Slug = $"new-order-{orderFull.Id}",
                     Meta = new NotificationMetadata
                     {
@@ -93,46 +128,65 @@ namespace Sotlaora.Controllers
                     }
                 };
 
-                _context.Notifications.Add(notification);
+                context.Notifications.Add(notification);
             }
 
 
-            _context.SaveChanges();
-            return CreatedAtAction("post order", new { id = orderFull.Id }, orderFull);
+            context.SaveChanges();
+            return Ok( new { id = orderFull.Id });
         }
 
-        [HttpGet("get-all-without-pro")]
+        [HttpGet("get-all-without-pro")]//For global search
         public async Task<IActionResult> GetAllOrdersWithoutPro()
         {
-            var orderFull = await _context.Orders
-                .Where(o => o.ProId == 0)
-                .ToListAsync();
-            return Ok(orderFull);
+            var ordersDTO = context.Orders.AsNoTracking().Where(o => o.ProId == null || o.Pro == null).Select(o => new OrderDTO
+            {
+                Title = o.Title,
+                Description = o.Description,
+                PostedAt = o.PostedAt,
+                Price = o.Price,
+                Location = o.Location,
+                AdditionalComment = o.AdditionalComment,
+                DeadlineDate = o.DeadlineDate,
+                DesiredTimeStart = o.DesiredTimeStart,
+                DesiredTimeEnd = o.DesiredTimeEnd,
+                Subcategories = o.Subcategories.Select(sc => sc.Id).ToList(),
+                ImageFileRefs = context.Images
+                    .Where(img => img.EntityId == o.Id && img.EntityType == ImageEntityType.Order)
+                    .Select(img => img.Ref)
+                    .ToList(),
+                ClientId = o.ClientId,
+                Status = o.Status
+            }).ToList();
+
+            return Ok(ordersDTO);
         }
+
+
 
         [HttpPut("{id}")]
         public ActionResult UpdateOrder(int id, Order order)
         {
-            var existingOrder = _context.Orders.Find(id);
+            var existingOrder = context.Orders.Find(id);
             if (existingOrder == null)
             {
                 return NotFound();
             }
             existingOrder.Description = order.Description;
-            _context.SaveChanges();
+            context.SaveChanges();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public ActionResult DeleteOrder(int id)
         {
-            var order = _context.Orders.Find(id);
+            var order = context.Orders.Find(id);
             if (order == null)
             {
                 return NotFound();
             }
-            _context.Orders.Remove(order);
-            _context.SaveChanges();
+            context.Orders.Remove(order);
+            context.SaveChanges();
             return NoContent();
         }
     }

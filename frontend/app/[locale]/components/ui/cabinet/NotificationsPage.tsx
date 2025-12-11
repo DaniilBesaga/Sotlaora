@@ -2,6 +2,47 @@ import React, { use, useEffect, useState } from 'react';
 import styles from './NotificationsPage.module.css';
 import { LoginContext } from '../../context/LoginContext';
 
+export function timeAgo(dateInput: string | number | Date): string {
+  const date = new Date(dateInput);
+  const now = new Date();
+
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSeconds < 10) return "только что";
+  if (diffSeconds < 60) return `${diffSeconds} сек назад`;
+
+  if (diffMinutes < 60) {
+    const m = diffMinutes;
+    if (m === 1) return "1 минуту назад";
+    if (m >= 2 && m <= 4) return `${m} минуты назад`;
+    return `${m} минут назад`;
+  }
+
+  if (diffHours < 24) {
+    const h = diffHours;
+    if (h === 1) return "1 час назад";
+    if (h >= 2 && h <= 4) return `${h} часа назад`;
+    return `${h} часов назад`;
+  }
+
+  if (diffDays === 1) return "вчера";
+
+  if (diffDays < 30) {
+    const d = diffDays;
+    if (d === 1) return "1 день назад";
+    if (d >= 2 && d <= 4) return `${d} дня назад`;
+    return `${d} дней назад`;
+  }
+
+  // fallback — отображаем дату
+  return date.toLocaleDateString("ru-RU");
+}
+
+
 const NotificationsPage = () => {
   // Имитация данных
   const [notifications, setNotifications] = useState([
@@ -77,6 +118,19 @@ const NotificationsPage = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data)
+          const transformedNotifications = data.map((item: any) => ({
+            id: item.id,
+            type: item.type === 'NewOrder' ? 'new_order' : item.type.toLowerCase(),
+            title: item.title,
+            message: item.message,
+            time: timeAgo(item.createdAt),
+            isUnread: !item.isRead,
+            meta: {
+              slug: item.slug
+            }
+          }));
+          
+          setNotifications(transformedNotifications);
         }
       } catch (error) {
         console.error('Ошибка при загрузке уведомлений:', error);

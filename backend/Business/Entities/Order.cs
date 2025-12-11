@@ -34,7 +34,7 @@ namespace Sotlaora.Business.Entities
         public int ClientId { get; set; }
         public User Client { get; set; } = null!;
 
-        public int ProId { get; set; }
-        public Pro Pro { get; set; } = null!;
+        public int? ProId { get; set; }
+        public Pro? Pro { get; set; } = null!;
     }
 }

@@ -98,8 +98,8 @@ export default function ChoosePerformerSection({
           
         </div>
         <div className={styles.actions}>
-            <button className={styles.primaryBtn} onClick={handleConfirm} style={{opacity: proId !== -1 ? '.5' : '1'}} disabled={proId !== -1 ? true : false}>Отправить предложение</button>
-            <button className={styles.primaryBtn} onClick={handleConfirm} style={{opacity: proId === -1 ? '.5' : '1'}} disabled={proId === -1 ? true : false}>Разместить предложение</button>
+            <button className={styles.primaryBtn} onClick={handleConfirm} style={{opacity: !proId ? '.5' : '1'}} disabled={!proId}>Отправить предложение</button>
+            <button className={styles.primaryBtn} onClick={handleConfirm} style={{opacity: proId === null ? '1' : '.5'}} disabled={proId === null ? false : true}>Разместить предложение</button>
           </div>
 
         <div className={styles.helper}>

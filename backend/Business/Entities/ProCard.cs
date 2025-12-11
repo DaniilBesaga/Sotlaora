@@ -10,6 +10,8 @@ namespace Sotlaora.Backend.Business.Entities
         public string ImageRef { get; set; } = string.Empty;
         public List<SubcategoryDTO> SubcategoriesDTO { get; set; } = new List<SubcategoryDTO>();
         public string Location { get; set; } = string.Empty;
-        public decimal? Price { get; set; } 
+        public decimal? Price { get; set; }
+        public double Rating { get; set; }
+        public int ReviewsCount { get; set; } 
     }
 }

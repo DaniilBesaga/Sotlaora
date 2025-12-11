@@ -42,7 +42,9 @@ namespace backend.Controllers
                                 u.ProSubcategories
                                     .Where(psc => subcategoriesId.Contains(psc.SubcategoryId))
                                     .Select(psc => psc.Price)
-                                    .FirstOrDefault() : null
+                                    .FirstOrDefault() : null,
+                    Rating = u.Reviews.Any() ? u.Reviews.Average(r => r.Stars) : 0.0,
+                    ReviewsCount = u.Reviews.Count(),
                 })
                 .ToList();
 

@@ -1,29 +1,24 @@
 'use client';
-import React, { use, useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './ProOrders.module.css';
 import OrderLocation from './OrderLocation';
 import ProDashboard from './ProDashboard';
 import { LoginContext } from '../../context/LoginContext';
-import { useRouter } from 'next/navigation';
 import OrderStatusBadge from './OrderStatusBadge';
 import ChatList from './ChatList';
 import EarningsPage from './Earnings';
 import NotificationsPage from './NotificationsPage';
-import CategorySelector from '../auth/CategorySelector';
+import { OrderDTO } from '@/types/Order';
 
 export default function ProOrders(){
 
-  const {user, authenticated, getMeLong, userLong, logout, refresh} = use(LoginContext);
-
-  const router = useRouter();
+  const {authenticated, userLong, authorizedFetch} = use(LoginContext);
 
   const [loading, setLoading] = useState(true);
+  const [ordersData, setOrdersData] = useState<OrderDTO[]>([]);
 
-  
-  
-  // sample data
   const [profile, setProfile] = useState({
     name: 'Иван Петров',
     id: '',
@@ -35,15 +30,25 @@ export default function ProOrders(){
   });
 
   useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await authorizedFetch('http://localhost:5221/api/user/get-all-orders')
+        const data = await res.json();
+        setOrdersData(data);console.log("order" , data)
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    }
     
     if (authenticated === 'authenticated' && userLong !== undefined) {
         setProfile(prevProfile => ({ ...prevProfile, name: userLong.userName || prevProfile.name, avatar: userLong.imageRef || prevProfile.avatar, id: `#${userLong.id}`,
         city: userLong.location || 'Timisoara', phone: userLong.phoneNumber || prevProfile.phone }));
-    }
-    console.log(userLong)
+
+        fetchOrders()
+        setLoading(false);
+      }
   }, [userLong]);
 
-  // quick nav (правый столбец)
   const quick = [
     { key: 'orders', label: 'Заказы', icon: '🧾', count: 4, href: '#orders' },
     { key: 'subscriptions', label: 'Подписки', icon: '🔔', count: 2, href: '#subscriptions' },
@@ -53,22 +58,19 @@ export default function ProOrders(){
   ];
 
   const [activeSection, setActiveSection] = useState('orders');
+  const [activeTab, setActiveTab] = useState('inwork');
 
   const handleChangeTab = (tab: string) => {
     setActiveSection(tab);
   }
 
-  // tabs & data
-  const [activeTab, setActiveTab] = useState('inwork'); // inwork | proposals | search | all | boost
-  const orders = sampleOrders;
-  const proposals = sampleProposals;
-  const newOrders = sampleNewOrders;
+  // Filter orders based on status
+  const activeOrders = ordersData.filter(o => o.status === 'Active' || o.status === 'UnderReview');
+  const completedOrders = ordersData.filter(o => o.status === 'Completed');
 
   return ( (authenticated === 'loading' && loading) ? <div>Loading...</div> :
     <div className={styles.page}>
-      {/* {userLong?.subcategories.length === 0 && <CategorySelector/>} */}
       <div className={styles.container}>
-        {/* HEADER (профиль вверху, занимает 2 колонки) */}
         <header className={styles.headerCard}>
           <img src={profile.avatar} alt="avatar" className={styles.avatar} />
           <div className={styles.headerInfo}>
@@ -86,15 +88,12 @@ export default function ProOrders(){
           </div>
         </header>
 
-        {/* MAIN: tabs + main content */}
         {activeSection === 'orders' && (
           <main className={styles.main}>
-            {/* Topbar (заголовок) */}
             <div className={styles.topbarRow}>
               <h1 className={styles.h1}>Заказы</h1>
             </div>
 
-            {/* HORIZONTAL TABS (под topbar) */}
             <nav className={styles.tabs} role="tablist" aria-label="Навигация заказов">
               <button
                 role="tab"
@@ -126,7 +125,6 @@ export default function ProOrders(){
               </button>
             </nav>
 
-            {/* Content area */}
             <section className={userLong?.proSubcategories.length === 0 ? styles.emptyNotice : styles.contentCard}>
             {userLong?.proSubcategories.length === 0 ? (
               <div className={styles.emptyNotice} role="status" aria-live="polite">
@@ -136,26 +134,25 @@ export default function ProOrders(){
                       Пока вы не укажете категории и подкатегории, мы не сможем отправлять вам релевантные заказы.
                       Перейдите в <a href="/cabinet/categories-selector" className={styles.infoLink}>настройки категорий</a> и отметьте те услуги, которые вы выполняете.
                     </p>
-
                   </div>
                 </div>
               </div>
             ) : (
               <>
                 {activeTab === 'inwork' && (
-                  <OrdersGrid items={orders.filter(o => o.status === 'active')} emptyText="В работе нет заказов" />
+                  <OrdersGrid items={activeOrders} emptyText="В работе нет заказов" />
                 )}
 
                 {activeTab === 'proposals' && (
-                  <OrdersGrid items={proposals} emptyText="У вас еще нет предложений" />
+                  <OrdersGrid items={[]} emptyText="У вас еще нет предложений" />
                 )}
 
                 {activeTab === 'search' && (
-                  <OrdersGrid items={newOrders} emptyText="Новых заказов не найдено" />
+                  <OrdersGrid items={ordersData} emptyText="Новых заказов не найдено" />
                 )}
 
                 {activeTab === 'all' && (
-                  <OrdersGrid items={orders} emptyText="Нет заказов" />
+                  <OrdersGrid items={ordersData} emptyText="Нет заказов" />
                 )}
               </>
             )}
@@ -164,20 +161,11 @@ export default function ProOrders(){
           </main>
         )}
 
-        {activeSection === 'settings' && (
-          <ProDashboard />)}
+        {activeSection === 'settings' && <ProDashboard />}
+        {activeSection === 'earnings' && <EarningsPage />}
+        {activeSection === 'messages' && <ChatList />}
+        {activeSection === 'subscriptions' && <NotificationsPage />}
 
-        {activeSection === 'earnings' && (
-          <EarningsPage />)}
-
-        {activeSection === 'messages' && (
-          <ChatList />)}
-
-        {activeSection === 'subscriptions' && (
-          <NotificationsPage />)}
-          
-
-        {/* RIGHT: quick navigation */}
         <aside className={styles.quickNav} aria-label="Быстрая навигация">
           <div className={styles.quickCard}>
             {quick.map(item => (
@@ -201,92 +189,70 @@ export default function ProOrders(){
   );
 }
 
-
-function OrdersGrid({ items, emptyText }) {
+function OrdersGrid({ items, emptyText }: { items: OrderDTO[], emptyText: string }) {
   if (!items || items.length === 0) {
     return <div className={styles.empty}>{emptyText}</div>;
   }
 
   return (
     <div className={styles.list}>
-      {items.map(it => (
-  <motion.article key={it.id} className={styles.card} whileHover={{ y: -6 }}>
-    {/* LEFT: media / thumbnails (если у тебя была большая колонка — оставляем) */}
-    <div className={styles.cardMedia}>
-      <div className={styles.mainThumb}>
-        <img src={it.images?.[0] ?? '/images/placeholder.jpg'} alt={it.title} />
-    <OrderStatusBadge status={it.status} />
-      </div>
-      {it.images && it.images.length > 1 && (
-        <div className={styles.thumbRow}>
-          {it.images.slice(0, 3).map((src, i) => (
-            <div key={i} className={styles.thumb}>
-              <img src={src} alt={`${it.title} ${i+1}`} />
+      {items.map((it: OrderDTO) => (
+        <motion.article key={it.id} className={styles.card} whileHover={{ y: -6 }}>
+          <div className={styles.cardMedia}>
+            <div className={styles.mainThumb}>
+              <img src={it.imageFileRefs?.[0] ?? '/images/placeholder.jpg'} alt={it.title} />
+              <OrderStatusBadge status={it.status} />
             </div>
-          ))}
-          {it.images.length > 3 && (
-            <div className={styles.moreThumb}>+{it.images.length - 3}</div>
-          )}
-        </div>
-      )}
-    </div>
+            {it.imageFileRefs && it.imageFileRefs.length > 1 && (
+              <div className={styles.thumbRow}>
+                {it.imageFileRefs.slice(0, 3).map((src: string, i: number) => (
+                  <div key={i} className={styles.thumb}>
+                    <img src={src} alt={`${it.title} ${i+1}`} />
+                  </div>
+                ))}
+                {it.imageFileRefs.length > 3 && (
+                  <div className={styles.moreThumb}>+{it.imageFileRefs.length - 3}</div>
+                )}
+              </div>
+            )}
+          </div>
 
-    {/* CENTER: main content */}
-    <div className={styles.cardBody}>
-      <div className={styles.cardHeadRow}>
-        <h3 className={styles.cardTitle} title={it.title}>{it.title}</h3>
-        <div className={styles.cardMeta}>{it.city} · {it.urgency}</div>
-      </div>
-
-      {/* NEW: горизонтальная полоса мини-картинок между заголовком и описанием */}
-      {it.images && it.images.length > 0 && (
-        <div className={styles.thumbStrip} role="list" aria-label="Фото заказа">
-          {it.images.map((src, i) => (
-            <div className={styles.thumbItem} role="listitem" key={i}>
-              <img src={src} alt={`${it.title} фото ${i+1}`} />
+          <div className={styles.cardBody}>
+            <div className={styles.cardHeadRow}>
+              <h3 className={styles.cardTitle} title={it.title}>{it.title}</h3>
+              <div className={styles.cardMeta}>{it.location?.city || 'N/A'} · {it.deadlineDate ? new Date(it.deadlineDate).toLocaleDateString() : 'Не срочно'}</div>
             </div>
-          ))}
-        </div>
-      )}
 
-      <p className={styles.cardDesc}>{it.desc}</p>
+            {it.imageFileRefs && it.imageFileRefs.length > 0 && (
+              <div className={styles.thumbStrip} role="list" aria-label="Фото заказа">
+                {it.imageFileRefs.map((src: string, i: number) => (
+                  <div className={styles.thumbItem} role="listitem" key={i}>
+                    <img src={src} alt={`${it.title} фото ${i+1}`} />
+                  </div>
+                ))}
+              </div>
+            )}
 
-      <div className={styles.metaRow}>
-        <div className={styles.tags}>
-          {it.tags.map(t => <span key={t} className={styles.chip}>{t}</span>)}
-        </div>
+            <p className={styles.cardDesc}>{it.description}</p>
 
-        <div className={styles.locationWrap}>
-          <OrderLocation type={it.locationType} />
-        </div>
-      </div>
-    </div>
+            <div className={styles.metaRow}>
+              <div className={styles.tags}>
+                {it.subcategories.map((t) => <span key={t.id} className={styles.chip}>Категория {t.title}</span>)}
+              </div>
 
-    {/* RIGHT: actions */}
-    <div className={styles.cardActions}>
-      <button className={styles.ghost}>Чат</button>
-      <button className={styles.primary}>Откликнуться</button>
-      <button className={styles.secondary}>Детали</button>
-    </div>
-  </motion.article>
-))}
+              <div className={styles.locationWrap}>
+                <OrderLocation type={it.location?.locationType} />
+              </div>
+            </div>
+          </div>
 
+          <div className={styles.cardActions}>
+            <button className={styles.ghost}>Чат</button>
+            <button className={styles.primary}>Откликнуться</button>
+            <button className={styles.secondary}>Детали</button>
+          </div>
+        </motion.article>
+      ))}
     </div>
   );
 }
-
-
-/* ---------- sample data ---------- */
-const sampleOrders = [
-  { id: 'o1', images: ['/images/services/air.jpg'], title: 'Протекает кран — требуется замена', desc: 'Необходимо заменить смеситель в ванной. Уточнить возможный подъезд.', price: 350, urgency: 'Сегодня', status: 'active', city: 'Брашов', tags: ['Сантехника','Выезд'] },
-  { id: 'o2', images: ['/images/services/air.jpg'], title: 'Установка люстры на 3 точки', desc: 'Монтаж люстры, проверка скрытой проводки.', price: 250, urgency: '2 дня', status: 'active', city: 'Брашов', tags: ['Электрика'] },
-  { id: 'o3', images: ['/images/services/air.jpg'], title: 'Сборка мебели IKEA — 2 шкафа', desc: 'Сборка двух шкафов PAX, двери и фурнитура в комплекте.', price: 180, urgency: 'Не срочно', status: 'done', city: 'Брашов', tags: ['Сборка'] },
-];
-
-const sampleProposals = [
-  { id: 'p1', images: ['/images/services/air.jpg'], title: 'Проблема с дверным замком', desc: 'Клиент пропонує 120 RON за замену', price: 120, urgency: 'Сегодня', city: 'Брашов', tags: ['Замки'] },
-];
-
-const sampleNewOrders = [
-  { id: 'n1', images: ['/images/services/air.jpg'], title: 'Поклеїти шпалери', desc: 'Квартира 40м² — потрібен майстер', price: 400, urgency: 'Цього тижня', city: 'Брашов', tags: ['Ремонт'] },
-];

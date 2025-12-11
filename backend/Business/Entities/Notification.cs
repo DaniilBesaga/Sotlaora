@@ -13,8 +13,8 @@ namespace Sotlaora.Business.Entities
         public DateTime CreatedAt { get; set; }
         public string Slug { get; set; } = string.Empty;
 
-        public int UserId { get; set; }
-        public User User { get; set; } = null!;
+        public int? UserId { get; set; }
+        public User? User { get; set; }
 
         public NotificationMetadata Meta { get; set; } = new();
     }

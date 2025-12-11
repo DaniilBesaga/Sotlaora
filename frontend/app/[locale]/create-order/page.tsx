@@ -161,7 +161,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
   const [order, setOrder] = useState<OrderDTO>(emptyOrder);
 
-  const [proId, setProId] = useState<number>(-1);
+  const [proId, setProId] = useState<number | null>(null);
   const [additionalComment, setAdditionalComment] = useState<string>("");
   const [isClicked, setIsClicked] = useState<boolean>(false);
 
@@ -267,7 +267,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
         setOrder(prev=> ({ ...prev, postedAt: new Date() }) );
 
-        const res = await fetch("http://localhost:5221/api/order/create", {
+        const res = await authorizedFetch("http://localhost:5221/api/order/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -284,7 +284,9 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
             DesiredTimeEnd: order.desiredTimeEnd,
             Subcategories: order.subcategories,
             ClientId: order.clientId,
-            ImageFileIds: dataImage.insertedIds
+            ImageFileIds: dataImage.insertedIds,
+            ProId: order.proId,
+            Status: order.proId ? OrderStatus.UnderReview : OrderStatus.Active
           }
         ),});
 
@@ -380,6 +382,12 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
         proId: proId,
       }) );
     }
+    else{
+      setOrder(prev=> ({
+        ...prev,
+        proId: null,
+      }) );
+    }
   }, [proId])
 
   useEffect(() => {
@@ -431,91 +439,150 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
         </div>
 
         {/* Form card becomes an accordion panel */}
-        <div id="order-form-panel" className={`${styles.accordionPanel} ${formOpen ? styles.expanded : styles.collapsed}`}>
-          <div className={`${styles.card} ${styles.formCard}`} aria-label="Форма создания заказа">
-            <input className={styles.titleInput} placeholder="Краткий заголовок — например: Протекает кран" value={title} onChange={(e) => setTitle(e.target.value)} />
+        {/* Form card becomes an accordion panel */}
+<div id="order-form-panel" className={`${styles.accordionPanel} ${formOpen ? styles.expanded : styles.collapsed}`}>
+  
+  <div className={styles.formCard} aria-label="Форма создания заказа">
+    
+    {/* TITLE */}
+    <input 
+      className={styles.titleInput} 
+      placeholder="Краткий заголовок (например: Протекает кран)" 
+      value={title} 
+      onChange={(e) => setTitle(e.target.value)} 
+      autoFocus={formOpen}
+    />
 
-            <textarea className={styles.desc} placeholder="Описание задачи..." value={desc} onChange={(e) => setDesc(e.target.value)} />
-            {formErrors.text && (<div className={styles.errorText}>{errorMessage}</div>)}
-            <div className={styles.controlsRow}>
-              <div className={styles.controlPanel}>
-                <button type="button" className={styles.rowHeader} aria-expanded={locOpen} onClick={() => { setLocOpen(p => !p); setBudgetOpen(false); setCalOpen(false); }}>
-                  <span>Локация{locationMode.length > 0 && <span className={styles.formBadge}>{locationMode}</span>}</span>
-                  <svg className={styles.icon} width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </button>
-                {formErrors.location && (<div className={styles.errorText}>{errorMessage}</div>)}
+    {/* DESCRIPTION */}
+    <div>
+      <textarea 
+        className={styles.desc} 
+        placeholder="Опишите задачу подробнее..." 
+        value={desc} 
+        onChange={(e) => setDesc(e.target.value)} 
+      />
+      {formErrors.text && (<div className={styles.errorText}>{errorMessage}</div>)}
+    </div>
 
-                <div className={`${styles.rowBody} ${locOpen ? styles.open : ""}`} aria-hidden={!locOpen}>
-                  <div className={styles.inline}>
-                    <button type="button" className={`${styles.smallChip} ${locationMode === "У меня" ? styles.smallChipActive : ""}`} onClick={() => {setLocationMode("У меня"); setLocOpen(false)}} aria-pressed={locationMode === 'У меня'}>У меня</button>
-                    <button type="button" className={`${styles.smallChip} ${locationMode === "У исполнителя" ? styles.smallChipActive : ""}`} onClick={() => {setLocationMode("У исполнителя"); setLocOpen(false)}} aria-pressed={locationMode === 'У исполнителя'}>У исполнителя</button>
-                    <button type="button" className={`${styles.smallChip} ${locationMode === "Онлайн" ? styles.smallChipActive : ""}`} onClick={() => {setLocationMode("Онлайн"); setLocOpen(false)}} aria-pressed={locationMode === 'Онлайн'}>Онлайн</button>
-                  </div>
+    {/* CONTROLS GRID */}
+    <div className={styles.controlsRow}>
+      
+      {/* 1. LOCATION */}
+      <div className={styles.controlPanel}>
+        <button type="button" className={styles.rowHeader} aria-expanded={locOpen} onClick={() => { setLocOpen(p => !p); setBudgetOpen(false); setCalOpen(false); }}>
+          <span style={{display:'flex', alignItems:'center'}}>
+            📍 Локация
+            {locationMode.length > 0 && <span className={styles.formBadge}>{locationMode}</span>}
+          </span>
+          <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        {formErrors.location && (<div className={styles.errorText}>{errorMessage}</div>)}
 
-                  <div className={styles.noteText}><strong>Тимишоара</strong> — сервис доступен только в городе.</div>
-                </div>
-              </div>
+        <div className={`${styles.rowBody} ${locOpen ? styles.open : ""}`}>
+          <div className={styles.inline}>
+            {["У меня", "У исполнителя", "Онлайн"].map(mode => (
+              <button 
+                key={mode}
+                type="button" 
+                className={`${styles.smallChip} ${locationMode === mode ? styles.smallChipActive : ""}`} 
+                onClick={() => {setLocationMode(mode); setLocOpen(false)}}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+          <div className={styles.noteText}>Сервис доступен только в г. Тимишоара</div>
+        </div>
+      </div>
 
-              <div className={styles.controlPanel}>
-                <button type="button" className={styles.rowHeader} aria-expanded={budgetOpen} onClick={() => { setBudgetOpen(p => !p); setLocOpen(false); setCalOpen(false); }}>
-                  <span>Бюджет{price !== 0 && <span className={styles.formBadge}>{`до ${price}`}</span>}</span>
-                  <svg className={styles.icon} width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 1v22" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-                </button>
-                {formErrors.budget && (<div className={styles.errorText}>{errorMessage}</div>)}
+      {/* 2. BUDGET */}
+      <div className={styles.controlPanel}>
+        <button type="button" className={styles.rowHeader} aria-expanded={budgetOpen} onClick={() => { setBudgetOpen(p => !p); setLocOpen(false); setCalOpen(false); }}>
+          <span style={{display:'flex', alignItems:'center'}}>
+            💳 Бюджет
+            {price !== 0 && <span className={styles.formBadge}>{`${price} RON`}</span>}
+          </span>
+          <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        {formErrors.budget && (<div className={styles.errorText}>{errorMessage}</div>)}
 
-                <div className={`${styles.rowBody} ${budgetOpen ? styles.open : ""}`} aria-hidden={!budgetOpen}>
-                  <label className={styles.smallLabel}>До, RON</label>
-                  <input type="number" className={styles.inputInline} value={price} onChange={e => setPrice(Number(e.target.value || 0))} min={0} />
-
-                  <div className={styles.quickRow}>
-                    {[50,100,200,500].map(v => (
-                      <button key={v} type="button" className={styles.quickBtn} onClick={() => {setPrice(v);setBudgetOpen(false)}}>до {v}</button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className={styles.controlPanel}>
-                <button type="button" className={styles.rowHeader} onClick={() => setCalOpen(p => !p)} aria-expanded={calOpen}>
-                  <span>Сроки{date.year !== 0 && 
-                    <span className={styles.formBadge} style={{fontSize: '.7rem'}}>{`${date.day}.${date.month}`} ({timePref.timeStart}-{timePref.timeEnd})</span>}
-                  </span>
-                  <svg className={styles.icon} width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 10l5-5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
-                </button>
-                {formErrors.date && (<div className={styles.errorText}>{errorMessage}</div>)}
-
-                {calOpen && (
-                  <CalendarDropdown initialStart={range.start} onApply={handleApplyDate} onClose={() => setCalOpen(false)} />
-                )}
-              </div>
-
-              <div className={styles.controlPanel}>
-                <label className={styles.rowHeader} htmlFor="filePicker" role="button">
-                  <span>Фото и файлы{files.length > 0 && <span className={styles.formBadge}>{files.length} file(s)</span>}</span>
-                  <svg className={styles.icon} width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/><path d="M7 10l5-5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </label>
-                <input id="filePicker" type="file" multiple onChange={handleFiles} className={styles.hiddenFile} />
-                {formErrors.files && (<div className={styles.errorText}>{errorMessage}</div>)}
-              </div>
-            </div>
-
-            <div className={styles.selectedCategories}>
-              {selectedCategories.length > 0 && (<div>
-                  {selectedCategories.map((cat) => (
-                    <div key={cat.id} onClick={()=>selectedCategories.filter((i)=>i.id !== cat.id)} className={styles.badge}>{cat.title}</div>))
-                  }
-              </div>
-                )
-              }
-            </div>
-            {formErrors.subcategory && (<div className={styles.errorText}>{errorMessage}</div>)}
-
-            <div className={styles.formFooter}>
-              <button type="submit" onClick={handleStep1Continue} className={styles.publishBtn}>Продолжить</button>
-              <button type="button" className={styles.btnGhost} onClick={() => {setCategoriesModalOpen(true); getAllCategories()}}>Категория</button>
-            </div>
+        <div className={`${styles.rowBody} ${budgetOpen ? styles.open : ""}`}>
+          <label className={styles.smallLabel}>Максимальная цена (RON)</label>
+          <input type="number" className={styles.inputInline} value={price} onChange={e => setPrice(Number(e.target.value || 0))} min={0} placeholder="0" />
+          <div className={styles.quickRow}>
+            {[50, 100, 200, 500].map(v => (
+              <button key={v} type="button" className={styles.quickBtn} onClick={() => {setPrice(v); setBudgetOpen(false)}}>
+                до {v}
+              </button>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* 3. DATES */}
+      <div className={styles.controlPanel}>
+        <button type="button" className={styles.rowHeader} onClick={() => setCalOpen(p => !p)} aria-expanded={calOpen}>
+          <span style={{display:'flex', alignItems:'center'}}>
+            📅 Сроки
+            {date.year !== 0 && (
+              <span className={styles.formBadge}>
+                {`${date.day}.${date.month}`} • {timePref.timeStart}-{timePref.timeEnd}
+              </span>
+            )}
+          </span>
+          <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        {formErrors.date && (<div className={styles.errorText}>{errorMessage}</div>)}
+
+        {/* Assuming CalendarDropdown handles its own positioning, or you wrap it in rowBody */}
+        {calOpen && (
+           <div className={`${styles.rowBody} ${styles.open}`} style={{padding:0, overflow:'hidden', minHeight: '300px'}}>
+             <CalendarDropdown initialStart={range.start} onApply={handleApplyDate} onClose={() => setCalOpen(false)} />
+           </div>
+        )}
+      </div>
+
+      {/* 4. FILES */}
+      <div className={styles.controlPanel}>
+        <label className={styles.rowHeader} htmlFor="filePicker" role="button">
+          <span style={{display:'flex', alignItems:'center'}}>
+            📎 Файлы
+            {files.length > 0 && <span className={styles.formBadge}>{files.length}</span>}
+          </span>
+          <svg className={styles.icon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </label>
+        <input id="filePicker" type="file" multiple onChange={handleFiles} className={styles.hiddenFile} />
+        {formErrors.files && (<div className={styles.errorText}>{errorMessage}</div>)}
+      </div>
+    </div>
+
+    {/* CATEGORIES & FOOTER */}
+    <div>
+      <div className={styles.selectedCategories}>
+        {selectedCategories.length > 0 ? (
+          selectedCategories.map((cat) => (
+            <div key={cat.id} onClick={() => selectedCategories.filter((i) => i.id !== cat.id)} className={styles.badge}>
+              {cat.title}
+            </div>
+          ))
+        ) : (
+          <span className={styles.noteText}>Категория не выбрана</span>
+        )}
+      </div>
+      {formErrors.subcategory && (<div className={styles.errorText}>{errorMessage}</div>)}
+
+      <div className={styles.formFooter}>
+        <button type="button" className={styles.btnGhost} onClick={() => {setCategoriesModalOpen(true); getAllCategories()}}>
+          {selectedCategories.length > 0 ? "Изменить категорию" : "Выбрать категорию"}
+        </button>
+        <button type="submit" onClick={handleStep1Continue} className={styles.publishBtn}>
+          Продолжить
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
 
         {/* Next step below as its own collapsible card */}
         <div className={styles.panelToggle} style={{ marginTop: 18 }}>
@@ -542,7 +609,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
               <button className={styles.publishBtn} onClick={() => alert('Перейти')}>Перейти</button>
             </div>
           </div>
-          <CompareSection pros={prosData} setProId={setProId}/>
+          <CompareSection pros={prosCards} setProId={setProId}/>
         </div>
 
         <div className={styles.panelToggle} style={{ marginTop: 18 }}>

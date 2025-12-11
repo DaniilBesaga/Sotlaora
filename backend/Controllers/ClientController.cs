@@ -36,7 +36,6 @@ namespace Sotlaora.Controllers
 
             var orders = context.Orders.AsNoTracking().Where(o => o.ClientId == user.Id).Select(o => new OrderDTO
             {
-                Id = o.Id,
                 Title = o.Title,
                 Description = o.Description,
                 PostedAt = o.PostedAt,

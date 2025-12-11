@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import compareStyles from './CompareSection.module.css';
+import { ProCard } from '@/types/Order';
 
-export function CompareSection({ pros = [], setProId }) {
+export function CompareSection({ pros = [], setProId } : { pros: ProCard[]; setProId: (id: number) => void }) {
   const [selected, setSelected] = useState([]); // массив id для сравнения
   const [compareOpen, setCompareOpen] = useState(false);
   const [chosenId, setChosenId] = useState(null); // выбранный мастер (если есть)
@@ -14,11 +15,13 @@ export function CompareSection({ pros = [], setProId }) {
   function clearSelection() {
     setSelected([]);
     setChosenId(null); // при очистке восстанавливаем всех
+    setProId(-1); // сообщаем наверх, что мастер не выбран
   }
 
   function chooseMaster(id) {
     // пометим выбранного мастера и оставим его в selected
     setChosenId(id);
+    setProId(id);  // сообщаем наверх выбранного мастера
     setSelected([id]);
     // скролл к верху для фокуса на выбранном
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -31,20 +34,22 @@ export function CompareSection({ pros = [], setProId }) {
     return pros.filter(p => p.id === chosenId);
   }, [pros, chosenId]);
 
-  const selectedItems = useMemo(() => pros.filter(p => selected.includes(p.id)), [pros, selected]);
+  const selectedItems = useMemo(() => pros.filter(p => selected.includes(p.proId)), [pros, selected]);
 
   // market average over all pros
   const marketAvgPrice = useMemo(() => {
     if (!pros.length) return 0;
-    const sum = pros.reduce((s, p) => s + parsePrice(p.rate), 0);
+    const sum = pros.reduce((s, p) => s + parsePrice(p.price), 0);
     return Math.round(sum / pros.length);
   }, [pros]);
 
   const selectedAvgPrice = useMemo(() => {
     if (!selectedItems.length) return 0;
-    const sum = selectedItems.reduce((s, p) => s + parsePrice(p.rate), 0);
+    const sum = selectedItems.reduce((s, p) => s + parsePrice(p.price), 0);
     return Math.round(sum / selectedItems.length);
   }, [selectedItems]);
+
+  console.log(pros)
 
   return (
     <section className={compareStyles.popular} aria-labelledby="compare-title">
@@ -89,7 +94,7 @@ export function CompareSection({ pros = [], setProId }) {
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <div style={{ fontWeight: 800 }}>Текущий выбор:</div>
               <div style={{ color: 'var(--muted)' }}>
-                {pros.find(p => p.id === chosenId)?.name || '—'}
+                {pros.find(p => p.id === chosenId)?.userName || '—'}
               </div>
               <div style={{ marginLeft: 'auto' }}>
                 <button className={compareStyles.btn} onClick={() => clearSelection()}>Сбросить выбор</button>
@@ -100,8 +105,8 @@ export function CompareSection({ pros = [], setProId }) {
 
         <div className={compareStyles.carousel} role="list">
           {visiblePros.map(p => {
-            const isSelected = selected.includes(p.id);
-            const isChosen = p.id === chosenId;
+            const isSelected = selected.includes(p.proId);
+            const isChosen = p.proId === chosenId;
             return (
               <article
                 key={p.id}
@@ -110,16 +115,16 @@ export function CompareSection({ pros = [], setProId }) {
                 aria-labelledby={`pro-${p.id}-name`}
               >
                 <div className={compareStyles.media}>
-                  <div className={compareStyles.img} style={{ backgroundImage: `url(${p.img})` }} aria-hidden />
+                  <div className={compareStyles.img} style={{ backgroundImage: `url(${p.imageRef})` }} aria-hidden />
                   <div className={compareStyles.overlay} aria-hidden />
 
                   {/* toggle selection для сравнения (скрываем, если уже выбран мастером и он единственный) */}
                   {!isChosen && (
                     <button
                       className={`${compareStyles.selectToggle} ${isSelected ? compareStyles.selected : ''}`}
-                      onClick={(e) => { e.preventDefault(); toggleSelect(p.id); }}
+                      onClick={(e) => { e.preventDefault(); toggleSelect(p.proId); }}
                       aria-pressed={isSelected}
-                      aria-label={isSelected ? `Убрать ${p.name} из сравнения` : `Добавить ${p.name} к сравнению`}
+                      aria-label={isSelected ? `Убрать ${p.userName} из сравнения` : `Добавить ${p.userName} к сравнению`}
                       title={isSelected ? 'Убрать из сравнения' : 'Добавить к сравнению'}
                     >
                       {isSelected ? '✓' : '+'}
@@ -129,26 +134,26 @@ export function CompareSection({ pros = [], setProId }) {
 
                 <div className={compareStyles.info}>
                   <div className={compareStyles.rowTop}>
-                    <div id={`pro-${p.id}-name`} className={compareStyles.name}>{p.name}</div>
+                    <div id={`pro-${p.id}-name`} className={compareStyles.name}>{p.userName}</div>
                   </div>
 
-                  <div className={compareStyles.role}>{p.role}</div>
+                  {/* <div className={compareStyles.role}>{p.role}</div> */}
 
                   <div className={compareStyles.specs} aria-hidden>
-                    {(p.specialties || []).slice(0, 2).map((s, i) => (
-                      <button key={i} className={compareStyles.chip} tabIndex={-1}>{s}</button>
+                    {(p.subcategoriesDTO || []).slice(0, 2).map((s, i) => (
+                      <button key={i} className={compareStyles.chip} tabIndex={-1}>{s.title}</button>
                     ))}
-                    {p.specialties && p.specialties.length > 2 && (
+                    {p.subcategoriesDTO && p.subcategoriesDTO.length > 2 && (
                       <button className={`${compareStyles.chip} ${compareStyles.more}`} tabIndex={-1}>
-                        +{p.specialties.length - 2}
+                        +{p.subcategoriesDTO.length - 2}
                       </button>
                     )}
                   </div>
 
                   <div className={compareStyles.metaRow}>
-                    <div className={compareStyles.rating}>⭐ {p.rating} <span className={compareStyles.reviews}>· {p.reviews}</span></div>
+                    <div className={compareStyles.rating}>⭐ {p.rating} <span className={compareStyles.reviews}>· {p.reviewsCount}</span></div>
 
-                    <div className={compareStyles.rate}>{p.rate}</div>
+                    <div className={compareStyles.rate}>{p.price}</div>
 
                     <div className={compareStyles.actions}>
                       <button
@@ -161,7 +166,7 @@ export function CompareSection({ pros = [], setProId }) {
                       {/* Главное: кнопка "Выбрать" */}
                       <button
                         className={`${compareStyles.btn} ${compareStyles.primary}`}
-                        onClick={() => chooseMaster(p.id)}
+                        onClick={() => chooseMaster(p.proId)}
                         aria-pressed={isChosen}
                         title={isChosen ? 'Этот мастер выбран' : 'Выбрать мастера'}
                       >
@@ -218,15 +223,17 @@ function CompareModal({ open, onClose, selectedItems = [], marketAvgPrice = 0, s
 
   const scored = useMemo(() => {
     return selectedItems.map(p => {
-      const price = parsePrice(p.rate);
-      const score = (Number(p.rating) || 0) * 10 + (Number(p.reviews) || 0) * 0.1 - price;
+      const price = parsePrice(p.price);
+      const score = (Number(p.reviewsCount) || 0) * 10 + (Number(p.reviewsCount) || 0) * 0.1 - price;
       return { ...p, _price: price, _score: score };
     });
   }, [selectedItems, parsePrice]);
 
-  const topThree = useMemo(() => {
+  const topThree: ProCard[] = useMemo(() => {
     return [...scored].sort((a, b) => b._score - a._score).slice(0, 3);
   }, [scored]);
+
+  console.log('Top three for compare:', topThree);
 
   const bestPriceId = useMemo(() => {
     if (!topThree.length) return null;
@@ -276,7 +283,7 @@ function CompareModal({ open, onClose, selectedItems = [], marketAvgPrice = 0, s
               <thead>
                 <tr>
                   <th>Параметр</th>
-                  {topThree.map(p => <th key={p.id}>{p.name}</th>)}
+                  {topThree.map(p => <th key={p.id}>{p.userName}</th>)}
                 </tr>
               </thead>
 
@@ -284,7 +291,7 @@ function CompareModal({ open, onClose, selectedItems = [], marketAvgPrice = 0, s
                 <tr>
                   <td>Фото</td>
                   {topThree.map(p => (
-                    <td key={p.id}><img className={compareStyles.compImg} src={p.img} alt={p.name} /></td>
+                    <td key={p.id}><img className={compareStyles.compImg} src={p.imageRef} alt={p.userName} /></td>
                   ))}
                 </tr>
 
@@ -295,7 +302,7 @@ function CompareModal({ open, onClose, selectedItems = [], marketAvgPrice = 0, s
                       key={p.id}
                       className={p.id === bestPriceId ? compareStyles.bestCell : ''}
                     >
-                      <div>{p.rate}</div>
+                      <div>{p.price}</div>
                     </td>
                   ))}
                 </tr>
@@ -307,14 +314,14 @@ function CompareModal({ open, onClose, selectedItems = [], marketAvgPrice = 0, s
                       key={p.id}
                       className={p.id === bestRatingId ? compareStyles.bestCell : ''}
                     >
-                      ⭐ {p.rating} · {p.reviews}
+                      ⭐ {p.rating} · {p.reviewsCount} отзывов
                     </td>
                   ))}
                 </tr>
 
                 <tr>
                   <td>Специализации</td>
-                  {topThree.map(p => <td key={p.id}>{(p.specialties || []).join(', ')}</td>)}
+                  {topThree.map(p => <td key={p.id}>{(p.subcategoriesDTO.map((i) => i.title) || []).join(', ')}</td>)}
                 </tr>
 
                 <tr>
