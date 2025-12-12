@@ -1,6 +1,7 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import styles from './ChooseProSection.module.css';
+import { LoginContext } from '../../context/LoginContext';
 
 export default function ChoosePerformerSection({
   candidates = [], // массив объектов исполнителей [{id,name,role, img, rate, rating, specialties, ...}]
@@ -16,6 +17,8 @@ export default function ChoosePerformerSection({
   const [deadline, setDeadline] = useState('');
   const [note, setNote] = useState('');
 
+  const {user, userLong, authenticated} = use(LoginContext); // TODO: get from context
+
   function handleConfirm() {
     const performer = candidates.find(c => c.id === proId);
     onConfirm({
@@ -26,7 +29,7 @@ export default function ChoosePerformerSection({
       note,
       timestamp: new Date().toISOString()
     });
-    
+    if(userLong?.id === -1 && user.id === -1) return;
     setIsClicked(true);
   }
 

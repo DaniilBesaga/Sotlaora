@@ -1,4 +1,6 @@
+using backend.Business.Models;
 using Backend.Business.Models;
+using Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -25,17 +27,60 @@ namespace Sotlaora.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Order> GetOrder(int id)
+        public async Task<ActionResult<OrderFullDTO>> GetOrder(int id)
         {
-            var order = context.Orders.Find(id);
+            var order = context.Orders
+                .Include(o => o.Subcategories)
+                .Include(o => o.Client)
+                .FirstOrDefault(o => o.Id == id);
+            
             if (order == null)
             {
                 return NotFound();
             }
-            return Ok(order);
+
+            var orderFull = new OrderFullDTO
+            {
+                Id = order.Id,
+                Title = order.Title,
+                Description = order.Description,
+                PostedAt = order.PostedAt,
+                Price = order.Price,
+                Location = order.Location,
+                Address = order.Address,
+                Distance = order.Distance,
+                AdditionalComment = order.AdditionalComment,
+                DeadlineDate = order.DeadlineDate,
+                DesiredTimeStart = order.DesiredTimeStart,
+                DesiredTimeEnd = order.DesiredTimeEnd,
+                SubcategoriesDTO = order.Subcategories.Select(sc => new SubcategoryDTO
+                {
+                    Id = sc.Id,
+                    Title = sc.Title
+                }).ToList(),
+                ImageFileRefs = context.Images
+                    .Where(img => img.EntityId == order.Id && img.EntityType == ImageEntityType.Order)
+                    .Select(img => img.Ref)
+                    .ToList(),
+                Client = new ClientDTO
+                {
+                    Id = order.Client.Id,
+                    UserName = order.Client.UserName,
+                    ImageRef = context.Images
+                    .Where(img => img.EntityId ==order.Client.Id && img.EntityType == ImageEntityType.User)
+                        .FirstOrDefault(img => img.Ref != null)?.Ref ?? string.Empty,
+                    Location = order.Client.Location,
+                    IsOnline = order.Client.IsOnline,
+                    LastSeen = order.Client.LastSeen,
+                },
+                Status = order.Status
+            };
+
+            return Ok(orderFull);
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "Client")]
         public async Task<ActionResult<Order>> CreateOrder([FromBody]OrderDTO order)
         {
             var userId = userManager.GetUserId(User);

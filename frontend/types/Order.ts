@@ -1,3 +1,4 @@
+import { ClientDTO } from "./Client";
 import { SubcategoryDTO } from "./ServicePrices";
 
 export enum OrderStatus {
@@ -91,4 +92,23 @@ export interface ProCard {
   price?: number;
   rating: number;
   reviewsCount: number;
+}
+
+export interface OrderFullDTO {
+  id: number;
+  title: string;
+  description: string;
+  postedAt: Date | string;
+  price: number;
+  location: Location;
+  address: string;
+  distance: number;
+  additionalComment: string;
+  deadlineDate?: Date | string | null;
+  desiredTimeStart?: string | null;
+  desiredTimeEnd?: string | null;
+  subcategoriesDTO: SubcategoryDTO[];
+  imageFileRefs: string[];
+  client: ClientDTO;
+  status: OrderStatus;
 }

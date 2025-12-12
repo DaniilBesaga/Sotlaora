@@ -2,37 +2,17 @@
 import { useState, useMemo, useEffect } from "react";
 import styles from "../searchpros/SearchPros.module.css";
 import { OrderDTO } from "@/types/Order";
-
-const CATEGORIES = {
-  "Ремонт": [
-    "Косметический ремонт",
-    "Ремонт стен и потолков",
-    "Плиточные работы",
-    "Сантехника",
-    "Малярные работы"
-  ],
-  "Электрика": [
-    "Розетки и выключатели",
-    "Проводка",
-    "Автоматы и щиты",
-    "Освещение"
-  ],
-  "Установка": [
-    "Сборка мебели",
-    "Монтаж техники",
-    "Монтаж дверей",
-    "Монтаж полок и карнизов"
-  ],
-};
+import { SubcategoryDTO } from "@/types/ServicePrices";
 
 const LANGUAGES = ["Румынский", "Английский", "Русский"];
 
 interface CategoryPillsProps {
   selectedCat: string | null;
   onSelect: (cat: string | null, sub: string | null) => void;
+  CATEGORIES: SubcategoryDTO[]
 }
 
-function CategoryPillsOrders({ selectedCat, onSelect }: CategoryPillsProps) {
+function CategoryPillsOrders({ CATEGORIES, selectedCat, onSelect }: CategoryPillsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSub, setSelectedSub] = useState<string | null>(null);
 
@@ -272,6 +252,7 @@ export default function SearchOrdersSection() {
   const [quickActive, setQuickActive] = useState<string[]>([]);
 
   const [ordersData, setOrdersData] = useState<OrderDTO[]>([]);
+  const [categoriesData, setCategoriesData] = useState<SubcategoryDTO[]>([]);
 
   const [filters, setFilters] = useState<FiltersState>({
     priceMin: 0,
@@ -288,6 +269,16 @@ export default function SearchOrdersSection() {
       const data = await res.json();
       console.log('Fetched orders:', data);
       setOrdersData(data);
+    }
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const res = await fetch('http://localhost:5221/api/category/with-subcategories');
+      const data = await res.json();
+      console.log('Fetched categories:', data);
+      setCategoriesData(data);
     }
     fetchOrders();
   }, []);
@@ -343,6 +334,7 @@ export default function SearchOrdersSection() {
   return (
     <div className={styles.container}>
       <CategoryPillsOrders
+        CATEGORIES={categoriesData}
         selectedCat={selectedCategory}
         onSelect={(c, s) => { setSelectedCategory(c); setSelectedSub(s); }}
       />

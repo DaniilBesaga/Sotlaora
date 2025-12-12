@@ -54,7 +54,8 @@ namespace Sotlaora.Backend.Controllers
 
                     images.Add(new Image
                     {
-                        Ref = fileName 
+                        Ref = filePath,
+                        EntityType = ImageEntityType.Order
                     });
                 }
 

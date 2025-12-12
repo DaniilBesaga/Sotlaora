@@ -515,6 +515,19 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
 
         <p className={styles.cardDesc}>{item.description}</p>
 
+        {item.imageFileRefs && item.imageFileRefs.length > 1 && (
+          <div className={styles.imageRow}>
+            {item.imageFileRefs.slice(1).map((imgRef, index) => (
+              <img 
+                key={index} 
+                src={imgRef} 
+                alt={`${item.title} ${index + 2}`} 
+                className={styles.thumbnailImage}
+              />
+            ))}
+          </div>
+        )}
+
         {/* BOTTOM ROW: Tags & Price */}
         <div className={styles.metaRow}>
           <div className={styles.tags}>

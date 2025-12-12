@@ -115,10 +115,13 @@ namespace Sotlaora.Backend.Controllers
 
                 await context.SaveChangesAsync();
 
-                return Ok(new {email, name, picture});
+                var redirectUrl = role == "pro" ? "http://localhost:3000/cabinet" : "http://localhost:3000/create-order";
+
+                return Redirect(redirectUrl);
             }
 
-            var user = new Pro{Email = email, UserName = name, Role = role == "pro" ? Role.Pro : Role.Client, CreatedAt = DateTime.UtcNow};
+            var user = role == "pro" ? new Pro{Email = email, UserName = name, Role = Role.Pro, CreatedAt = DateTime.UtcNow} 
+            : new User{Email = email, UserName = name, Role = Role.Client, CreatedAt = DateTime.UtcNow};
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
@@ -167,7 +170,7 @@ namespace Sotlaora.Backend.Controllers
             context.Images.Add(new Image
             {
                 Ref = picture,
-                EntityType = ImageEntityType.User,
+                EntityType = role == "pro" ? ImageEntityType.Pro : ImageEntityType.User,
                 EntityId = user.Id
             });
 

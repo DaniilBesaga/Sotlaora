@@ -538,7 +538,7 @@ namespace Sotlaora.Controllers
 
             var orders = user.AssignedOrders.ToList();
             
-            var ordersDTO = context.Orders.AsNoTracking().Where(o => o.ProId == user.Id).Select(o => new OrderDTO
+            var ordersDTO = context.Orders.AsNoTracking().Where(o => o.ProId == user.Id || o.ProId == null).Select(o => new OrderDTO
             {
                 Title = o.Title,
                 Description = o.Description,

@@ -203,7 +203,7 @@ function OrdersGrid({ items, emptyText }: { items: OrderDTO[], emptyText: string
               <img src={it.imageFileRefs?.[0] ?? '/images/placeholder.jpg'} alt={it.title} />
               <OrderStatusBadge status={it.status} />
             </div>
-            {it.imageFileRefs && it.imageFileRefs.length > 1 && (
+            {/* {it.imageFileRefs && it.imageFileRefs.length > 1 && (
               <div className={styles.thumbRow}>
                 {it.imageFileRefs.slice(0, 3).map((src: string, i: number) => (
                   <div key={i} className={styles.thumb}>
@@ -214,7 +214,7 @@ function OrdersGrid({ items, emptyText }: { items: OrderDTO[], emptyText: string
                   <div className={styles.moreThumb}>+{it.imageFileRefs.length - 3}</div>
                 )}
               </div>
-            )}
+            )} */}
           </div>
 
           <div className={styles.cardBody}>

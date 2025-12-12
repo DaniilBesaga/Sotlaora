@@ -561,3 +561,16 @@
 .metaUrgent svg {
   stroke: #d97706;
 }
+
+.imageRow {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.imageRow img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+}
