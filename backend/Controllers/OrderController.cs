@@ -13,7 +13,6 @@ namespace Sotlaora.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Client")]
     public class OrderController(UserManager<User> userManager, AppDbContext context) : ControllerBase
     {
         private readonly string _imagePath =

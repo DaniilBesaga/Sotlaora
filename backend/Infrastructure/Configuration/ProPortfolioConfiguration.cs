@@ -28,14 +28,11 @@ namespace Sotlaora.Infrastructure.Configuration
                 .IsRequired();
 
             builder.HasOne(p => p.Subcategory)
-                .WithMany()
+                .WithMany(s => s.ProPortfolios)   // <-- вот это нужно!
                 .HasForeignKey(p => p.SubcategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(p => p.Pro)
-                .WithOne(p => p.Portfolio)
-                .HasForeignKey<Pro>(p => p.PortfolioId)
-                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

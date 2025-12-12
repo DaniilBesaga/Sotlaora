@@ -73,7 +73,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         if(user.id === -1 && userLong.id === -1){
             if(path.includes('/cabinet-c')) {
                 getMeLongClient()
-            } else if(!path.includes('/auth')) 
+            } else if(!path.includes('/auth') && !path.includes('/searchorders')) 
             {
                 getMe()
                 getMeLong()

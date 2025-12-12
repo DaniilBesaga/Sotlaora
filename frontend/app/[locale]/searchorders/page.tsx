@@ -1,9 +1,8 @@
 "use client"
-import React, { useState, useMemo } from "react";
-import styles from "../searchpros/SearchPros.module.css"; // reuse same css-module
+import { useState, useMemo, useEffect } from "react";
+import styles from "../searchpros/SearchPros.module.css";
+import { OrderDTO } from "@/types/Order";
 
-// Reuse categories from your original file or import; here we reuse CATEGORIES
-// If you kept the original CATEGORIES in another file, import it instead.
 const CATEGORIES = {
   "Ремонт": [
     "Косметический ремонт",
@@ -24,97 +23,26 @@ const CATEGORIES = {
     "Монтаж дверей",
     "Монтаж полок и карнизов"
   ],
-  // ... (оставьте остальные категории как в оригинале)
 };
 
 const LANGUAGES = ["Румынский", "Английский", "Русский"];
 
-const MOCK_ORDERS = [
-  {
-    id: "o1",
-    title: "Починить протекающий кран",
-    description: "Кран капает уже несколько дней. Нужно заменить кран-буксу и устранить течь.",
-    category: "Ремонт",
-    sub: "Сантехника",
-    budgetMin: 20,
-    budgetMax: 40,
-    budgetUnit: "фикс",
-    location: { city: "București", distanceKm: 4.2 },
-    postedAt: "2025-11-27T10:30:00Z",
-    urgencyHours: 24,
-    customerRating: 4.6,
-    responsesCount: 1,
-    remoteAllowed: false,
-    languages: ["Румынский", "Русский"],
-    tags: ["сантехника", "течет", "быстрый выезд"]
-  },
-  {
-    id: "o2",
-    title: "Генеральная уборка квартиры 2 camere",
-    description: "После ремонта — требуются уборка, вынос мусора, мытье окон.",
-    category: "Уборка",
-    sub: "После ремонта",
-    budgetMin: 60,
-    budgetMax: 90,
-    budgetUnit: "фикс",
-    location: { city: "București", distanceKm: 12 },
-    postedAt: "2025-11-25T08:00:00Z",
-    urgencyHours: 72,
-    customerRating: 4.9,
-    responsesCount: 7,
-    remoteAllowed: false,
-    languages: ["Румынский"],
-    tags: ["уборка", "послеремонт", "вывоз"]
-  },
-  {
-    id: "o3",
-    title: "Подключить лампу и розетку — вызов",
-    description: "Нужен мастер для подключения потолочной лампы и одной розетки.",
-    category: "Электрика",
-    sub: "Розетки и выключатели",
-    budgetMin: 15,
-    budgetMax: 30,
-    budgetUnit: "за вызов",
-    location: { city: "Ilfov", distanceKm: 22 },
-    postedAt: "2025-11-28T06:45:00Z",
-    urgencyHours: 6,
-    customerRating: 4.5,
-    responsesCount: 0,
-    remoteAllowed: false,
-    languages: ["Румынский", "Английский"],
-    tags: ["электрика", "лампа", "розетка"]
-  },
-  {
-    id: "o4",
-    title: "Онлайн-консультация по сборке мебели (инструкции)",
-    description: "Есть чертежи и инструкции — нужна консультация по сборке кухни онлайн.",
-    category: "Мебель",
-    sub: "Установка кухни",
-    budgetMin: 10,
-    budgetMax: 20,
-    budgetUnit: "час",
-    location: { city: "Online", distanceKm: null },
-    postedAt: "2025-11-26T12:00:00Z",
-    urgencyHours: 48,
-    customerRating: 4.2,
-    responsesCount: 2,
-    remoteAllowed: true,
-    languages: ["Английский", "Румынский"],
-    tags: ["онлайн", "сборка", "консультация"]
-  }
-];
+interface CategoryPillsProps {
+  selectedCat: string | null;
+  onSelect: (cat: string | null, sub: string | null) => void;
+}
 
-function CategoryPillsOrders({ selectedCat, onSelect }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSub, setSelectedSub] = useState(null);
+function CategoryPillsOrders({ selectedCat, onSelect }: CategoryPillsProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSub, setSelectedSub] = useState<string | null>(null);
 
-  function handleCategoryClick(cat) {
+  function handleCategoryClick(cat: string) {
     setSelectedSub(null);
     setSelectedCategory((prev) => (prev === cat ? null : cat));
     onSelect(cat, null);
   }
 
-  function handleSubClick(cat, sub) {
+  function handleSubClick(cat: string, sub: string) {
     setSelectedCategory(cat);
     setSelectedSub(sub);
     onSelect(cat, sub);
@@ -146,7 +74,7 @@ function CategoryPillsOrders({ selectedCat, onSelect }) {
         <div className={styles.subBlock}>
           <h3 className={styles.subTitle}>{selectedCategory}</h3>
           <div className={styles.subGrid}>
-            {CATEGORIES[selectedCategory].map((sub) => (
+            {CATEGORIES[selectedCategory as keyof typeof CATEGORIES].map((sub) => (
               <button
                 key={sub}
                 className={`${styles.subItem} ${selectedSub === sub ? styles.subItemActive : ''}`}
@@ -162,7 +90,13 @@ function CategoryPillsOrders({ selectedCat, onSelect }) {
   );
 }
 
-function QuickChips({ chips, active, onToggle }) {
+interface QuickChipsProps {
+  chips: Array<{ id: string; label: string }>;
+  active: string[];
+  onToggle: (id: string) => void;
+}
+
+function QuickChips({ chips, active, onToggle }: QuickChipsProps) {
   return (
     <div className={styles.quickChips}>
       <div className={styles.chipsRow}>
@@ -180,8 +114,24 @@ function QuickChips({ chips, active, onToggle }) {
   );
 }
 
-function FiltersPanelOrders({ state, setState, onApply, onClear }) {
-  const toggleLanguage = (lang) => {
+interface FiltersState {
+  priceMin: number;
+  priceMax: number;
+  maxAgeDays: number;
+  remoteAllowed: boolean;
+  inPerson: boolean;
+  languages: string[];
+}
+
+interface FiltersPanelProps {
+  state: FiltersState;
+  setState: React.Dispatch<React.SetStateAction<FiltersState>>;
+  onApply: () => void;
+  onClear: () => void;
+}
+
+function FiltersPanelOrders({ state, setState, onApply, onClear }: FiltersPanelProps) {
+  const toggleLanguage = (lang: string) => {
     setState((s) => ({
       ...s,
       languages: s.languages.includes(lang)
@@ -265,7 +215,14 @@ function FiltersPanelOrders({ state, setState, onApply, onClear }) {
   );
 }
 
-function OrderCard({ order, onApply, onSave, onMessage }) {
+interface OrderCardProps {
+  order: OrderDTO;
+  onApply: (order: OrderDTO) => void;
+  onSave: (order: OrderDTO) => void;
+  onMessage: (order: OrderDTO) => void;
+}
+
+function OrderCard({ order, onApply, onSave, onMessage }: OrderCardProps) {
   const posted = new Date(order.postedAt);
   const postedStr = posted.toLocaleString();
 
@@ -279,23 +236,22 @@ function OrderCard({ order, onApply, onSave, onMessage }) {
         <div className={styles.titleRow}>
           <div>
             <h5 className={styles.name}>{order.title}</h5>
-            <div className={styles.servicesText}>{order.category} • {order.sub}</div>
+            <div className={styles.servicesText}>{order.description}</div>
           </div>
 
           <div className={styles.priceBlock}>
             <div className={styles.priceValue}>
-              {order.budgetMin}{order.budgetUnit ? `–${order.budgetMax} ${order.budgetUnit}` : ''}
+              {order.price} RON
             </div>
-            <div className={styles.distanceText}>{order.location?.distanceKm ? `${order.location.distanceKm} km` : order.location?.city}</div>
+            <div className={styles.distanceText}>{order.location?.city || 'N/A'}</div>
           </div>
         </div>
 
-        <p className={styles.bio}>{order.description}</p>
+        <p className={styles.bio}>{order.additionalComment || order.description}</p>
 
         <div className={styles.statsRow}>
           <div className={styles.smallText}>Опубликовано: {postedStr}</div>
-          <div className={styles.smallText}>Рейтинг заказчика: {order.customerRating} ★</div>
-          <div className={styles.smallText}>Откликов: {order.responsesCount}</div>
+          <div className={styles.smallText}>Статус: {order.status}</div>
 
           <div style={{marginLeft: "auto", display: "flex", gap: 8}}>
             <button onClick={() => onMessage(order)} className={styles.chatBtn}>Сообщение</button>
@@ -303,23 +259,21 @@ function OrderCard({ order, onApply, onSave, onMessage }) {
             <button onClick={() => onSave(order)} className={styles.chatBtn}>Сохранить</button>
           </div>
         </div>
-
-        <div style={{marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap"}}>
-          {order.tags.map(t => <span key={t} className={styles.badge}>{t}</span>)}
-        </div>
       </div>
     </article>
   );
 }
 
 export default function SearchOrdersSection() {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSub, setSelectedSub] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSub, setSelectedSub] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
-  const [quickActive, setQuickActive] = useState([]);
+  const [quickActive, setQuickActive] = useState<string[]>([]);
 
-  const [filters, setFilters] = useState({
+  const [ordersData, setOrdersData] = useState<OrderDTO[]>([]);
+
+  const [filters, setFilters] = useState<FiltersState>({
     priceMin: 0,
     priceMax: 1000,
     maxAgeDays: 30,
@@ -327,6 +281,16 @@ export default function SearchOrdersSection() {
     inPerson: true,
     languages: []
   });
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const res = await fetch('http://localhost:5221/api/order/get-all-without-pro');
+      const data = await res.json();
+      console.log('Fetched orders:', data);
+      setOrdersData(data);
+    }
+    fetchOrders();
+  }, []);
 
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
 
@@ -337,7 +301,7 @@ export default function SearchOrdersSection() {
     { id: "highPay", label: "Высокий бюджет" }
   ];
 
-  function toggleChip(id) {
+  function toggleChip(id: string) {
     setQuickActive((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   }
 
@@ -359,29 +323,22 @@ export default function SearchOrdersSection() {
   const filtered = useMemo(() => {
     const now = new Date();
 
-    return MOCK_ORDERS.filter((o) => {
-      if (selectedCategory && o.category !== selectedCategory) return false;
-      if (selectedSub && o.sub !== selectedSub) return false;
-      if (query && !(`${o.title} ${o.description} ${o.tags.join(" ")}`).toLowerCase().includes(query.toLowerCase())) return false;
-      if (filters.remoteAllowed && !o.remoteAllowed) return false;
-      if (!filters.inPerson && !o.remoteAllowed) return false; // if user wants only remote, inPerson=false handled above
-      if (filters.languages.length && !filters.languages.every(l => o.languages.includes(l))) return false;
-      if (quickActive.includes("nearby") && (o.location?.distanceKm ?? 999) > 15) return false;
-      if (quickActive.includes("urgent") && o.urgencyHours > 24) return false;
-      if (quickActive.includes("highPay") && o.budgetMax < 50) return false;
-      if (filters.priceMin && o.budgetMax < filters.priceMin) return false;
-      if (filters.priceMax && o.budgetMin > filters.priceMax) return false;
+    return ordersData.filter((o) => {
+      if (query && !(`${o.title} ${o.description}`).toLowerCase().includes(query.toLowerCase())) return false;
+      if (filters.priceMin && o.price < filters.priceMin) return false;
+      if (filters.priceMax && o.price > filters.priceMax) return false;
 
-      // max age filter
       if (filters.maxAgeDays) {
         const posted = new Date(o.postedAt);
-        const ageDays = (now - posted) / (1000 * 60 * 60 * 24);
+        const ageDays = (now.getTime() - posted.getTime()) / (1000 * 60 * 60 * 24);
         if (ageDays > filters.maxAgeDays) return false;
       }
 
+      if (quickActive.includes("highPay") && o.price < 50) return false;
+
       return true;
     });
-  }, [selectedCategory, selectedSub, query, filters, quickActive]);
+  }, [ordersData, query, filters, quickActive]);
 
   return (
     <div className={styles.container}>

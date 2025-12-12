@@ -43,7 +43,8 @@ namespace Sotlaora.Backend.Controllers
 
                 foreach (var file in files)
                 {
-                    var fileName = fileNames[files.ToList().IndexOf(file)];
+                    var fileName = file.FileName;
+
                     var filePath = Path.Combine(_imagePath, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
@@ -51,11 +52,10 @@ namespace Sotlaora.Backend.Controllers
                         await file.CopyToAsync(stream);
                     }
 
-                    var image = new Image
+                    images.Add(new Image
                     {
-                        Ref = file.FileName,
-                    };
-                    images.Add(image);
+                        Ref = fileName 
+                    });
                 }
 
                 _context.AddRange(images);
