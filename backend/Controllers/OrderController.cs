@@ -1,5 +1,7 @@
+using backend.Business.Entities;
 using backend.Business.Models;
 using Backend.Business.Models;
+using Business.Entities;
 using Business.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -146,7 +148,31 @@ namespace Sotlaora.Controllers
                     }
                 };
 
+                var chat = new Chat
+                {
+                    OrderId = orderFull.Id,
+                    ClientId = orderFull.ClientId,
+                    ProId = orderFull.ProId.Value
+                };
+
+                var systemMessage = new Message
+                    {
+                        Chat = chat, // associate with the newly created chat
+                        Content = "Chat has started", // text shown in the chat
+                        Timestamp = DateTime.Now,
+                        SenderId = orderFull.ClientId, // optional: use 0 or a special system user id
+                        ReceiverId = orderFull.ProId.Value, // or chat.ProId, or both depending on your logic
+                        IsRead = false,
+                        IsSystemMessage = true
+                    };
+
+                context.Messages.Add(systemMessage);
+                context.Chats.Add(chat);
+
                 context.Notifications.Add(notificationToPro);
+
+                context.SaveChanges();
+
                 return Ok( new { id = orderFull.Id });
             }
 
@@ -174,7 +200,6 @@ namespace Sotlaora.Controllers
 
                 context.Notifications.Add(notification);
             }
-
 
             context.SaveChanges();
             return Ok( new { id = orderFull.Id });

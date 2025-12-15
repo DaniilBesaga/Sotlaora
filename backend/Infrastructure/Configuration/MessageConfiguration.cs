@@ -30,6 +30,10 @@ namespace backend.Infrastructure.Configuration
 
             builder.Property(m => m.ChatId)
                 .IsRequired();
+
+            builder.Property(m => m.IsSystemMessage)
+                .IsRequired()
+                .HasDefaultValue(false);
         }
     }
 }

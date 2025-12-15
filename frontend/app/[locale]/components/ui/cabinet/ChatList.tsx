@@ -1,5 +1,5 @@
 import { ChatShortDTO } from "@/types/Chat"
-import styles from '../../components/ui/cabinet/ChatList.module.css';
+import styles from './ChatList.module.css';
 
 export default async function ChatsList() {
 

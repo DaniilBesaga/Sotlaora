@@ -374,7 +374,7 @@ export default function UserCabinet() {
     return false; 
   });
 
-  const quick = [{ key: 'create', label: 'Create Order', icon: <Plus size={18}/>, href: '/create-order', highlight: true }, { key: 'messages', label: 'Messages', icon: <MessageCircle size={18}/>, count: 2, href: '#messages' }, { key: 'wallet', label: 'Wallet', icon: <Wallet size={18}/>, href: '#wallet' }, { key: 'settings', label: 'Settings', icon: <Settings size={18}/>, href: '#settings' }];
+  const quick = [{ key: 'create', label: 'Create Order', icon: <Plus size={18}/>, href: '/create-order', highlight: true }, { key: 'messages', label: 'Messages', icon: <MessageCircle size={18}/>, count: 2, href: '/cabinet-c/chats' }, { key: 'wallet', label: 'Wallet', icon: <Wallet size={18}/>, href: '#wallet' }, { key: 'settings', label: 'Settings', icon: <Settings size={18}/>, href: '#settings' }];
 
   return (
     <div className={styles.page}>
