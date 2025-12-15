@@ -1,5 +1,6 @@
 using Backend.Business.Models;
 using Business.Models;
+using Business.Models.Chat;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -145,5 +146,7 @@ namespace Sotlaora.Controllers
                 }).ToList()
             });
         }
+    
+        
     }
 }

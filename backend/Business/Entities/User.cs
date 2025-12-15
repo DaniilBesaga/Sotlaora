@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using backend.Business.Entities;
 using Microsoft.AspNetCore.Identity;
 using Sotlaora.Business.Entities.UserMetadata;
 
@@ -27,5 +28,6 @@ namespace Sotlaora.Business.Entities
         public ICollection<Order> Orders { get; set; } = new List<Order>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<Chat> ClientChats { get; set; } = new List<Chat>();
     }
 }

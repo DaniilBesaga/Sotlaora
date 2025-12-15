@@ -1,4 +1,6 @@
 
+using backend.Business.Entities;
+
 namespace Sotlaora.Business.Entities
 {
     
@@ -30,6 +32,9 @@ namespace Sotlaora.Business.Entities
         public OrderStatus Status { get; set; }
 
         public ICollection<Subcategory> Subcategories { get; set; } = new List<Subcategory>();
+        
+        public int ChatId { get; set; }
+        public Chat Chat { get; set; } = null!;
 
         public int ClientId { get; set; }
         public User Client { get; set; } = null!;

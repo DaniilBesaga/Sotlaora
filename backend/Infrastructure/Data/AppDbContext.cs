@@ -1,3 +1,6 @@
+using backend.Business.Entities;
+using backend.Infrastructure.Configuration;
+using Business.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +31,9 @@ namespace Sotlaora.Infrastructure.Data
         public DbSet<ProPortfolio> ProPortfolios { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
 
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -45,6 +51,9 @@ namespace Sotlaora.Infrastructure.Data
             builder.ApplyConfiguration(new ProSubcategoryConfiguration());
             builder.ApplyConfiguration(new ProPortfolioConfiguration());
             builder.ApplyConfiguration(new UserProfileConfiguration());
+
+            builder.ApplyConfiguration(new ChatConfiguration());
+            builder.ApplyConfiguration(new MessageConfiguration());
             
             builder.Entity<User>()
                 .HasDiscriminator<string>("UserType")

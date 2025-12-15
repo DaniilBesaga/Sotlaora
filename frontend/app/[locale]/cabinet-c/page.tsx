@@ -369,8 +369,8 @@ export default function UserCabinet() {
   const [activeTab, setActiveTab] = useState<'active' | 'history' | 'drafts'>('active');
 
   const displayedOrders = ordersData.filter(order => {
-    if (activeTab === 'active') return [OrderStatus.Active, OrderStatus.UnderReview, OrderStatus.Taken, OrderStatus.WaitingForPayment].includes(order.status);
-    if (activeTab === 'history') return [OrderStatus.Completed, OrderStatus.Cancelled].includes(order.status);
+    if (activeTab === 'active') return [OrderStatus.Active, OrderStatus.Assigned, OrderStatus.Disscussion, OrderStatus.InProgress, OrderStatus.Paid, OrderStatus.WaitingForConfirmationByClient].includes(order.status);
+    if (activeTab === 'history') return [OrderStatus.Completed, OrderStatus.CancelledByClient, OrderStatus.CancelledByPro].includes(order.status);
     return false; 
   });
 

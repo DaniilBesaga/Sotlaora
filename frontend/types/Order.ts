@@ -2,12 +2,16 @@ import { ClientDTO } from "./Client";
 import { SubcategoryDTO } from "./ServicePrices";
 
 export enum OrderStatus {
-  Active = "Active",
-  Taken = "Taken",
+  Draft = "Draft",
+  Active = "Active", // not taken yet
+  Assigned = "Assigned", // assigned to specific pro
+  Disscussion = "Discussion", // in discussion with pro
+  InProgress = "InProgress", // taken by pro
   Completed = "Completed",
-  Cancelled = "Cancelled",
-  WaitingForPayment = "WaitingForPayment",
-  UnderReview = "UnderReview",
+  Paid = "Paid",
+  WaitingForConfirmationByClient = "WaitingForConfirmationByClient",
+  CancelledByClient = "CancelledByClient",
+  CancelledByPro = "CancelledByPro",
 }
 
 export enum Location {

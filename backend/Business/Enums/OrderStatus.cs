@@ -3,11 +3,15 @@ namespace Sotlaora.Business.Entities
     
     public enum OrderStatus
     {
+        Draft,
         Active,
-        Taken,
+        Assigned,
+        Discussion,
+        InProgress,
         Completed,
-        Cancelled,
-        WaitingForPayment,
-        UnderReview
+        Paid,
+        WaitingForConfirmationByClient,
+        CancelledByClient,
+        CancelledByPro
     }
 }

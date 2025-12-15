@@ -286,7 +286,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
             ClientId: order.clientId,
             ImageFileIds: dataImage.insertedIds,
             ProId: order.proId,
-            Status: order.proId ? OrderStatus.UnderReview : OrderStatus.Active
+            Status: order.proId ? OrderStatus.Assigned : OrderStatus.Active
           }
         ),});
 

@@ -111,7 +111,7 @@ namespace Sotlaora.Controllers
                 DesiredTimeEnd = order.DesiredTimeEnd,
                 Subcategories = order.Subcategories?.Select(id => context.Subcategories.Find(id)).Where(s => s != null).ToList(),
                 ClientId = user.Id,
-                Status = order.ProId != 0 ? OrderStatus.UnderReview : OrderStatus.Active,
+                Status = order.ProId != 0 ? OrderStatus.Assigned : OrderStatus.Active,
                 ProId = order.ProId == null ? null : order.ProId
             };
             context.Orders.Add(orderFull);
