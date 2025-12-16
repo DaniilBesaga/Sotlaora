@@ -536,7 +536,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
 
         {/* Assuming CalendarDropdown handles its own positioning, or you wrap it in rowBody */}
         {calOpen && (
-           <div className={`${styles.rowBody} ${styles.open}`} style={{padding:0, overflow:'hidden', minHeight: '300px'}}>
+           <div className={` ${styles.open} ${styles.calendarBody}`}>
              <CalendarDropdown initialStart={range.start} onApply={handleApplyDate} onClose={() => setCalOpen(false)} />
            </div>
         )}

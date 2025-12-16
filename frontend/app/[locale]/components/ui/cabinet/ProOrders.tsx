@@ -52,7 +52,7 @@ export default function ProOrders(){
   const quick = [
     { key: 'orders', label: 'Заказы', icon: '🧾', count: 4, href: '#orders' },
     { key: 'subscriptions', label: 'Подписки', icon: '🔔', count: 2, href: '#subscriptions' },
-    { key: 'messages', label: 'Сообщения', icon: '💬', count: 3, href: '#messages' },
+    { key: 'messages', label: 'Сообщения', icon: '💬', count: 3, href: '/cabinet/messages' },
     { key: 'earnings', label: 'Заработок', icon: '💵', count: null, href: '#earnings' },
     { key: 'settings', label: 'Настройки', icon: '⚙️', count: null, href: '#settings' },
   ];
@@ -65,7 +65,7 @@ export default function ProOrders(){
   }
 
   // Filter orders based on status
-  const activeOrders = ordersData.filter(o => o.status === 'Active' || o.status === 'UnderReview');
+  const activeOrders = ordersData.filter(o => o.status === 'Active' || o.status === 'Assigned');
   const completedOrders = ordersData.filter(o => o.status === 'Completed');
 
   return ( (authenticated === 'loading' && loading) ? <div>Loading...</div> :
@@ -163,7 +163,6 @@ export default function ProOrders(){
 
         {activeSection === 'settings' && <ProDashboard />}
         {activeSection === 'earnings' && <EarningsPage />}
-        {activeSection === 'messages' && <ChatList />}
         {activeSection === 'subscriptions' && <NotificationsPage />}
 
         <aside className={styles.quickNav} aria-label="Быстрая навигация">

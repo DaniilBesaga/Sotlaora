@@ -8,24 +8,24 @@ export default function Header() {
   const t = useTranslations('Header');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const {user, authenticated, getMe, logout, refresh, userLong} = use(LoginContext);
+  const {user, authenticated, getMe, logout, refresh, userLong, getMeLongClient} = use(LoginContext);
 
   useEffect(() => {
-    // const check = async () => {
-    //   const result = await getMe()
+    const check = async () => {
+      const result = await getMe(false)
 
-    //   if(result.status === 401){
-    //     const refreshStatus = await refresh();
+      if(result.status === 401){
+        const refreshStatus = await refresh();
 
-    //     if(refreshStatus === 200){
-    //       await getMe();
-    //     }
-    //     else {
-          
-    //     }
-    //   }
-    // }
-    // check();
+        if(refreshStatus === 200){
+          await getMe(false);
+        }
+        else {
+          await getMeLongClient(false);
+        }
+      }
+    }
+    check();
     console.log( authenticated);
   }, [authenticated]);
 

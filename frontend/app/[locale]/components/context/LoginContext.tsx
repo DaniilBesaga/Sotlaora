@@ -71,13 +71,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
     useEffect(() => {
         if(user.id === -1 && userLong.id === -1){
-            // if(path.includes('/cabinet-c')) {
-            //     getMeLongClient()
-            // } else if(!path.includes('/auth') && !path.includes('/searchorders')) 
-            // {
-            //     getMe()
-            //     getMeLong()
-            // }
+            getMeLongClient()
 
             if(path.includes('/cabinet-c') || path.includes('/create-order')) {
                 getMeLongClient()

@@ -82,9 +82,6 @@ export default function CalendarDropdown({ initialStart = null, onApply, onClose
   return (
     <div className={styles.wrapper} role="dialog" aria-modal="true">
       <div className={styles.header}>
-        <div className={styles.tabs}>
-          <button className={`${styles.tab} ${tab === "date" ? styles.activeTab : ""}`} onClick={() => setTab("date")}>Дата</button>
-        </div>
 
         <div className={styles.monthRow}>
           <button className={styles.nav} onClick={() => changeMonth(-1)} aria-label="Предыдущий месяц">‹</button>
