@@ -5,6 +5,8 @@ import styles from '../../components/ui/cabinet/ChatList.module.css';
 
 export default function ChatsClient({chats}: {chats: ChatShortDTO[]}) {
 
+  console.log(chats)
+
     return(
         <div className={styles.container}>
             {/* Заголовок и поиск */}

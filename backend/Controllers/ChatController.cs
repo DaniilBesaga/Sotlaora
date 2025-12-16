@@ -34,28 +34,45 @@ namespace backend.Controllers
                 return NotFound();
             }
 
-            var chats = user.ClientChats.Select(c => new
-            {
-                Chat = c,
-                LastMessageTime = c.Messages.OrderByDescending(m => m.Timestamp).Select(m => m.Timestamp).FirstOrDefault()
-            }).AsEnumerable().Select(x => new ChatShortDTO
-            {
-                Id = x.Chat.Id,
-                ClientName = user.UserName!,
-                Avatar = context.Images
-                    .Where(img => img.EntityType == ImageEntityType.Pro && img.EntityId == user.Id)
-                    .Select(img => img.Ref)
-                    .FirstOrDefault() ?? string.Empty,
-                OrderId = x.Chat.OrderId,
-                OrderTitle = x.Chat.Order.Title,
-                LastMessage = x.Chat.Messages.OrderByDescending(m => m.Timestamp).Select(m => m.Content).FirstOrDefault() ?? string.Empty,
-                Time = x.LastMessageTime != default 
-                    ? (DateTime.Now - x.LastMessageTime).TotalHours < 24 
-                        ? x.LastMessageTime.ToString("HH:mm") 
-                        : x.LastMessageTime.ToString("dd MMM")
-                    : string.Empty,
-                Unread = x.Chat.Messages.Any(m => m.ReceiverId == user.Id && !m.IsRead)
-            }).ToList();
+            var chatData = user.ClientChats
+    .Select(c => new
+    {
+        c.Id,
+        c.OrderId,
+        OrderTitle = c.Order?.Title,
+        Messages = c.Messages.ToList(),
+        ProId = c.ProId // 👈 materialize ONCE
+    })
+    .ToList();
+
+        var chats = chatData.Select(c => new ChatShortDTO
+        {
+            Id = c.Id,
+            ClientName = user.UserName ?? string.Empty,
+            Avatar = context.Images
+                .Where(img => img.EntityType == ImageEntityType.Pro &&
+                            img.EntityId == c.ProId)
+                .Select(img => img.Ref)
+                .FirstOrDefault() ?? string.Empty,
+            OrderId = c.OrderId,
+            OrderTitle = c.OrderTitle ?? string.Empty,
+
+            LastMessage = c.Messages
+                .OrderByDescending(m => m.Timestamp)
+                .Select(m => m.Content)
+                .FirstOrDefault() ?? string.Empty,
+
+            Time = c.Messages.Any()
+                ? (DateTime.UtcNow - c.Messages.Max(m => m.Timestamp)).TotalHours < 24
+                    ? c.Messages.Max(m => m.Timestamp).ToString("HH:mm")
+                    : c.Messages.Max(m => m.Timestamp).ToString("dd MMM")
+                : string.Empty,
+
+            Unread = c.Messages.Any(m =>
+                m.ReceiverId == user.Id && !m.IsRead)
+        })
+        .ToList();
+
 
             return Ok(chats);
         }

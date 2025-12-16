@@ -159,7 +159,7 @@ namespace Sotlaora.Controllers
                     {
                         Chat = chat, // associate with the newly created chat
                         Content = "Chat has started", // text shown in the chat
-                        Timestamp = DateTime.Now,
+                        Timestamp = DateTime.UtcNow,
                         SenderId = orderFull.ClientId, // optional: use 0 or a special system user id
                         ReceiverId = orderFull.ProId.Value, // or chat.ProId, or both depending on your logic
                         IsRead = false,
