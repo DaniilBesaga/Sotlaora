@@ -3,6 +3,7 @@ import { use, useEffect, useState } from 'react';
 import styles from './Header.module.css';
 import { useTranslations } from 'next-intl';
 import { LoginContext } from '../context/LoginContext';
+import { Role } from '@/types/Role';
 
 export default function Header() {
   const t = useTranslations('Header');
@@ -11,22 +12,8 @@ export default function Header() {
   const {user, authenticated, getMe, logout, refresh, userLong, getMeLongClient} = use(LoginContext);
 
   useEffect(() => {
-    const check = async () => {
-      const result = await getMe(false)
-
-      if(result.status === 401){
-        const refreshStatus = await refresh();
-
-        if(refreshStatus === 200){
-          await getMe(false);
-        }
-        else {
-          await getMeLongClient(false);
-        }
-      }
-    }
-    check();
-    console.log( authenticated);
+    
+    console.log(authenticated);
   }, [authenticated]);
 
   return (
@@ -60,7 +47,7 @@ export default function Header() {
 
           {/* Login icon */}
           {authenticated === 'authenticated' && (
-            <a href='/cabinet' className={styles.iconBtn} aria-label="Profile">
+            <a href={userLong?.role === Role.Client ? '/cabinet-c' : '/cabinet'} className={styles.iconBtn} aria-label="Profile">
               <img src={(user.imageRef === undefined && userLong?.imageRef === undefined) ?  '/images/default-profile.png' : (user.imageRef || userLong?.imageRef)} alt="Profile" className={styles.profilePic} />
             </a>
           )}

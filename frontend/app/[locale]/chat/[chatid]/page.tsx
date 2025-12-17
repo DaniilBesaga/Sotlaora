@@ -100,7 +100,7 @@ export default function ChatPage() {
   // --- 1. Fetch Chat Details & Messages ---
   // --- 1. Fetch Chat Details & Messages ---
   useEffect(() => {
-    if (!params.chatid) return;
+    if (!params.chatid || !userLong) return;
 
     const fetchData = async () => {
       try {
@@ -115,6 +115,7 @@ export default function ChatPage() {
         // 2. Get Messages
         const msgRes = await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/messages`);
         const msgData = await msgRes.json();
+        console.log(msgData)
         
         // --- UPDATED MAPPING LOGIC ---
         const formattedMessages = msgData.map((m: any) => {
@@ -145,6 +146,7 @@ export default function ChatPage() {
         });
         
         setMessages(formattedMessages);
+        console.log("Formatted Messages:", formattedMessages);
 
       } catch (error) {
         console.error("Failed to load chat data", error);
@@ -154,13 +156,13 @@ export default function ChatPage() {
     };
 
     fetchData();
-  }, [params.chatid]);
+    console.log("userLong", userLong);
+  }, [params.chatid, userLong]);
 
   // --- 2. Computed Properties (Role Logic) ---
   
   const amIClient = chatInfo ? userLong?.id.toString() === chatInfo.clientId.toString() : false;
   const amIPro = chatInfo ? userLong?.id.toString() === chatInfo.proId.toString() : false;
-  console.log(userLong?.id);
   
   const myRole = amIClient ? 'client' : amIPro ? 'pro' : 'admin';
 
@@ -251,7 +253,7 @@ export default function ChatPage() {
     setInputText('');
   };
 
-  const handleCreateOffer = () => {
+  const handleCreateOffer = async () => {
     if (!chatInfo) return;
     
     const newPrice = offerInput;
@@ -268,13 +270,58 @@ export default function ChatPage() {
         timestamp: new Date()
     };
 
+    try {
+      await fetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
+          method: "POST",
+          headers: { 
+              "Content-Type": "application/json",
+          },
+          credentials: 'include',
+          body: JSON.stringify({ 
+              Content: `Offer: ${newPrice} RON`, 
+              Type: 'offer',
+              Price: newPrice, 
+              IsSystemMessage: false
+          }),
+      });
+    } catch (err) {
+      console.error("Failed to save offer to backend:", err);
+    }
+
     setMessages([...messages, newMsg]);
     setOfferModalOpen(false);
   };
 
-  const handleAcceptOffer = (msgId: string, price: number) => {
-    // Call API to update Order Status
-    // updateOrder(chatInfo.fullOrder.id, price) ...
+  const handleAcceptOffer = async (msgId: string, price: number) => {
+        
+    try {
+        await fetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify({ 
+                Content: `Deal accepted! Final price: ${price} RON. Work can begin.`,
+                Type: 'system',
+                IsSystemMessage: true
+            }),
+        });
+
+        await fetch(`http://localhost:5221/api/order/${chatInfo?.fullOrder.id}/setNewPrice`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: 'include',
+            body: JSON.stringify(
+                price
+            ),
+        });
+
+    } catch (err) {
+        console.error("Failed to save system message:", err);
+    }
 
     setMessages(msgs => msgs.map(m => m.id === msgId ? { ...m, offerStatus: 'accepted' } : m));
     

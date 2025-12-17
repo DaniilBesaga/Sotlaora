@@ -54,6 +54,8 @@ namespace Sotlaora.Infrastructure.Data
 
             builder.ApplyConfiguration(new ChatConfiguration());
             builder.ApplyConfiguration(new MessageConfiguration());
+
+            builder.ApplyConfiguration(new MessageOfferConfiguration());
             
             builder.Entity<User>()
                 .HasDiscriminator<string>("UserType")

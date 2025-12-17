@@ -70,16 +70,28 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
     const router = useRouter()
 
     useEffect(() => {
-        if(user.id === -1 && userLong.id === -1){
-            getMeLongClient()
+        if (user.id === -1 && userLong.id === -1) {
+            const checkAuth = async () => {
+                // call concurrently so both run in parallel
+                const [resLongClient, resShort, res] = await Promise.all([
+                    getMeLongClient(),
+                    getMeLong(),
+                    getMe()
+                ]);
 
-            if(path.includes('/cabinet-c') || path.includes('/create-order')) {
-                getMeLongClient()
-            } else if(path.includes('/cabinet')) 
-            {
-                getMe()
-                getMeLong()
-            }
+                // If BOTH failed -> redirect to auth
+                if (!resLongClient.ok && !resShort.ok && !res.ok) {
+                    setAuthenticated("unauthenticated");
+                    router.push('/auth');
+                } else {
+                    setAuthenticated("authenticated");
+                }
+            };
+
+            checkAuth().catch((e) => {
+                console.error("checkAuth failed", e);
+                setAuthenticated("unauthenticated");
+            });
         }
     }, [])
 
@@ -111,7 +123,6 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             setUser(EmptyUser);
             setAuthenticated("unauthenticated");
-            router.push('/auth')
             return { ok: false, status: 401 };
 
         } catch (error) {
@@ -150,7 +161,6 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             setUserLong(EmptyUserLong);
             setAuthenticated("unauthenticated");
-            router.push('/auth')
             return { ok: false, status: 401 };
 
         } catch (error) {
@@ -190,6 +200,7 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
             if (res.ok) {
                 const data = await res.json();
+                console.log("getMeLongClient data:", data);
                 if (data?.id && data?.email) {
                     setUserLong(data);
                     setAuthenticated("authenticated");
@@ -205,7 +216,6 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
             }
 
             setUserLong(EmptyUserLong);
-            router.push('/auth')
             setAuthenticated("unauthenticated");
             return { ok: false, status: 401 };
 

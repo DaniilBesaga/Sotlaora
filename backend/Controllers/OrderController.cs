@@ -258,5 +258,19 @@ namespace Sotlaora.Controllers
             context.SaveChanges();
             return NoContent();
         }
+
+        [HttpPut("{id}/setNewPrice")]
+        public async Task<ActionResult> SetNewPrice(int id, [FromBody] decimal price)
+        {
+            var existingOrder = await context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound();
+            }
+            existingOrder.Price = price;
+            existingOrder.Status = OrderStatus.InProgress;
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
     }
 }

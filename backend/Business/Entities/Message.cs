@@ -1,4 +1,5 @@
 using backend.Business.Entities;
+using backend.Business.Enums;
 
 namespace Business.Entities
 {
@@ -14,7 +15,7 @@ namespace Business.Entities
         public Guid ChatId { get; set; }
         public Chat Chat { get; set; } = null!;
 
-        public bool IsSystemMessage { get; set; } = false;
+        public MessageType Type { get; set; } = MessageType.Text;
 
     }
 }

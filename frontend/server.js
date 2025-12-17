@@ -106,23 +106,7 @@ app.prepare().then(() => {
       // 2. Persist to Backend
       const chatId = getChatId(room);
 
-      try {
-        await fetch(`http://localhost:5221/api/chat/${chatId}/sendMessage`, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-            },
-            credentials: 'include',
-            body: JSON.stringify({ 
-                Content: `Offer: ${price}`, 
-                Type: 'offer',
-                Price: price, 
-                IsSystemMessage: false
-            }),
-        });
-      } catch (err) {
-        console.error("Failed to save offer to backend:", err);
-      }
+      
     });
 
     // --- 4. Send System Message (NEW) ---
@@ -139,24 +123,7 @@ app.prepare().then(() => {
         
         io.to(room).emit("newMessage", msg);
 
-        const chatId = getChatId(room);
         
-        try {
-            await fetch(`http://localhost:5221/api/chat/${chatId}/sendMessage`, {
-                method: "POST",
-                headers: { 
-                    "Content-Type": "application/json",
-                },
-                credentials: 'include',
-                body: JSON.stringify({ 
-                    Content: content,
-                    Type: 'system',
-                    IsSystemMessage: true
-                }),
-            });
-        } catch (err) {
-            console.error("Failed to save system message:", err);
-        }
     });
 
     socket.on("disconnect", () => {
