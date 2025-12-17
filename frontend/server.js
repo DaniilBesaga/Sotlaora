@@ -75,7 +75,7 @@ app.prepare().then(() => {
       const msg = createMessage({ 
           text: content, 
           senderType: senderId, 
-          type: 'text' 
+          type: 'Text' 
       });
       
       io.to(room).emit("newMessage", msg);
@@ -97,8 +97,8 @@ app.prepare().then(() => {
           text: `New Price Proposal: ${price} RON`, 
           senderType: senderId || "pro", 
           price: price, 
-          type: "offer",
-          offerStatus: "pending"
+          type: "Offer",
+          offerStatus: "Pending"
       });
       
       io.to(room).emit("newMessage", msg);
@@ -117,8 +117,8 @@ app.prepare().then(() => {
     socket.on("sendSystemMessage", async ({ room, content }) => {
         const msg = createMessage({ 
             text: content, 
-            senderType: "system", 
-            type: "system" 
+            senderType: "System", 
+            type: "System" 
         });
         
         io.to(room).emit("newMessage", msg);

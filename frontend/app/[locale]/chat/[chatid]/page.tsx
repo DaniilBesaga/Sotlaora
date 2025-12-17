@@ -62,10 +62,10 @@ interface Message {
   id: string;
   senderId: string; // We will use string to match LoginContext usually, though API uses int
   text?: string;
-  type: 'text' | 'img' | 'offer' | 'system';
+  type: 'Text' | 'Img' | 'Offer' | 'System';
   timestamp: Date;
   offerPrice?: number;
-  offerStatus?: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+  offerStatus?: 'Pending' | 'Accepted' | 'Rejected' | 'Withdrawn';
 }
 
 type NewMessage = {
@@ -75,9 +75,15 @@ type NewMessage = {
   readed: boolean;
   // Add these for offers/system messages
   price?: number; 
-  type?: 'text' | 'img' | 'offer' | 'system'; 
-  offerStatus?: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+  type?: 'Text' | 'Img' | 'Offer' | 'System'; 
+  offerStatus?: 'Pending' | 'Accepted' | 'Rejected' | 'Withdrawn';
 };
+
+enum MessageType {
+  Text = "Text",
+  Offer = "Offer",
+  System = "System"
+}
 
 export default function ChatPage() {
   
@@ -111,6 +117,7 @@ export default function ChatPage() {
         const infoData: ChatInfoDTO = await infoRes.json();
         setChatInfo(infoData);
         setOfferInput(infoData.fullOrder.price); 
+        console.log("Chat Info:", infoData);
 
         // 2. Get Messages
         const msgRes = await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/messages`);
@@ -120,12 +127,12 @@ export default function ChatPage() {
         // --- UPDATED MAPPING LOGIC ---
         const formattedMessages = msgData.map((m: any) => {
             // 1. Check if System Message
-            if (m.isSystemMessage) {
+            if (m.type === 'System') {
                 return {
                     id: m.id || Math.random().toString(),
-                    senderId: 'system', // Specific ID for system
+                    senderId: 'System', // Specific ID for system
                     text: m.content || m.text,
-                    type: 'system',
+                    type: 'System',
                     timestamp: new Date(m.timestamp),
                     offerPrice: null,
                     offerStatus: null
@@ -138,7 +145,7 @@ export default function ChatPage() {
                 id: m.id || Math.random().toString(),
                 senderId: m.senderId.toString(), 
                 text: m.content || m.text,
-                type: m.type || 'text', // 'text' or 'offer'
+                type: m.type || MessageType.Text, // 'text' or 'offer'
                 timestamp: new Date(m.timestamp),
                 offerPrice: m.offerPrice,
                 offerStatus: m.offerStatus
@@ -180,13 +187,14 @@ export default function ChatPage() {
     socket.emit("joinRoom", { room: `chat_${params.chatid}` });
 
     socket.on("newMessage", (msg: NewMessage) => {
-        let msgType = msg.type || 'text';
-      if (msg.price) msgType = 'offer';
-      if (msg.senderType === 'system') msgType = 'system';
+      console.log("Received new message via socket:", msg);
+        let msgType = msg.type || 'Text';
+      if (msg.price) msgType = 'Offer';
+      if (msg.senderType === 'system') msgType = 'System';
 
       // 2. Determine Sender ID
-      const senderId = msgType === 'system' 
-          ? 'system' 
+      const senderId = msgType === 'System' 
+          ? 'System' 
           : (msg.senderType === 'client' ? chatInfo.clientId.toString() : chatInfo.proId.toString());
       
       // 3. Update State
@@ -194,12 +202,12 @@ export default function ChatPage() {
           id: Date.now().toString(),
           senderId: senderId,
           text: msg.text,
-          type: msgType as any, // Cast to ensure TS is happy
+          type: msgType as MessageType, // Cast to ensure TS is happy
           timestamp: new Date(msg.timestamp),
           
           // MAP THE PRICE HERE
           offerPrice: msg.price, 
-          offerStatus: msg.offerStatus || 'pending'
+          offerStatus: msg.offerStatus || 'Pending'
       }]);
     });
 
@@ -225,7 +233,7 @@ export default function ChatPage() {
       id: Date.now().toString(),
       senderId: userLong.id.toString(),
       text: inputText,
-      type: 'text',
+      type: 'Text',
       timestamp: new Date()
     };
     setMessages([...messages, newMsg]);
@@ -237,7 +245,7 @@ export default function ChatPage() {
         senderType: senderType 
     });
 
-    await fetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
+    await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
@@ -245,7 +253,7 @@ export default function ChatPage() {
         credentials: 'include',
         body: JSON.stringify({ 
             Content: inputText,
-            Type: 'text',
+            Type: 'Text',
             IsSystemMessage: false
         }),
     });
@@ -264,14 +272,14 @@ export default function ChatPage() {
     const newMsg: Message = {
         id: Date.now().toString(),
         senderId: userLong.id.toString(),
-        type: 'offer',
+        type: 'Offer',
         offerPrice: newPrice,
-        offerStatus: 'pending',
+        offerStatus: 'Pending',
         timestamp: new Date()
     };
 
     try {
-      await fetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
+      await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
           method: "POST",
           headers: { 
               "Content-Type": "application/json",
@@ -279,7 +287,7 @@ export default function ChatPage() {
           credentials: 'include',
           body: JSON.stringify({ 
               Content: `Offer: ${newPrice} RON`, 
-              Type: 'offer',
+              Type: 'Offer  ',
               Price: newPrice, 
               IsSystemMessage: false
           }),
@@ -295,27 +303,31 @@ export default function ChatPage() {
   const handleAcceptOffer = async (msgId: string, price: number) => {
         
     try {
-        await fetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
+        const res = await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/sendMessage`, {
             method: "POST",
-            headers: { 
-                "Content-Type": "application/json",
-            },
-            credentials: 'include',
             body: JSON.stringify({ 
                 Content: `Deal accepted! Final price: ${price} RON. Work can begin.`,
-                Type: 'system',
+                Type: 'System',
                 IsSystemMessage: true
             }),
         });
 
-        await fetch(`http://localhost:5221/api/order/${chatInfo?.fullOrder.id}/setNewPrice`, {
+        const data = await res.json();
+        const mesId = data.id - 1; // The pro sends the offer, so the system message is next id, so to update the order we need to -1
+
+        await authorizedFetch(`http://localhost:5221/api/order/${chatInfo?.fullOrder.id}/setNewPrice`, {
             method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: 'include',
             body: JSON.stringify(
                 price
+            ),
+        });
+
+        const status = 'Accepted';
+
+        await authorizedFetch(`http://localhost:5221/api/chat/${params.chatid}/${mesId}/updateOfferStatus`, {
+            method: "PUT",
+            body: JSON.stringify(
+                status
             ),
         });
 
@@ -323,7 +335,7 @@ export default function ChatPage() {
         console.error("Failed to save system message:", err);
     }
 
-    setMessages(msgs => msgs.map(m => m.id === msgId ? { ...m, offerStatus: 'accepted' } : m));
+    setMessages(msgs => msgs.map(m => m.id === msgId ? { ...m, offerStatus: 'Accepted' } : m));
     
     // Locally update order status for UI
     if(chatInfo) {
@@ -333,17 +345,14 @@ export default function ChatPage() {
         });
     }
 
-    setMessages(prev => [...prev, {
-      id: Date.now().toString(), 
-      senderId: 'system', 
-      text: `Deal accepted! Final price: ${price} RON. Work can begin.`, 
-      type: 'system', 
-      timestamp: new Date()
-    }]);
+    socket.emit("sendSystemMessage", { 
+        room: `chat_${params.chatid}`, 
+        content: `Deal accepted! Final price: ${price} RON. Work can begin.` 
+    });
   };
 
   const handleRejectOffer = (msgId: string) => {
-    setMessages(msgs => msgs.map(m => m.id === msgId ? { ...m, offerStatus: 'rejected' } : m));
+    setMessages(msgs => msgs.map(m => m.id === msgId ? { ...m, offerStatus: 'Rejected' } : m));
   };
 
   // Helper: Date Formatter
@@ -385,7 +394,8 @@ export default function ChatPage() {
           <div className={styles.messagesList}>
             {messages.map((msg) => {
               const isMe = msg.senderId.toString() === userLong?.id.toString();
-              const isSystem = msg.type === 'system';
+              const isSystem = msg.type === 'System';
+              if(msg.type === 'Offer') console.log("Offer Message:", msg);
 
               if (isSystem) {
                 return (
@@ -393,6 +403,7 @@ export default function ChatPage() {
                     <div className={styles.systemMessageBubble}>
                       <AlertCircle size={14} /> 
                       <span>{msg.text}</span>
+                      
                     </div>
                   </div>
                 );
@@ -402,30 +413,30 @@ export default function ChatPage() {
                 <div key={msg.id} className={`${styles.messageRow} ${isMe ? styles.rowMe : styles.rowThem}`}>
                   {!isMe && <img src={otherUser.avatar} alt="Sender" width={32} height={32} className={styles.miniAvatar} />}
                   
-                  <div className={`${styles.bubble} ${isMe ? styles.bubbleMe : styles.bubbleThem} ${msg.type === 'offer' ? styles.bubbleOffer : ''}`}>
-                    {msg.type === 'text' && <p>{msg.text}</p>}
+                  <div className={`${styles.bubble} ${isMe ? styles.bubbleMe : styles.bubbleThem} ${msg.type === 'Offer' ? styles.bubbleOffer : ''}`}>
+                    {msg.type === 'Text' && <p>{msg.text}</p>}
                     
-                    {msg.type === 'offer' && (
-                      <div className={`${styles.offerCard} ${msg.offerStatus === 'withdrawn' ? styles.offerCardDimmed : ''}`}>
+                    {msg.type === 'Offer' && (
+                      <div className={`${styles.offerCard} ${msg.offerStatus === 'Withdrawn' ? styles.offerCardDimmed : ''}`}>
                         <div className={styles.offerHeader}>
                           <DollarSign size={18} />
-                          <span>{msg.offerStatus === 'withdrawn' ? 'Previous Offer' : 'Price Proposal'}</span>
+                          <span>{msg.offerStatus === 'Withdrawn' ? 'Previous Offer' : 'Price Proposal'}</span>
                         </div>
                         <div className={styles.offerAmount}>{msg.offerPrice} RON</div>
                         
-                        {msg.offerStatus === 'pending' && <div className={styles.offerStatusPending}>Waiting for acceptance...</div>}
-                        {msg.offerStatus === 'accepted' && <div className={styles.offerStatusAccepted}><CheckCircle2 size={16}/> Accepted</div>}
-                        {msg.offerStatus === 'rejected' && <div className={styles.offerStatusRejected}><XCircle size={16}/> Rejected</div>}
+                        {msg.offerStatus === 'Pending' && <div className={styles.offerStatusPending}>Waiting for acceptance...</div>}
+                        {msg.offerStatus === 'Accepted' && <div className={styles.offerStatusAccepted}><CheckCircle2 size={16}/> Accepted</div>}
+                        {msg.offerStatus === 'Rejected' && <div className={styles.offerStatusRejected}><XCircle size={16}/> Rejected</div>}
                         
                         {/* Offer Actions */}
-                        {msg.offerStatus === 'pending' && amIClient && (
+                        {msg.offerStatus === 'Pending' && amIClient && (
                           <div className={styles.offerActions}>
                             <button onClick={() => handleRejectOffer(msg.id)} className={styles.btnReject}>Reject</button>
                             <button onClick={() => handleAcceptOffer(msg.id, msg.offerPrice!)} className={styles.btnAccept}>Accept Deal</button>
                           </div>
                         )}
 
-                        {msg.offerStatus === 'pending' && amIPro && (
+                        {msg.offerStatus === 'Pending' && amIPro && (
                           <div className={styles.offerActions}>
                              <button onClick={() => { setOfferInput(msg.offerPrice!); setOfferModalOpen(true); }} className={styles.btnChange}>
                                <Edit3 size={14} /> Change Price

@@ -16,6 +16,5 @@ namespace Business.Entities
         public Chat Chat { get; set; } = null!;
 
         public MessageType Type { get; set; } = MessageType.Text;
-
     }
 }

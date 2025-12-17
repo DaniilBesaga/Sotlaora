@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Business.Models.Models;
 using Backend.Business.Models;
 using Business.Models;
+using backend.Business.Enums;
+using backend.Business.Entities;
 
 namespace backend.Controllers
 {
@@ -189,10 +191,15 @@ namespace backend.Controllers
                 return Forbid();
             }
 
-            var messages = await context.Messages
-                .Where(m => m.ChatId == chatId)
-                .OrderBy(m => m.Timestamp)
-                .Select(m => new MessageDTO
+            var messages = await
+            (
+                from m in context.Messages
+                where m.ChatId == chatId
+                orderby m.Timestamp
+                join o in context.MessageOffers
+                    on m.Id equals o.MessageId into offers
+                from o in offers.DefaultIfEmpty() // LEFT JOIN
+                select new MessageDTO
                 {
                     Id = m.Id,
                     Content = m.Content,
@@ -200,9 +207,13 @@ namespace backend.Controllers
                     IsRead = m.IsRead,
                     SenderId = m.SenderId,
                     ReceiverId = m.ReceiverId,
-                    IsSystemMessage = m.IsSystemMessage
-                })
-                .ToListAsync();
+                    Type = m.Type,
+
+                    OfferPrice = o != null ? o.Price : null,
+                    OfferStatus = o != null ? o.Status : null
+                }
+            ).ToListAsync();
+
 
             return Ok(messages);
         }
@@ -308,10 +319,10 @@ namespace backend.Controllers
                     OfferPrice = request.Price,
                     
                     // Logic: If it's an offer, default status is 'pending'
-                    OfferStatus = request.Type == "offer" ? "pending" : null
+                    OfferStatus = request.Type == MessageType.Offer ? OfferStatus.Pending : null
                 };
 
-                context.Messages.Add(new Message
+                var mes = new Message
                 {
                     ChatId = chatId,
                     Content = message.Content,
@@ -319,11 +330,36 @@ namespace backend.Controllers
                     SenderId = message.SenderId,
                     ReceiverId = message.ReceiverId,
                     IsRead = message.IsRead,
-                    IsSystemMessage = message.IsSystemMessage
-                });
-                await context.SaveChangesAsync();
+                    Type = request.Type
+                };
 
-                return Ok(message);
+                context.Messages.Add(mes);
+                await context.SaveChangesAsync(); // Message.Id is generated here
+
+                if (request.Type == MessageType.Offer && request.Price.HasValue)
+                {
+                    context.MessageOffers.Add(new MessageOffer
+                    {
+                        MessageId = mes.Id,
+                        Price = request.Price.Value,
+                        Status = OfferStatus.Pending
+                    });
+
+                    await context.SaveChangesAsync();
+                }
+
+                return Ok(new MessageDTO
+                {
+                    Id = mes.Id,
+                    Content = mes.Content,
+                    Timestamp = mes.Timestamp,
+                    SenderId = mes.SenderId,
+                    ReceiverId = mes.ReceiverId,
+                    IsRead = mes.IsRead,
+                    Type = mes.Type,
+                    OfferPrice = request.Price,
+                    OfferStatus = request.Type == MessageType.Offer ? OfferStatus.Pending : null
+                });
             }
             return BadRequest();
         }
@@ -395,6 +431,30 @@ namespace backend.Controllers
             };
 
             return Ok(chatInfo);
+        }
+
+        [HttpPut("{chatId}/{messageId}/updateOfferStatus")]
+        public async Task<IActionResult> UpdateOfferStatus(Guid chatId, int messageId, [FromBody] OfferStatus status)
+        {
+            var chat = await context.Chats.FindAsync(chatId);
+            if (chat == null)
+            {
+                return NotFound();
+            }
+
+            var messageOffer = await context.MessageOffers
+                .Include(mo => mo.Message)
+                .FirstOrDefaultAsync(mo => mo.MessageId == messageId);
+
+            if (messageOffer == null || messageOffer.Message.ChatId != chatId)
+            {
+                return NotFound();
+            }
+
+            messageOffer.Status = status;
+            await context.SaveChangesAsync();
+
+            return Ok();
         }
 
     }

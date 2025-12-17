@@ -1,4 +1,5 @@
 using backend.Business.Entities;
+using backend.Business.Enums;
 using backend.Business.Models;
 using Backend.Business.Models;
 using Business.Entities;
@@ -163,7 +164,7 @@ namespace Sotlaora.Controllers
                         SenderId = orderFull.ClientId, // optional: use 0 or a special system user id
                         ReceiverId = orderFull.ProId.Value, // or chat.ProId, or both depending on your logic
                         IsRead = false,
-                        IsSystemMessage = true
+                        Type = MessageType.System
                     };
 
                 context.Messages.Add(systemMessage);

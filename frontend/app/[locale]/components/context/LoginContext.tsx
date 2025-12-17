@@ -73,18 +73,19 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
         if (user.id === -1 && userLong.id === -1) {
             const checkAuth = async () => {
                 // call concurrently so both run in parallel
-                const [resLongClient, resShort, res] = await Promise.all([
-                    getMeLongClient(),
-                    getMeLong(),
-                    getMe()
-                ]);
+                
+                const resLongClient = await getMeLongClient();
+                if(resLongClient.ok){
+                    setAuthenticated("authenticated");
+                    return;
+                }
+                const resShort = await getMeLong();
+                const res = await getMe();
 
                 // If BOTH failed -> redirect to auth
                 if (!resLongClient.ok && !resShort.ok && !res.ok) {
-                    setAuthenticated("unauthenticated");
                     router.push('/auth');
                 } else {
-                    setAuthenticated("authenticated");
                 }
             };
 

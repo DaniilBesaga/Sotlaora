@@ -1,3 +1,5 @@
+using backend.Business.Enums;
+
 namespace Business.Models.Models
 {
     public class MessageDTO
@@ -10,8 +12,8 @@ namespace Business.Models.Models
         public int ReceiverId { get; set; }
         public bool IsSystemMessage { get; set; } = false;
 
-        public string Type { get; set; } = "text"; 
+        public MessageType Type { get; set; } = MessageType.Text; 
         public decimal? OfferPrice { get; set; }
-        public string? OfferStatus { get; set; } // "pending", "accepted", "rejected", "withdrawn"
+        public OfferStatus? OfferStatus { get; set; }
     }
 }
