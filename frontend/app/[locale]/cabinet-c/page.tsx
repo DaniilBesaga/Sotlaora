@@ -324,6 +324,8 @@ export default function UserCabinet() {
 
   const {getMeLongClient, authorizedFetch, userLong, authenticated} = use(LoginContext)
 
+  const [chatsCount, setChatsCount] = useState<number>(0);
+
   const [ordersData, setOrdersData] = useState<OrderDTO[]>([]);
 
   const [profile, setProfile] = useState({
@@ -351,9 +353,19 @@ export default function UserCabinet() {
       }
     };
 
+    const fetchChatsCount = async () => {
+
+      const res = await authorizedFetch('http://localhost:5221/api/chat/chatsCount');
+      if (res.ok) {
+        const data = await res.json();
+        setChatsCount(data.chatsCount);
+      }
+    }
+
    getMeLongClient(false);
     if(userLong !== undefined) {
       fetchOrders();
+      fetchChatsCount();
     }
   }, []);
 
@@ -431,7 +443,7 @@ export default function UserCabinet() {
                    <div className={styles.qLeft}>{item.icon}</div>
                    <div className={styles.qCenter}>
                       <div className={styles.qLabel}>{item.label}</div>
-                      {item.count && <div className={styles.qSub}>{item.count} новых</div>}
+                      {chatsCount && <div className={styles.qSub}>{chatsCount} новых</div>}
                    </div>
                    <div className={styles.qRight}>›</div>
                 </Link>

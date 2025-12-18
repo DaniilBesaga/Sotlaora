@@ -7,10 +7,14 @@ namespace Sotlaora.Business.Entities
         Active,
         Assigned,
         Discussion,
+        WaitingForPayment,
         InProgress,
         Completed,
         Paid,
         WaitingForConfirmationByClient,
+        WaitingForConfirmationByPro,
+        CompletedByClient,
+        CompletedByPro,
         CancelledByClient,
         CancelledByPro
     }

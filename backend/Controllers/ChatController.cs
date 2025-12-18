@@ -218,7 +218,7 @@ namespace backend.Controllers
             return Ok(messages);
         }
 
-        [HttpPost("{chatId}/markAsRead")]
+        [HttpPut("{chatId}/markAsRead")]
         public async Task<IActionResult> MarkMessagesAsRead(Guid chatId)
         {
             var userId = userManager.GetUserId(User);
@@ -457,5 +457,45 @@ namespace backend.Controllers
             return Ok();
         }
 
+    
+        [HttpGet("chatsCount")]
+        public async Task<IActionResult> GetChatsCount()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .Include(u => u.ClientChats)
+                .ThenInclude(c => c.Messages)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            var pro = await context.Users.OfType<Pro>()
+                .Include(p => p.ProChats)
+                .ThenInclude(c => c.Messages)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null && pro == null)
+            {
+                return NotFound();
+            }
+
+            int chatsCount = 0;
+
+            if (user != null)
+            {
+                chatsCount += user.ClientChats.Count(c => c.Messages.Any(m => !m.IsRead));
+            }
+
+            if (pro != null)
+            {
+                chatsCount += pro.ProChats.Count(c => c.Messages.Any(m => !m.IsRead));
+            }
+
+            return Ok(new { ChatsCount = chatsCount });
+        }
     }
 }

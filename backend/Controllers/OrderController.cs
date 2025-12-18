@@ -269,7 +269,64 @@ namespace Sotlaora.Controllers
                 return NotFound();
             }
             existingOrder.Price = price;
-            existingOrder.Status = OrderStatus.InProgress;
+            existingOrder.Status = OrderStatus.WaitingForPayment;
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpPut("{id}/receivePayment")]
+        public async Task<ActionResult> ReceivePayment(int id, [FromBody] int paymentCode)
+        {
+            // Simulate payment verification logic
+            bool isPaid = paymentCode == 5731331; 
+
+            var existingOrder = await context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound();
+            }
+
+            if (isPaid)
+            {
+                existingOrder.Status = OrderStatus.InProgress;
+                await context.SaveChangesAsync();
+                return Ok("Payment received and order is now In Progress.");
+            }
+            return BadRequest("Payment not received.");
+        }
+
+        [HttpPut("{id}/updateStatus")]
+        public async Task<ActionResult> UpdateOrderStatus(int id, [FromBody] OrderStatus status)
+        {
+            var existingOrder = await context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound();
+            }
+            existingOrder.Status = status;
+            if(status == OrderStatus.CompletedByClient || status == OrderStatus.CompletedByPro)
+            {
+                existingOrder.Status = OrderStatus.Completed;
+                var notificationToPro = new Notification
+                {
+                    Title = "New Order Proposal",
+                    Message = $"You have received a new order proposal '{existingOrder.Title}'.",
+                    Type = NotificationType.Assigned,
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UserId = existingOrder.ProId.Value,
+                    Slug = $"order-proposal-{existingOrder.Id}",
+                    Meta = new NotificationMetadata
+                    {
+                        OrderId = existingOrder.Id,
+                        ClientName = context.Users.Find(existingOrder.ClientId)?.UserName ?? "Client",
+                        Category = string.Join(", ", existingOrder.Subcategories.Select(s => s.Title)),
+                        Amount = existingOrder.Price.ToString("")
+                    }
+                };
+
+                context.Notifications.Add(notificationToPro);
+            }
             await context.SaveChangesAsync();
             return NoContent();
         }

@@ -9,11 +9,23 @@ export default function Header() {
   const t = useTranslations('Header');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const {user, authenticated, getMe, logout, refresh, userLong, getMeLongClient} = use(LoginContext);
+  const [chatsCount, setChatsCount] = useState<number>(0);
+
+  const {user, authenticated, getMe, logout, refresh, userLong, getMeLongClient, authorizedFetch} = use(LoginContext);
 
   useEffect(() => {
     
-    console.log(authenticated);
+    const fetchChatsCount = async () => {
+      if (authenticated === 'unauthenticated') return;
+
+      const res = await authorizedFetch('http://localhost:5221/api/chat/chatsCount');
+      if (res.ok) {
+        const data = await res.json();
+        setChatsCount(data.chatsCount);
+      }
+    }
+    fetchChatsCount();
+
   }, [authenticated]);
 
   return (
@@ -60,14 +72,18 @@ export default function Header() {
           </a>)}
 
           {/* Chat icon */}
-          <button className={styles.iconBtn} aria-label={t('chat')}>
+          <a className={styles.iconBtn} aria-label={t('chat')} 
+            href={(userLong?.role === Role.Client ? '/cabinet-c/chats' : '/cabinet/messages') }>
             <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" fill="none">
               <path 
                 d="M7 17L3 20V7C3 5.343 4.343 4 6 4H18C19.657 4 21 5.343 21 7V14C21 15.657 19.657 17 18 17H7Z"
                 strokeWidth="2"
               />
             </svg>
-          </button>
+            {chatsCount > 0 && (
+              <span className={styles.chatBadge}>{chatsCount}</span>
+            )}
+          </a>
 
           {/* Primary CTA */}
           <a href="#" className={`${styles.btn} ${styles.primary}`}>{t('auth.order')}</a>
