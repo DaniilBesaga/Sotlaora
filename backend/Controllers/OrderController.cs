@@ -309,8 +309,8 @@ namespace Sotlaora.Controllers
                 existingOrder.Status = OrderStatus.Completed;
                 var notificationToPro = new Notification
                 {
-                    Title = "New Order Proposal",
-                    Message = $"You have received a new order proposal '{existingOrder.Title}'.",
+                    Title = $"The order has been completed {existingOrder.Title}",
+                    Message = $"You have completed the order '{existingOrder.Title}' and received payment.",
                     Type = NotificationType.Assigned,
                     IsRead = false,
                     CreatedAt = DateTime.UtcNow,
@@ -326,9 +326,54 @@ namespace Sotlaora.Controllers
                 };
 
                 context.Notifications.Add(notificationToPro);
+                return Ok(existingOrder.Status);
             }
             await context.SaveChangesAsync();
             return NoContent();
+        }
+    
+        [HttpGet("allProOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrdersForPro()
+        {
+            var userId = userManager.GetUserId(User);
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (!int.TryParse(userId, out var id)) return Unauthorized();
+
+            var user = await context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var orders = context.Orders
+                .Where(o => o.ProId == user.Id).AsNoTracking()
+                .Select(o => new OrderDTO
+                {
+                    Title = o.Title,
+                    Description = o.Description,
+                    PostedAt = o.PostedAt,
+                    Price = o.Price,
+                    Location = o.Location,
+                    AdditionalComment = o.AdditionalComment,
+                    DeadlineDate = o.DeadlineDate,
+                    DesiredTimeStart = o.DesiredTimeStart,
+                    DesiredTimeEnd = o.DesiredTimeEnd,
+                    Subcategories = o.Subcategories.Select(sc => sc.Id).ToList(),
+                    ImageFileRefs = context.Images
+                        .Where(img => img.EntityId == o.Id && img.EntityType == ImageEntityType.Order)
+                        .Select(img => img.Ref)
+                        .ToList(),
+                    ClientId = o.ClientId,
+                    Status = o.Status
+                })
+                .ToList();
+
+            return Ok(orders);
         }
     }
 }

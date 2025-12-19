@@ -162,7 +162,6 @@ export default function ProOrders(){
         )}
 
         {activeSection === 'settings' && <ProDashboard />}
-        {activeSection === 'earnings' && <EarningsPage />}
         {activeSection === 'subscriptions' && <NotificationsPage />}
 
         <aside className={styles.quickNav} aria-label="Быстрая навигация">

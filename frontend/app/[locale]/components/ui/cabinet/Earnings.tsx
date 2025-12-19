@@ -1,49 +1,156 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo, use } from 'react';
 import styles from './Earnings.module.css';
+import { LoginContext } from '../../context/LoginContext';
+// Assuming OrderDTO is in your types folder, but I will define it below for context
+// import { OrderDTO } from '@/types/Order'; 
+
+// --- Types Definition (Based on your input) ---
+export type OrderStatus = 'Active' | 'Assigned' | 'Discussion' | 'InProgress' | 'Completed' | 'Paid' | 'WaitingForConfirmationByClient' | 'CancelledByClient' | 'CancelledByPro' | 'WaitingForPayment';
+
+export interface Location {
+    latitude: number;
+    longitude: number;
+    address?: string;
+}
+
+export interface OrderDTO {
+    id: number;
+    title: string;
+    description: string;
+    postedAt: Date | string; // API usually returns string, interface might say Date
+    price: number;
+    location: Location;
+    additionalComment: string;
+    deadlineDate?: Date | string;
+    desiredTimeStart?: string; 
+    desiredTimeEnd?: string;
+    subcategories: number[];
+    imageFileRefs: string[];
+    imageFileIds: number[];
+    status: OrderStatus;
+    clientId: number;
+    proId: number;
+}
+
+// --- Component ---
 
 const EarningsPage = () => {
-  // Данные для графика (6 месяцев)
-  const chartData = [
-    { month: 'Янв', amount: 12500, height: '40%' },
-    { month: 'Фев', amount: 18200, height: '60%' },
-    { month: 'Мар', amount: 15400, height: '50%' },
-    { month: 'Апр', amount: 24000, height: '80%' },
-    { month: 'Май', amount: 9800,  height: '30%' },
-    { month: 'Июн', amount: 28500, height: '95%' },
-  ];
+  const [orders, setOrders] = useState<OrderDTO[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // История заказов
-  const [transactions] = useState([
-    {
-      id: 101,
-      title: 'Ремонт проводки в офисе',
-      desc: 'Полная замена розеток в переговорной комнате, установка нового щитка и диагностика сети.',
-      date: '15 июня 2024',
-      amount: 4500,
-      status: 'completed'
-    },
-    {
-      id: 102,
-      title: 'Установка кондиционера',
-      desc: 'Монтаж сплит-системы, штробление стены под трассу, вакуумация и запуск.',
-      date: '12 июня 2024',
-      amount: 3200,
-      status: 'completed'
-    },
-    {
-      id: 103,
-      title: 'Сборка мебели IKEA',
-      desc: 'Сборка двух шкафов ПАКС и комода. Вынос упаковки. Работа заняла 4 часа.',
-      date: '10 июня 2024',
-      amount: 1800,
-      status: 'completed'
-    },
-  ]);
+  // Using React 19 'use' API as per your snippet
+  const { authorizedFetch } = use(LoginContext);
 
-  // Функция обрезки текста
-  const truncate = (str, n) => {
+  // 1. Fetch Data
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const res = await authorizedFetch('http://localhost:5221/api/order/allProOrders', {
+          method: 'GET',
+        });
+        
+        if (res.ok) {
+          const data: OrderDTO[] = await res.json();
+          setOrders(data);
+        } else {
+            console.error("Error fetching orders:", res.status);
+        }
+      } catch (error) {
+        console.error("Failed to load earnings", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [authorizedFetch]);
+
+  // 2. Calculate Total Balance
+  // We only count orders that are 'Paid' or 'Completed'
+  const totalBalance = useMemo(() => {
+    return orders.reduce((sum, order) => {
+      if (['Paid', 'Completed'].includes(order.status)) {
+        return sum + order.price;
+      }
+      return sum;
+    }, 0);
+  }, [orders]);
+
+  // 3. Prepare Chart Data (Dynamic Last 6 Months)
+  const chartData = useMemo(() => {
+    const today = new Date();
+    const result = [];
+    
+    // Generate buckets for the last 6 months (including current)
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+        const monthName = d.toLocaleDateString('ru-RU', { month: 'short' }); // "Янв", "Фев"
+        // Capitalize first letter
+        const label = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+        
+        result.push({
+            monthObj: d, // Store date object for comparison
+            monthLabel: label,
+            amount: 0,
+            height: '0%'
+        });
+    }
+
+    // Aggregate Data from API
+    orders.forEach(order => {
+        // Only count earnings
+        if (!['Paid', 'Completed'].includes(order.status)) return;
+
+        const orderDate = new Date(order.postedAt);
+        
+        // Find which bucket this order belongs to
+        const bucket = result.find(r => 
+            r.monthObj.getMonth() === orderDate.getMonth() && 
+            r.monthObj.getFullYear() === orderDate.getFullYear()
+        );
+
+        if (bucket) {
+            bucket.amount += order.price;
+        }
+    });
+
+    // Calculate Heights based on the Maximum value found
+    const maxVal = Math.max(...result.map(d => d.amount));
+
+    return result.map(item => ({
+        month: item.monthLabel,
+        amount: item.amount,
+        // If maxVal is 0, height is 0. Otherwise calculate percentage (max height 95%)
+        height: maxVal > 0 ? `${(item.amount / maxVal) * 95}%` : '0%' 
+    }));
+
+  }, [orders]);
+
+  // 4. Sort and Format Transactions for the List
+  const transactions = useMemo(() => {
+    return [...orders]
+      // Sort: Newest first
+      .sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime())
+      // Map to view model
+      .map(order => ({
+        id: order.id,
+        title: order.title,
+        desc: order.description,
+        amount: order.price,
+        // Format date: "15 июня 2024"
+        date: new Date(order.postedAt).toLocaleDateString('ru-RU', {
+             day: 'numeric', month: 'long', year: 'numeric'
+        }),
+        status: order.status
+      }));
+  }, [orders]);
+
+  // Helper
+  const truncate = (str: string, n: number) => {
+    if (!str) return '';
     return (str.length > n) ? str.slice(0, n-1) + '...' : str;
   };
+
+  if (loading) return <div className={styles.container}>Loading...</div>;
 
   return (
     <div className={styles.container}>
@@ -53,7 +160,9 @@ const EarningsPage = () => {
         <h1 className={styles.pageTitle}>Мои доходы</h1>
         <div className={styles.balanceCard}>
           <span className={styles.balanceLabel}>Доступно к выводу</span>
-          <div className={styles.balanceValue}>9 500 ₴</div>
+          <div className={styles.balanceValue}>
+            {totalBalance.toLocaleString('ru-RU')} ₴
+          </div>
         </div>
       </div>
 
@@ -61,7 +170,7 @@ const EarningsPage = () => {
       <div className={styles.chartSection}>
         <div className={styles.chartHeader}>
           <h3 className={styles.sectionTitle}>Статистика за полгода</h3>
-          <span className={styles.periodBadge}>2024</span>
+          <span className={styles.periodBadge}>{new Date().getFullYear()}</span>
         </div>
         
         <div className={styles.barChart}>
@@ -72,7 +181,10 @@ const EarningsPage = () => {
                   className={styles.barFill} 
                   style={{ height: item.height }}
                 >
-                  <span className={styles.tooltip}>{item.amount} ₴</span>
+                  {/* Only show tooltip if amount > 0 */}
+                  {item.amount > 0 && (
+                      <span className={styles.tooltip}>{item.amount} ₴</span>
+                  )}
                 </div>
               </div>
               <span className={styles.monthLabel}>{item.month}</span>
@@ -84,32 +196,45 @@ const EarningsPage = () => {
       {/* История операций */}
       <div className={styles.historySection}>
         <h3 className={styles.sectionTitle}>История начислений</h3>
-        <div className={styles.transactionList}>
-          {transactions.map((item) => (
-            <div key={item.id} className={styles.transCard}>
-              <div className={styles.transIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                </svg>
-              </div>
-              
-              <div className={styles.transContent}>
-                <div className={styles.transHeader}>
-                  <span className={styles.transTitle}>{item.title}</span>
-                  <span className={styles.transAmount}>+{item.amount} ₴</span>
+        
+        {transactions.length === 0 ? (
+            <p style={{ color: '#888', padding: '20px' }}>История операций пуста</p>
+        ) : (
+            <div className={styles.transactionList}>
+            {transactions.map((item) => (
+                <div key={item.id} className={styles.transCard}>
+                <div className={styles.transIcon}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
                 </div>
-                <p className={styles.transDesc}>
-                  {truncate(item.desc, 80)}
-                </p>
-                <div className={styles.transMeta}>
-                  <span>Заказ #{item.id}</span>
-                  <span>•</span>
-                  <span>{item.date}</span>
+                
+                <div className={styles.transContent}>
+                    <div className={styles.transHeader}>
+                    <span className={styles.transTitle}>{item.title}</span>
+                    <span 
+                        className={styles.transAmount}
+                        style={{ color: ['Paid', 'Completed'].includes(item.status) ? '#22c55e' : '#64748b' }}
+                    >
+                        {['Paid', 'Completed'].includes(item.status) ? '+' : ''}{item.amount} ₴
+                    </span>
+                    </div>
+                    <p className={styles.transDesc}>
+                        {truncate(item.desc, 80)}
+                    </p>
+                    <div className={styles.transMeta}>
+                    <span>Заказ #{item.id}</span>
+                    <span>•</span>
+                    <span>{item.date}</span>
+                    <span>•</span>
+                    {/* Optional: Show status badge text */}
+                    <span style={{ fontSize: '0.85em', opacity: 0.8 }}>{item.status}</span>
+                    </div>
                 </div>
-              </div>
+                </div>
+            ))}
             </div>
-          ))}
-        </div>
+        )}
       </div>
 
       {/* Блок вывода средств */}

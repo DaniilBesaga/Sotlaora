@@ -366,12 +366,28 @@ export default function ChatPage() {
 
     const status = 'Completed';
 
-    await authorizedFetch(`http://localhost:5221/api/order/${chatInfo?.fullOrder.id}/updateStatus`, {
+    const resStatus = await authorizedFetch(`http://localhost:5221/api/order/${chatInfo?.fullOrder.id}/updateStatus`, {
         method: "PUT",
         body: JSON.stringify(
             amIClient ? 'CompletedByClient' : 'CompletedByPro'
         ),
     });
+
+    const dataStatus = await resStatus.json();
+
+    const notif = {
+        Title: `The order has been completed ${chatInfo?.fullOrder.title}`,
+        Message: `You have completed the order '${chatInfo?.fullOrder.title}' and received payment.`,
+        Type: 'Completed',
+        Slug: `/cabinet/earnings`,
+    }
+
+    if(dataStatus.status === status){
+      await authorizedFetch(`http://localhost:5221/api/chat/${chatInfo?.fullOrder.id}/create-payment-notification`, {
+          method: "POST",
+          body: JSON.stringify({notification: notif}),
+      });
+    }
   }
 
   const handleCancelOrder = async () => {

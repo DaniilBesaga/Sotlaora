@@ -87,6 +87,44 @@ namespace Backend.Controllers
             return Ok(new { notification.Id });
         }
 
+        [HttpPost("{orderId}/create-payment-notification")]
+        public async Task<ActionResult<object>> CreatePaymentNotification(int orderId, [FromBody] NotificationDTO notificationDTO)
+        {
+            if (notificationDTO == null)
+            {
+                return BadRequest("Notification data is required.");
+            }
+
+            var user = await userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Map NotificationDTO to Notification entity
+            var notification = new Notification
+            {
+                Title = notificationDTO.Title,
+                Message = notificationDTO.Message,
+                Type = notificationDTO.Type,
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow,
+                UserId = context.Orders.Where(o => o.Id == orderId).Select(o => o.ProId).FirstOrDefault(),
+                Meta = new NotificationMetadata
+                {
+                    OrderId = orderId,
+                    Amount = context.Orders.Where(o => o.Id == orderId).Select(o => o.Price).FirstOrDefault().ToString()
+                }
+            };
+
+            context.Notifications.Add(notification);
+            await context.SaveChangesAsync();
+
+            // return CreatedAtAction(nameof(GetNotification), new { id = notification.Id }, notification);
+            return Ok(new { notification.Id });
+        }
+
         [HttpPatch("read-all")]
         public async Task< IActionResult> ReadAllNotifications ()
         {
