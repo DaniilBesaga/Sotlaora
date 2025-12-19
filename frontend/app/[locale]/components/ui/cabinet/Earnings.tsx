@@ -52,6 +52,7 @@ const EarningsPage = () => {
         if (res.ok) {
           const data: OrderDTO[] = await res.json();
           setOrders(data);
+          console.log("Fetched orders:", data);
         } else {
             console.error("Error fetching orders:", res.status);
         }
@@ -98,8 +99,6 @@ const EarningsPage = () => {
     // Aggregate Data from API
     orders.forEach(order => {
         // Only count earnings
-        if (!['Paid', 'Completed'].includes(order.status)) return;
-
         const orderDate = new Date(order.postedAt);
         
         // Find which bucket this order belongs to
@@ -161,7 +160,7 @@ const EarningsPage = () => {
         <div className={styles.balanceCard}>
           <span className={styles.balanceLabel}>Доступно к выводу</span>
           <div className={styles.balanceValue}>
-            {totalBalance.toLocaleString('ru-RU')} ₴
+            {totalBalance.toLocaleString('ru-RU')} RON
           </div>
         </div>
       </div>
@@ -216,7 +215,7 @@ const EarningsPage = () => {
                         className={styles.transAmount}
                         style={{ color: ['Paid', 'Completed'].includes(item.status) ? '#22c55e' : '#64748b' }}
                     >
-                        {['Paid', 'Completed'].includes(item.status) ? '+' : ''}{item.amount} ₴
+                        {['Paid', 'Completed'].includes(item.status) ? '+' : ''}{item.amount} RON
                     </span>
                     </div>
                     <p className={styles.transDesc}>

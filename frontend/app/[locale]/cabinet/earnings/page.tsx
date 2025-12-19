@@ -1,9 +1,10 @@
+'use client';
 import EarningsPage from "../../components/ui/cabinet/Earnings";
 
 export default function Earnings() {
 
     return(
-        <div>
+        <div style={{display: 'grid'}}>
             <EarningsPage/>
         </div>
     )

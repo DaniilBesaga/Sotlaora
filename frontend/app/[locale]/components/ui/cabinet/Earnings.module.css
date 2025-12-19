@@ -1,8 +1,9 @@
 .container {
-  max-width: 900px;
+  width: 1200px;
   padding: 40px 20px 80px 20px; /* Отступ снизу больше для футера */
   font-family: Inter, system-ui, -apple-system, sans-serif;
   color: #0f172a;
+  margin: 0 auto;
   grid-column: 1 / span 2;
 }
 

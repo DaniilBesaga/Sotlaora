@@ -65,7 +65,7 @@ export default function ProChats({ chats = [] }: { chats?: ChatShortDTO[] }) {
     { key: 'orders', label: 'Заказы', icon: '🧾', count: 4, href: '/cabinet/orders' },
     { key: 'subscriptions', label: 'Подписки', icon: '🔔', count: 2, href: '#subscriptions' },
     { key: 'messages', label: 'Сообщения', icon: '💬', count: chats.filter(c => c.unread).length, href: '/cabinet/messages', highlight: true },
-    { key: 'earnings', label: 'Заработок', icon: '💵', count: null, href: '#earnings' },
+    { key: 'earnings', label: 'Заработок', icon: '💵', count: null, href: '/cabinet/earnings' },
     { key: 'settings', label: 'Настройки', icon: '⚙️', count: null, href: '#settings' },
   ];
 

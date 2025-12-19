@@ -303,15 +303,14 @@ namespace Sotlaora.Controllers
             {
                 return NotFound();
             }
-            existingOrder.Status = status;
-            if(status == OrderStatus.CompletedByClient || status == OrderStatus.CompletedByPro)
+            if(existingOrder.Status == OrderStatus.CompletedByClient || existingOrder.Status == OrderStatus.CompletedByPro)
             {
                 existingOrder.Status = OrderStatus.Completed;
                 var notificationToPro = new Notification
                 {
                     Title = $"The order has been completed {existingOrder.Title}",
                     Message = $"You have completed the order '{existingOrder.Title}' and received payment.",
-                    Type = NotificationType.Assigned,
+                    Type = NotificationType.Completed,
                     IsRead = false,
                     CreatedAt = DateTime.UtcNow,
                     UserId = existingOrder.ProId.Value,
@@ -326,8 +325,10 @@ namespace Sotlaora.Controllers
                 };
 
                 context.Notifications.Add(notificationToPro);
+                await context.SaveChangesAsync();
                 return Ok(existingOrder.Status);
             }
+            existingOrder.Status = status;
             await context.SaveChangesAsync();
             return NoContent();
         }
@@ -352,6 +353,7 @@ namespace Sotlaora.Controllers
 
             var orders = context.Orders
                 .Where(o => o.ProId == user.Id).AsNoTracking()
+                .Where(o => o.Status == OrderStatus.Completed)
                 .Select(o => new OrderDTO
                 {
                     Title = o.Title,

@@ -40,7 +40,7 @@ interface OrderFullDTO {
     userName: string;
     email: string;
   };
-  status: 'Active' | 'Assigned' | 'Discussion' | 'InProgress' | 'Completed' | 'Paid' | 'WaitingForConfirmationByClient' | 'CancelledByClient' | 'CancelledByPro' | 'WaitingForPayment';
+  status: 'Active' | 'Assigned' | 'Discussion' | 'InProgress' | 'Completed' | 'Paid' | 'WaitingForConfirmationByClient' | 'CancelledByClient' | 'CancelledByPro' | 'WaitingForPayment' | 'CompletedByClient' | 'CompletedByPro' | 'Negotiating';
 }
 
 interface ChatInfoDTO {
@@ -341,6 +341,15 @@ export default function ChatPage() {
     setPaymentCode('');
   }
 
+  useEffect(() => {
+    if(paymentCode.length === 7) {
+        setChatInfo({
+            ...chatInfo!,
+            fullOrder: { ...chatInfo!.fullOrder, status: 'InProgress' }
+        });
+    }
+  }, [paymentCode]);
+
   const handleConfirmCompletion = async () => {
 
     let msgText = "";
@@ -538,7 +547,7 @@ export default function ChatPage() {
                             </button>
                           </div>
                       )}
-                      {status === 'InProgress' && (
+                      {(status === 'InProgress' || status === 'CompletedByClient' || status === 'CompletedByPro') && (
                           <button className={styles.btnSuccess} onClick={handleConfirmCompletion} style={{ width: '100%', background: '#22c55e', color: 'white', border: 'none', padding: 10, borderRadius: 8, fontWeight: 600 }}>
                               <CheckCheck size={18} style={{marginRight:8}} /> Confirm Completion
                           </button>
@@ -581,7 +590,7 @@ export default function ChatPage() {
                        )}
 
                        {/* COMPLETION PHASE */}
-                       {status === 'InProgress' && (
+                       {(status === 'InProgress' || status === 'CompletedByClient' || status === 'CompletedByPro') && (
                            <button onClick={handleConfirmCompletion} style={{ width: '100%', background: '#22c55e', color: 'white', border: 'none', padding: 10, borderRadius: 8, fontWeight: 600 }}>
                               <CheckCheck size={18} style={{marginRight:8}} /> Confirm Completion
                            </button>

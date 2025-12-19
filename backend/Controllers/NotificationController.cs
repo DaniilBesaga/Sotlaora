@@ -39,6 +39,7 @@ namespace Backend.Controllers
                     IsRead = n.IsRead,
                     CreatedAt = n.CreatedAt
                 })
+                .OrderByDescending(n => n.CreatedAt)
                 .ToListAsync();
 
             return Ok(notifications);
