@@ -22,7 +22,7 @@ namespace Sotlaora.Business.Entities
         public int UserProfileId { get; set; }
         public UserProfile UserProfile { get; set; } = null!;
 
-        
+        public bool VerifiedIdentity { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Order> Orders { get; set; } = new List<Order>();

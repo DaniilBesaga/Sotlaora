@@ -762,10 +762,37 @@
   font-size: 15px;
   padding: 4px 0;
   color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
+
 .checkboxLabel input {
-  width: 18px; height: 18px; margin-right: 8px;
-  accent-color: var(--accent);
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+}
+
+.checkboxLabel input:checked {
+  background-color: var(--accent);
+}
+
+.checkboxLabel input:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .actionsRow {
@@ -823,6 +850,7 @@
   box-shadow: var(--shadow-hover);
   border-color: rgba(0,0,0,0.03);
   z-index: 2;
+  cursor: pointer;
 }
 
 .avatar {
@@ -1199,6 +1227,7 @@
   margin-right: 10px;
   accent-color: var(--accent);
   cursor: pointer;
+  color: white !important;
 }
 
 .actionsRow {
@@ -1443,9 +1472,9 @@
 @media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; gap: 24px; }
   .filtersPanel { display: none; } /* Desktop hidden */
-  .filtersBtnMobile { display: inline-block; }
+  .filtersBtnMobile { display: inline-block; width: 100%;}
   
-  .topRow { flex-wrap: wrap; padding: 12px; gap: 12px; }
+  .topRow { flex-wrap: wrap; padding: 12px; gap: 12px; flex-direction: column;}
   .input { margin-right: 0; width: 100%; }
   .locationInput { width: 100%; flex: 100%; }
   .searchBtn { width: 100%; margin: 8px 0 0 0; }
@@ -1457,4 +1486,223 @@
   .titleRow { flex-direction: column; gap: 8px; }
   .priceBlock { align-self: flex-start; margin-top: 4px; }
   .bio { max-width: 100%; margin: 12px 0; }
+}
+
+/* ... existing code ... */
+
+/* --- CUSTOM SELECT (Use this structure instead of <select>) --- */
+
+/* 1. Wrapper (position: relative is crucial for dropdown placement) */
+.customSelect {
+  position: relative;
+  width: 100%;
+}
+
+/* 2. The "Button" that looks like an input */
+.selectTrigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.selectTrigger:hover {
+  background: #fff;
+  border-color: #d1d5db;
+}
+
+/* Active state (when dropdown is open) */
+.selectTriggerActive {
+  background: #fff;
+  border-color: #6eb0ff;
+  box-shadow: 0 0 0 3px rgba(110, 176, 255, 0.15);
+}
+
+/* 3. The Dropdown Menu (Absolute position) */
+.optionsMenu {
+  position: absolute;
+  top: calc(100% + 8px); /* Space between trigger and menu */
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(12, 18, 30, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(12, 18, 30, 0.12); /* Deep modern shadow */
+  padding: 6px;
+  z-index: 50;
+  max-height: 240px;
+  overflow-y: auto;
+  
+  /* Animation */
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Class to add when menu is open */
+.optionsMenuOpen {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* 4. Individual Option Item */
+.option {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.option:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+/* Selected Option styling */
+.optionSelected {
+  background: #f0f7ff;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Optional: Scrollbar styling for the menu */
+.optionsMenu::-webkit-scrollbar {
+  width: 6px;
+}
+.optionsMenu::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+
+.safetyNote {
+  border-top: 1px solid #f1f5f9;
+  font-size: 1rem;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+/* --- BASE STYLES --- */
+.filtersPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputNumber, .selectInput {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 14px;
+  outline: none;
+}
+
+/* --- DESKTOP VARIANT OVERRIDES --- */
+/* Target only when inside the desktop container */
+.desktopFilters .filtersPanel {
+  width: 280px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* --- MOBILE MODAL OVERRIDES --- */
+/* Target only when inside the mobile modal container */
+.modalPanel .filtersPanel {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.modalPanel .filtersTitle {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+/* Mobile Checkbox "Tap Zones" */
+.modalPanel .checkboxLabel {
+  display: flex;
+  align-items: center;
+  padding: 14px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+/* Mobile Action Buttons (Stacked) */
+.modalPanel .actionsRow {
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+  /* Push buttons to stay at bottom of screen */
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 10px;
+}
+
+.modalPanel .applyBtn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 14px;
+  font-weight: 700;
+  order: 1; /* Apply on top */
+}
+
+.modalPanel .clearBtn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #9ca3af;
+  border: none;
+  order: 2; /* Clear at the very bottom */
+}
+
+/* Location Button Adjustments */
+.locationBtn {
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.modalPanel .inputNumber {
+  font-size: 16px; /* Prevents mobile zoom on focus */
+  padding: 14px;
 }

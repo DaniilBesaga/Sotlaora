@@ -1,79 +1,175 @@
-
+/* Background */
 .bgLayer {
-position: absolute;
-inset: 0;
-background: radial-gradient(60% 60% at 50% 40%, rgba(0,0,0,0.02), transparent 40%);
-z-index: 0;
+  position: absolute;
+  inset: 0;
+  
+  z-index: 0;
+  pointer-events: none;
 }
 
+/* Section */
+.hero {
+  position: relative;
+  overflow: hidden; /* Keeps badges from overflowing screen width */
+  padding: 80px 0;
+}
 
+/* Container */
 .container {
-position: relative;
-width: 1350px;
-height: 620px;
-display: block;
-z-index: 10;
-margin: 0 auto;
+  position: relative;
+  max-width: 1350px;
+  margin: 0 auto;
+  padding: 0 24px;
+  /* Min-height ensures the orbit layout works on desktop */
+  min-height: 620px; 
+  z-index: 10;
 }
 
-
+/* Title */
 .title {
-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-font-weight: 700;
-font-size: clamp(36px, 6vw, 80px);
-line-height: 0.95;
-color: var(--white);
-text-align: center;
-margin: 0 auto;
-padding-top: 170px;
-width: min(820px, 100%);
-z-index: 1000;
-position: relative;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; /* Stack the split text */
+
+  font-weight: 700;
+  font-size: clamp(32px, 5vw, 80px);
+  line-height: 1.1;
+  color: var(--accent-gradient);
+  text-align: center;
+
+  max-width: 800px;
+  margin: auto;
+  z-index: 2;
+  pointer-events: none; 
 }
 
+/* Wrapper for cards (needed for centering on mobile) */
+.cardsGrid {
+  width: 100%;
+  height: 100%;
+}
 
+/* Cards (Desktop Default) */
 .card {
-width: 260px;
-background: black;
-color: #e9f0ec;
-padding: 22px 20px;
-border-radius: 10px;
-position: absolute;
-box-shadow: 0 18px 40px rgba(8, 18, 16, 0.18);
+  width: 260px;
+  background: #111; /* Dark card background */
+  color: #e9f0ec;
+  padding: 24px 22px;
+  border-radius: 16px;
+  position: absolute; /* This makes the orbit work */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: transform 0.3s ease;
 }
 
+.card:hover {
+  transform: translateY(-5px);
+  z-index: 20;
+}
 
 .card h3 {
-margin: 0 0 10px 0;
-font-size: 20px;
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #fff;
 }
-
 
 .card p {
-margin: 0;
-font-size: 14px;
-opacity: 0.9;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  opacity: 0.8;
 }
 
-
-.badge, .smallBadge {
-position: absolute;
-transform: translate(-24%, -24%);
-right: -12px;
-top: -22px;
-border-radius: 12px;
-overflow: hidden;
-background: white;
-box-shadow: 0 10px 18px rgba(8, 18, 16, 0.18);
+/* Badges */
+.badge,
+.smallBadge {
+  position: absolute;
+  right: -12px;
+  top: -22px;
+  border-radius: 50%; /* Make circular */
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
 }
 
+.smallBadge {
+  top: auto;
+  bottom: -18px;
+  right: -14px;
+}
 
-.smallBadge { right: -14px; top: auto; bottom: -18px; transform: none; }
+/* ========================= */
+/* TABLET & MOBILE (≤ 1024px) */
+/* ========================= */
+@media (max-width: 1024px) {
+  .hero {
+    padding: 60px 0;
+    height: auto;
+  }
 
+  .container {
+    min-height: auto; /* Remove fixed height constraint */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-@media (max-width: 900px) {
-.container { height: auto; }
-.card { width: 92%; position: relative; margin: 18px auto; }
-.badge, .smallBadge { display: none; }
-.title { font-size: clamp(28px, 8vw, 44px); width: 100%; }
+  /* Reset Title Positioning */
+  .title {
+    position: relative; /* No longer absolute centered */
+    inset: auto;
+    margin: 0 0 50px 0;
+    pointer-events: auto;
+    width: 100%;
+  }
+
+  /* Create a Grid Layout */
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    gap: 30px; /* Space between cards */
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* Reset Card Positioning */
+  .card {
+    /* KEY FIX: We must override the inline styles (top/left) set by React */
+    position: relative !important; 
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    
+    width: 100%; /* Fill the grid cell */
+    margin: 0;
+  }
+}
+
+/* ========================= */
+/* MOBILE (≤ 600px) */
+/* ========================= */
+@media (max-width: 600px) {
+  .title {
+    font-size: 32px;
+    margin-bottom: 40px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr; /* 1 column stack */
+    gap: 40px; /* More space for the badges hanging off */
+    padding: 0 10px; /* Safety padding */
+  }
+  
+  .card {
+    /* Ensure badges don't get cut off on very small screens */
+    margin-bottom: 10px; 
+  }
 }

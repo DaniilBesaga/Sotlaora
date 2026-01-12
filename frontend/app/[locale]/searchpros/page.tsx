@@ -1,189 +1,85 @@
 "use client"
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import styles from "./SearchPros.module.css";
+import { Category } from "@/types/Category";
+import { ProCardDTO } from "@/types/ProDTO";
+import { useRouter } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
 
-// Search + Filters + Results mockup
-// CSS-modules are used (styles.*) — corresponds to SearchMastersSection.module.css
+// --- CUSTOM SELECT COMPONENT ---
+// Replaces standard <select> to match the modern design
+function CustomSelect({ options, value, onChange, placeholder = "Select" }) {
+  const [isOpen, setIsOpen] = useState(false);
 
-export const CATEGORIES = {
-  "Ремонт": [
-    "Косметический ремонт",
-    "Ремонт стен и потолков",
-    "Плиточные работы",
-    "Сантехника",
-    "Малярные работы"
-  ],
+  // Helper to get the display label from the value
+  const getLabel = () => {
+    // If options are objects { label, value }
+    const found = options.find((o) => (o.value || o) === value);
+    if (found) return found.label || found.value || found;
+    return placeholder;
+  };
 
-  "Электрика": [
-    "Розетки и выключатели",
-    "Проводка",
-    "Автоматы и щиты",
-    "Освещение"
-  ],
+  return (
+    <div className={styles.customSelect}>
+      <div 
+        className={`${styles.selectTrigger} ${isOpen ? styles.selectTriggerActive : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{getLabel()}</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </div>
 
-  "Установка": [
-    "Сборка мебели",
-    "Монтаж техники",
-    "Монтаж дверей",
-    "Монтаж полок и карнизов"
-  ],
+      <div className={`${styles.optionsMenu} ${isOpen ? styles.optionsMenuOpen : ''}`}>
+        {options.map((opt, idx) => {
+          const optValue = typeof opt === 'object' ? opt.value : opt;
+          const optLabel = typeof opt === 'object' ? opt.label : opt;
+          const isSelected = value === optValue;
 
-  "Мебель": [
-    "Сборка",
-    "Ремонт мебели",
-    "Установка кухни"
-  ],
+          return (
+            <div 
+              key={idx}
+              className={`${styles.option} ${isSelected ? styles.optionSelected : ''}`}
+              onClick={() => {
+                onChange(optValue);
+                setIsOpen(false);
+              }}
+            >
+              {optLabel}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
-  "Стиральная машина": [
-    "Ремонт",
-    "Установка",
-    "Диагностика"
-  ],
+// --- MAIN COMPONENTS ---
 
-  "Холодильник": [
-    "Ремонт",
-    "Диагностика"
-  ],
+function CategoryPills({selected, onSelect }) {
+  const [categories, setCategories] = useState<Category[]>([]);
 
-  "Газ (бойлер, плита, духовка)": [
-    "Ремонт",
-    "Установка",
-    "Обслуживание"
-  ],
+  useEffect(() => {
+     const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:5221/api/category/with-subcategories');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
 
-  "Кондиционер": [
-    "Установка",
-    "Заправка",
-    "Чистка",
-    "Ремонт"
-  ],
+    fetchCategories();
+  }, []);
 
-  "Замки": [
-    "Вскрытие",
-    "Установка замков",
-    "Ремонт замков"
-  ],
-
-  "Вывоз мусора": [
-    "Строительный мусор",
-    "Бытовой мусор",
-    "Мебель/крупногабарит"
-  ],
-
-  "Уборка": [
-    "Генеральная уборка",
-    "Квартиры",
-    "Офисы",
-    "После ремонта"
-  ],
-
-  "Транспорт, переезды и услуги": [
-    "Переезд",
-    "Грузчики",
-    "Перевозка мебели"
-  ],
-
-  "Дезинфекция": [
-    "Дезинсекция",
-    "Дератизация",
-    "Антибактериальная обработка"
-  ],
-
-  "Счётчики (газ, электричество, вода)": [
-    "Установка",
-    "Поверка",
-    "Замена"
-  ],
-
-  "Почасовой мастер": [
-    "Мелкие работы",
-    "Муж на час"
-  ],
-
-  "Бытовая техника": [
-    "Плиты",
-    "Духовки",
-    "Пылесосы",
-    "Мелкая техника"
-  ],
-
-  "Видеонаблюдение и безопасность": [
-    "Установка камер",
-    "Умный дом",
-    "Сигнализация"
-  ],
-
-  "Ремонт телефонов и ноутбуков": [
-    "Замена экрана",
-    "Батарея",
-    "Диагностика"
-  ]
-};
-
-
-const LANGUAGES = ["Румынский", "Английский"];
-
-const MOCK_PERFORMERS = [
-  {
-    id: "1",
-    name: "Иван Петров",
-    rating: 4.9,
-    reviewsCount: 124,
-    priceFrom: 30,
-    priceTo: 60,
-    priceUnit: "час",
-    services: ["Сантехника", "Монтаж"],
-    location: { city: "București", distanceKm: 3.2 },
-    responseTimeHours: 1,
-    availability: "online",
-    badges: ["verified", "pro"],
-    shortBio: "Опытный сантехник — замена труб, монтаж сантехники.",
-    skillsTags: ["замена труб", "монтаж унитаза", "ремонт кранов"],
-    languages: ["Русский", "Румынский"]
-  },
-  {
-    id: "2",
-    name: "Maria Ionescu",
-    rating: 4.7,
-    reviewsCount: 58,
-    priceFrom: 25,
-    priceTo: 45,
-    priceUnit: "час",
-    services: ["Уборка"],
-    location: { city: "București", distanceKm: 7.1 },
-    responseTimeHours: 24,
-    availability: "soon",
-    badges: ["guarantee"],
-    shortBio: "Быстро и качественно. Опыт: 6 лет.",
-    skillsTags: ["генеральная уборка", "мойка окон"],
-    languages: ["Румынский"]
-  },
-  {
-    id: "3",
-    name: "Alex Popescu",
-    rating: 4.3,
-    reviewsCount: 12,
-    priceFrom: 15,
-    priceTo: 25,
-    priceUnit: "за вызов",
-    services: ["Электрика"],
-    location: { city: "Ilfov", distanceKm: 18 },
-    responseTimeHours: 4,
-    availability: "online",
-    badges: [],
-    shortBio: "Мелкие электромонтажные работы. Быстрый выезд.",
-    skillsTags: ["розетки", "замена проводки"],
-    languages: ["Румынский", "Английский"]
-  }
-];
-
-function CategoryPills({ categories, selected, onSelect }) {
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSub, setSelectedSub] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSub, setSelectedSub] = useState(0);
 
   function handleCategoryClick(cat) {
-    setSelectedSub(null);
-    setSelectedCategory((prev) => (prev === cat ? null : cat));
+    setSelectedSub(0);
+    setSelectedCategory((prev) => (prev === cat ? "" : cat));
   }
 
   function handleSubClick(cat, sub) {
@@ -201,16 +97,16 @@ function CategoryPills({ categories, selected, onSelect }) {
 
       {/* Top pills */}
       <div className={styles.pillsRow}>
-        {Object.keys(CATEGORIES).map((cat) => (
+        {categories.map((cat) => (
           <button
-            key={cat}
-            onClick={() => handleCategoryClick(cat)}
-            className={`${styles.pill} ${selectedCategory === cat ? styles.pillActive : ''}`}
-            aria-pressed={selectedCategory === cat}
-            aria-expanded={selectedCategory === cat}
-            title={cat}
+            key={cat.title}
+            onClick={() => handleCategoryClick(cat.title)}
+            className={`${styles.pill} ${selectedCategory === cat.title ? styles.pillActive : ''}`}
+            aria-pressed={selectedCategory === cat.title}
+            aria-expanded={selectedCategory === cat.title}
+            title={cat.title}
           >
-            {cat}
+            {cat.title}
           </button>
         ))}
       </div>
@@ -221,13 +117,13 @@ function CategoryPills({ categories, selected, onSelect }) {
           <h3 className={styles.subTitle}>{selectedCategory}</h3>
 
           <div className={styles.subGrid}>
-            {CATEGORIES[selectedCategory].map((sub) => (
+            {categories.find(cat => cat.title === selectedCategory)?.subcategories.map((sub) => (
               <button
-                key={sub}
-                className={`${styles.subItem} ${selectedSub === sub ? styles.subItemActive : ''}`}
-                onClick={() => handleSubClick(selectedCategory, sub)}
+                key={sub.id}
+                className={`${styles.subItem} ${selectedSub === sub.id ? styles.subItemActive : ''}`}
+                onClick={() => handleSubClick(selectedCategory, sub.id)}
               >
-                {sub}
+                {sub.title}
               </button>
             ))}
           </div>
@@ -275,6 +171,13 @@ export  function FiltersPanel({ state, setState, onApply, onClear }) {
     }));
   };
 
+  const ratingOptions = [
+    { label: "Любой", value: 0 },
+    { label: "4.0+", value: 4 },
+    { label: "4.5+", value: 4.5 },
+    { label: "4.8+", value: 4.8 },
+  ];
+
   return (
     <aside className={styles.filtersPanel}>
       <h4 className={styles.filtersTitle}>Фильтры</h4>
@@ -282,13 +185,6 @@ export  function FiltersPanel({ state, setState, onApply, onClear }) {
       <div className={styles.filterGroup}>
         <label className={styles.fieldLabel}>Цена (RON за {state.priceUnit})</label>
         <div className={styles.row}>
-          {/* <input
-            type="number"
-            value={state.priceMin}
-            onChange={(e) => setState((s) => ({ ...s, priceMin: Number(e.target.value) }))}
-            className={styles.inputNumber}
-            placeholder="Мин"
-          /> */}
           <input
             type="number"
             value={state.priceMax}
@@ -301,60 +197,12 @@ export  function FiltersPanel({ state, setState, onApply, onClear }) {
 
       <div className={styles.filterGroup}>
         <label className={styles.fieldLabel}>Рейтинг (мин)</label>
-        <select
-          value={state.ratingMin}
-          onChange={(e) => setState((s) => ({ ...s, ratingMin: Number(e.target.value) }))}
-          className={styles.select}
-        >
-          <option value={0}>Любой</option>
-          <option value={4}>4+</option>
-          <option value={4.5}>4.5+</option>
-          <option value={4.8}>4.8+</option>
-        </select>
-      </div>
-
-      <div className={styles.filterGroup}>
-        <label className={styles.fieldLabel}>Срочность (ответ в часах)</label>
-        <input
-          type="number"
-          min={0}
-          value={state.urgencyHours}
-          onChange={(e) => setState((s) => ({ ...s, urgencyHours: Number(e.target.value) }))}
-          className={styles.inputNumber}
-          placeholder="Например 4"
+        {/* REPLACED <select> WITH CustomSelect */}
+        <CustomSelect 
+            options={ratingOptions}
+            value={state.ratingMin}
+            onChange={(val) => setState((s) => ({ ...s, ratingMin: val }))}
         />
-      </div>
-
-      <div className={styles.filterGroup}>
-        <label className={styles.fieldLabel}>Тип занятости</label>
-        <div className={styles.checkboxRow}>
-          {["full", "part"].map((type) => (
-            <label key={type} className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={state.employment.includes(type)}
-                onChange={() => toggleEmployment(type)}
-              />
-              {type === "full" ? "Полная" : "Частичная"}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.filterGroup}>
-        <label className={styles.fieldLabel}>Языки</label>
-        <div className={styles.languagesWrap}>
-          {LANGUAGES.map((lang) => (
-            <label key={lang} className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={state.languages.includes(lang)}
-                onChange={() => toggleLanguage(lang)}
-              />
-              {lang}
-            </label>
-          ))}
-        </div>
       </div>
 
       <div className={styles.actionsRow}>
@@ -365,34 +213,40 @@ export  function FiltersPanel({ state, setState, onApply, onClear }) {
   );
 }
 
-function PerformerCard({ p, variant = "expanded", onChat, onBook }) {
+function PerformerCard({ p, variant = "expanded", onChat, onBook } : { p: ProCardDTO, variant: "compact" | "expanded", onChat: (p: ProCardDTO) => void, onBook: (p: ProCardDTO) => void }) {
+  const router = useRouter();
   return (
-    <article className={`${styles.card} ${variant === "compact" ? styles.cardCompact : styles.cardExpanded}`}>
+    <article className={`${styles.card} ${variant === "compact" ? styles.cardCompact : styles.cardExpanded}`}
+    onClick={() => router.push(`/propublicprofile`)}>
       <img src="/images/pros/1.jpg" className={styles.avatar}/>
       <div className={styles.performerMain}>
         <div className={styles.titleRow}>
           <div>
-            <h5 className={styles.name}>{p.name}</h5>
-            <div className={styles.servicesText}>{p.services.join(" • ")}</div>
+            <h5 className={styles.name}>{p.userName}</h5>
+            <div className={styles.servicesText}>{p.subcategoriesDTO.map(sc => sc.title).join(" • ")}</div>
           </div>
           <div className={styles.priceBlock}>
-            <div className={styles.priceValue}>{p.priceFrom}{p.priceUnit ? ` ${p.priceUnit}` : ''}</div>
-            <div className={styles.distanceText}>{p.location?.distanceKm ? `${p.location.distanceKm} km` : p.location?.city}</div>
+            <div className={styles.priceValue}>{p.price}</div>
+            <div className={styles.distanceText}>{p.location ? `${p.location} km` : p.location}</div>
           </div>
         </div>
 
         {variant === "expanded" && (
           <>
-            <p className={styles.bio}>{p.shortBio}</p>
+            <p className={styles.bio}>{p.description}</p>
             <div className={styles.statsRow}>
               <div className={styles.smallText}>{p.rating} ★ ({p.reviewsCount})</div>
-              {p.badges.map((b) => (
-                <span key={b} className={styles.badge}>{b}</span>
-              ))}
+              {p.verifiedIdentity && (<div className={styles.safetyNote}>
+                <ShieldCheck size={14} />
+                Личность подтверждена
+              </div>)}
 
               <div className={styles.actions}>
-                <button onClick={() => onChat(p)} className={styles.chatBtn}>Чат</button>
-                <button onClick={() => onBook(p)} className={styles.bookBtn}>Заказать</button>
+                <a href={`/propublicprofile/${p.proId}`} className={styles.chatBtn}>Профиль</a>
+                <a onClick={(e) => {
+                    e.stopPropagation();
+                    onBook(p);
+                }} className={styles.bookBtn}>Заказать</a>
               </div>
             </div>
           </>
@@ -407,10 +261,34 @@ export default function SearchMastersSection() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
   const [quickActive, setQuickActive] = useState([]);
+  
+  // Added state for Sorting
+  const [sortOption, setSortOption] = useState("Рекомендованные");
+
+  const [pros, setPros] = useState<ProCardDTO[]>([]);
+
+  useEffect(() => {
+     const fetchPros = async () => {
+      try {
+        const response = await fetch('http://localhost:5221/api/pro/all-pros', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        const data = await response.json();
+        console.log('Fetched pros:', data);
+        setPros(data);
+      } catch (error) {
+        console.error('Error fetching pros:', error);
+      }
+    };
+
+    fetchPros();
+  }, []);
 
   const [filters, setFilters] = useState({
-    priceMin: 0,
-    priceMax: 1000,
+    price: 0,
     priceUnit: "час",
     ratingMin: 0,
     urgencyHours: 0,
@@ -439,8 +317,7 @@ export default function SearchMastersSection() {
 
   function clearFilters() {
     setFilters({
-      priceMin: 0,
-      priceMax: 1000,
+      price: 0,
       priceUnit: "час",
       ratingMin: 0,
       urgencyHours: 0,
@@ -451,28 +328,26 @@ export default function SearchMastersSection() {
   }
 
   const filtered = useMemo(() => {
-    return MOCK_PERFORMERS.filter((p) => {
-      if (selectedCategory && !p.services.includes(selectedCategory)) return false;
-      if (query && !(`${p.name} ${p.services.join(' ')} ${p.shortBio}`).toLowerCase().includes(query.toLowerCase())) return false;
-      if (filters.verified && !p.badges.includes("verified")) return false;
-      if (filters.ratingMin && p.rating < filters.ratingMin) return false;
-      if (filters.languages.length && !filters.languages.every(l => p.languages.includes(l))) return false;
-      if (filters.urgencyHours && p.responseTimeHours > filters.urgencyHours) return false;
-      if (quickActive.includes("withReviews") && p.reviewsCount < 5) return false;
-      if (quickActive.includes("online") && p.availability !== "online") return false;
-      if (quickActive.includes("guarantee") && !p.badges.includes("guarantee")) return false;
-      if (quickActive.includes("nearby") && (p.location?.distanceKm ?? 999) > 10) return false;
-
-      const pPrice = p.priceFrom ?? 0;
-      if (pPrice < filters.priceMin || pPrice > filters.priceMax) return false;
-
+    // Basic filtering logic here
+    // Sorting logic can be added here based on `sortOption`
+    return pros.filter((p) => {
       return true;
     });
-  }, [selectedCategory, query, filters, quickActive]);
+  }, [selectedCategory, query, filters, quickActive, pros, sortOption]);
+
+  const router = useRouter()
+
+  const sortOptions = [
+    "Рекомендованные",
+    "Цена ↑",
+    "Цена ↓",
+    "Рейтинг",
+    "Быстрота ответа"
+  ];
 
   return (
     <div className={styles.container}>
-      <CategoryPills categories={CATEGORIES} selected={selectedCategory} onSelect={(c) => setSelectedCategory((s) => (s === c ? null : c))} />
+      <CategoryPills selected={selectedCategory} onSelect={(c) => setSelectedCategory((s) => (s === c ? null : c))} />
 
       <div className={styles.topCard}>
         <div className={styles.topRow}>
@@ -510,13 +385,15 @@ export default function SearchMastersSection() {
             <div className={styles.resultCount}>Найдено: {filtered.length}</div>
             <div className={styles.sortWrap}>
               <label className={styles.smallText}>Сортировать:</label>
-              <select className={styles.sortSelect}>
-                <option>Рекомендованные</option>
-                <option>Цена ↑</option>
-                <option>Цена ↓</option>
-                <option>Рейтинг</option>
-                <option>Быстрота ответа</option>
-              </select>
+              
+              {/* REPLACED <select> WITH CustomSelect */}
+              <div style={{ width: '200px' }}>
+                <CustomSelect 
+                    options={sortOptions}
+                    value={sortOption}
+                    onChange={(val) => setSortOption(val)}
+                />
+              </div>
             </div>
           </div>
 
@@ -528,7 +405,7 @@ export default function SearchMastersSection() {
                   p={p}
                   variant="expanded"
                   onChat={(perf) => console.log("chat", perf)}
-                  onBook={(perf) => console.log("book", perf)}
+                  onBook={(perf) => {localStorage.setItem('proId', perf.proId.toString()); router.push('/create-order')}}
                 />
               ))
             ) : (

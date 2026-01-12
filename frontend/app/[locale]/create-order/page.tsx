@@ -229,7 +229,12 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
           body: JSON.stringify(subcategoriesId)
         });
         const data = await res.json();
-        setProsCards(data);
+        if(localStorage.getItem("proId")){
+          setProsCards(data.filter((pro: ProCard) => pro.id.toString() !== localStorage.getItem("proId")) );
+        }
+        else{
+          setProsCards(data);
+        }
         console.log('Fetched pros for selected categories:', data);
         // setProsData(data);
       }
@@ -402,6 +407,23 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
     }
   }, [isClicked])
 
+  const [selectedProId, setSelectedProId] = useState<string | null>(null);
+
+  // 2. Check LocalStorage on Mount
+  useEffect(() => {
+    // Ensure we are on client-side
+    if (typeof window !== 'undefined') {
+      const storedId = localStorage.getItem("proId");
+      if (storedId) setSelectedProId(storedId);
+    }
+  }, []);
+
+  // 3. Handle Cancel
+  const handleCancelPro = () => {
+    localStorage.removeItem("proId");
+    window.location.reload(); // Reloads page as requested
+  };
+
   return (
     <main className={styles.wrapper}>
       <div className={styles.bg} aria-hidden />
@@ -421,6 +443,25 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
             <div className={styles.stepCard}><div className={styles.stepNum}>2</div><div className={styles.stepText}><strong>Сравните</strong><small>Рейтинг, отзывы, цена.</small></div></div>
             <div className={styles.stepCard}><div className={styles.stepNum}>3</div><div className={styles.stepText}><strong>Выберите</strong><small>Договоритесь о цене и сроках.</small></div></div>
           </div>
+          {selectedProId && (
+          <div className={`${styles.card} ${styles.proSelectionCard}`}>
+            <div className={styles.proSelectionInfo}>
+              <div className={styles.proAvatarStub}>
+                {/* Placeholder icon or fetch avatar if needed */}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <div>
+                <div className={styles.proLabel}>Вы выбрали специалиста</div>
+                <div className={styles.proId}>ID: #{selectedProId}</div>
+              </div>
+            </div>
+            
+            <button onClick={handleCancelPro} className={styles.cancelProBtn} title="Отменить выбор">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <span>Сбросить</span>
+            </button>
+          </div>
+        )}
         </header>
 
         {/* New: compact toggle bar that controls formCard visibility */}
@@ -438,7 +479,6 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
           </button>
         </div>
 
-        {/* Form card becomes an accordion panel */}
         {/* Form card becomes an accordion panel */}
 <div id="order-form-panel" className={`${styles.accordionPanel} ${formOpen ? styles.expanded : styles.collapsed}`}>
   
@@ -590,7 +630,7 @@ const selectedItems = useMemo(() => prosData.filter(p => selected.includes(p.id)
             className={styles.toggleBtn}
             aria-expanded={nextOpen}
             aria-controls="next-step-panel"
-            // disabled={!steps.step1}
+            disabled={!steps.step1}
             onClick={() => setNextOpen(p => !p)}
           >
             <div className={styles.toggleTitle}>Дальше: Сравнение предложений</div>

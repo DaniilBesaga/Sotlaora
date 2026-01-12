@@ -96,6 +96,9 @@
   padding:8px 6px 6px;
   border-top: 1px dashed rgba(12,18,30,0.04);
   margin-top:8px;
+  margin-top: 12px;
+  padding: 12px 6px; /* Increased padding for better tap area */
+  border-top: 1px dashed rgba(12,18,30,0.1);
 }
 .currentSelection{ font-size:13px; color:#374151; font-weight:700; }
 .none{ color:#9aa2ad; font-weight:500; }
@@ -193,4 +196,90 @@
 .radio input:focus {
   outline: none;
   box-shadow: 0 0 6px #0abab577;
+}
+
+
+/* =========================================
+   RESPONSIVE MEDIA QUERIES
+   Add this to the very bottom of your CSS
+   ========================================= */
+
+@media (max-width: 480px) {
+  /* 1. Container Adjustment */
+  .wrapper {
+    width: 94%;           /* Take up most of the screen width */
+    max-width: 360px;     /* Don't get too big on larger phones */
+    left: 50% !important; /* Force centering if absolute */
+    transform: translateX(-50%); /* Center align */
+    margin-left: 0;
+    padding: 15px;        /* Slightly more breathing room */
+    box-sizing: border-box;
+  }
+
+  /* 2. Calendar Grid Touch Targets */
+  .dayCell {
+    height: 42px; /* Taller cells for easier tapping */
+    font-size: 14px;
+  }
+  
+  .weekName {
+    font-size: 11px; /* Slightly smaller to prevent text wrap */
+  }
+
+  /* 3. Header & Navigation */
+  .monthLabel {
+    font-size: 1.1rem;
+  }
+  
+  .nav {
+    width: 40px;  /* Bigger arrow buttons */
+    height: 40px;
+  }
+
+  /* 4. Time Selection (Radio Buttons) */
+  .timeOptions {
+    gap: 5px; /* More space between options */
+    padding: 5px 7px !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .radio {
+    padding: 4px 0; /* Increase hit area vertically */
+  }
+  
+  .radio input {
+    width: 15px;  /* Larger radio circle */
+    height: 15px;
+  }
+  
+  .radio span {
+    font-size: .9rem;
+  }
+
+  /* 5. Footer Controls */
+  .controls {
+    flex-direction: column; /* Stack selection text and buttons */
+    align-items: stretch;   /* Full width */
+    gap: 12px;
+    padding: 0;
+  }
+
+  .currentSelection {
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .actionButtons {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Equal width buttons */
+    gap: 10px;
+  }
+
+  .clearBtn, .applyBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 0; /* Taller buttons */
+    text-align: center;
+  }
 }

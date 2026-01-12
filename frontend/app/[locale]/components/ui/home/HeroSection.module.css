@@ -1,115 +1,202 @@
-.hero{
-  position:relative;
-  min-height:620px;
-  display:flex;
-  align-items:center;
-  padding:48px 20px;
-  color: #fff;
+:root {
+  --bg-overlay: rgba(6, 10, 20, 0.36);
+  --bg-overlay-2: rgba(6, 10, 20, 0.18);
+  /* Added specific colors for the badges to work */
+  --accent1: #6e4ef2; 
+  --accent2: #ff6332;
+  --muted: rgba(255, 255, 255, 0.6);
+  --accent-gradient: linear-gradient(90deg, var(--accent1), var(--accent2));
+  --glass: rgba(255, 255, 255, 0.06);
+  --card: rgba(255, 255, 255, 0.06);
 }
 
-:root{
---bg-overlay: rgba(6,10,20,0.36);
---bg-overlay-2: rgba(6,10,20,0.18);
---accent-gradient: linear-gradient(90deg,#6e4ef2,#ff6332);
---glass: rgba(255,255,255,0.06);
---card: rgba(255,255,255,0.06);
+/* --- HERO SECTION --- */
+.hero {
+  position: relative;
+  min-height: 620px;
+  display: flex;
+  align-items: center;
+  padding: 48px 20px;
+  color: #fff;
+  overflow: hidden; /* Prevents scrollbars if animations go out of bounds */
 }
+
 .bgLayer,
 .overlay {
   position: absolute;
   inset: 0;
-
+  /* Default Desktop Margins */
   left: 150px;
   right: 150px;
   margin: 20px 0;
-
   border-radius: 10px;
+  pointer-events: none; /* Allows clicking text if z-index fails */
 }
 
-/* Фон */
+/* Background Image */
 .bgLayer {
   background-repeat: no-repeat;
-  background-size: cover; /* картинка растягивается идеально */
+  background-size: cover;
   background-position: 50% 90%;
   z-index: 0;
   filter: saturate(1.03) contrast(1.02);
 }
 
-/* Градиент */
+/* Gradient Overlay */
 .overlay {
   background: linear-gradient(180deg, var(--bg-overlay), var(--bg-overlay-2));
   z-index: 1;
 }
-.content{position:relative;z-index:2;max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:36px;align-items:center}
 
-.left{padding: 15px 20px;border-radius: 10px; background: rgba(6,10,20,0.1);}
-.kicker{font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:8px}
-
-.headline{font-size:clamp(2.1rem,4.5vw,3.1rem);line-height:1.02;font-weight:800;margin:0 0 12px;color:rgba(255,255,255,0.98)}
-.headlineLine{display:block}
-
-.highlight{display:inline-block;font-weight:900;font-size:clamp(1.8rem,6vw,3.4rem);background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;color:white;margin-right:6px}
-.dot{color:rgba(255,255,255,0.85);margin:0 6px;font-weight:800}
-
-.lead{color:rgba(255,255,255,0.9);max-width:620px;margin-bottom:18px}
-
-/* search card — looks modern */
-.searchCard{ display:flex;gap:12px;align-items:center;background:black;backdrop-filter:blur(8px);padding:10px;border-radius:12px;box-shadow:0 8px 28px rgba(2,6,23,0.18);border:1px solid rgba(255,255,255,0.06);max-width:720px}
-
-.searchLeft{display:flex;align-items:center;gap:10px;flex:1}
-.icon{width:28px;height:28px;color:rgba(255, 255, 255, 0.9)}
-.searchInput{flex:1;border:var(--accent-gradient);background:transparent;color:rgba(255,255,255,0.95);outline:none;font-size:15px}
-.searchBtn{background:var(--accent-gradient);border:none;padding:10px 16px;border-radius:10px;color:white;font-weight:700;cursor:pointer}
-
-.badges{display:flex;gap:10px;margin-top:2rem}
-.badge{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.04);font-weight:700;font-size:13px;color:rgba(255,255,255,0.95)}
-.badge svg{opacity:0.95}
-
-/* right — modern floating device */
-.right{display:flex;justify-content:center}
-.deviceCard{width:360px;border-radius:16px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 30px 80px rgba(3,6,23,0.5);border:1px solid rgba(255,255,255,0.04)}
-.deviceCard img{width:100%;height:100%;object-fit:cover;display:block}
-
-/* responsive */
-@media (max-width:980px){
-  .content{grid-template-columns:1fr;}
-  .right{display:none}
-  .headline{font-size:2rem}
-  .highlight{font-size:1.6rem}
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  width: 100%; /* Ensure it takes space */
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 36px;
+  align-items: center;
 }
 
-@media (max-width:560px){
-  .hero{padding:28px 14px;min-height:420px}
-  .searchCard{padding:8px}
-  .kicker{display:none}
+.left {
+  padding: 15px 20px;
+  border-radius: 10px;
+  /* Optional: visual aid to read text better */
+  /* background: rgba(6, 10, 20, 0.1); */ 
 }
 
+.kicker {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+}
 
+.headline {
+  font-size: clamp(2.1rem, 4.5vw, 3.1rem);
+  line-height: 1.02;
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.98);
+}
 
-/* badge styled like .trustItem (pill with left accent) */
+.headlineLine {
+  display: block;
+}
+
+.highlight {
+  display: inline-block;
+  font-weight: 900;
+  font-size: clamp(1.8rem, 6vw, 3.4rem);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; /* Changed to transparent so gradient shows */
+  margin-right: 6px;
+}
+
+.dot {
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 6px;
+  font-weight: 800;
+}
+
+.lead {
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 620px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* --- SEARCH CARD --- */
+.searchCard {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #000;
+  backdrop-filter: blur(8px);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(2, 6, 23, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  max-width: 720px;
+  width: 100%;
+}
+
+.searchLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  outline: none;
+  font-size: 15px;
+  min-width: 0;
+}
+
+.searchBtn {
+  background: var(--accent-gradient);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.searchBtn:hover {
+  opacity: 0.9;
+}
+
+/* --- BADGES CONTAINER --- */
+.badges {
+  display: flex;
+  gap: 16px; /* Increased slightly for pill style */
+  margin-top: 2.5rem;
+  flex-wrap: wrap; /* CRITICAL: Allows badges to stack on mobile */
+}
+
+/* --- PILL BADGE STYLING --- */
 .badge {
   display: flex;
   gap: 12px;
   align-items: center;
-  padding: 12px 16px 12px 12px;
-  border-radius: 999px;               /* pill */
+  padding: 10px 16px 10px 12px;
+  border-radius: 999px; /* pill */
   min-width: 180px;
-  box-shadow: 0 8px 26px rgba(12,18,30,0.04);
-  transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s ease, background .2s ease;
+  box-shadow: 0 8px 26px rgba(12, 18, 30, 0.04);
+  transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.22s ease, background 0.2s ease;
   position: relative;
   overflow: visible;
   border-left: 6px solid var(--accent2) !important;
   cursor: default;
-  background: rgb(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.4);
+  text-decoration: none;
 }
 
-/* hover/floating */
 .badge:hover {
   transform: translateY(-6px);
-  box-shadow: 0 18px 46px rgba(12,18,30,0.08);
+  box-shadow: 0 18px 46px rgba(12, 18, 30, 0.08);
 }
 
-/* small accent dot like trustItem::before */
+/* Small accent dot */
 .badge::before {
   content: '';
   position: absolute;
@@ -120,45 +207,178 @@
   height: 10px;
   border-radius: 50%;
   background: linear-gradient(90deg, var(--accent1), var(--accent2));
-  box-shadow: 0 6px 20px rgba(6,30,120,0.08);
+  box-shadow: 0 6px 20px rgba(6, 30, 120, 0.08);
 }
 
-/* icon container (same behavior as .iconWrap used in trustItem) */
 .badge .iconWrap {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(12,18,30,0.05);
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 8px 20px rgba(12, 18, 30, 0.05);
   flex-shrink: 0;
-  transition: transform .28s ease, box-shadow .28s ease;
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
 }
-.badge .iconWrap svg{
+
+.badge .iconWrap svg {
   color: white !important;
-}
-.badge:hover .iconWrap { transform: translateY(-4px) scale(1.03); box-shadow: 0 16px 34px rgba(12,18,30,0.08); }
-
-/* text block */
-.badge .txt { min-width: 0; }
-.badge .lbl { font-weight:700; font-size:0.98rem; color: white; }
-.badge .sub { font-size:0.8rem; color: var(--muted); margin-top: 2px; }
-
-/* svg handling */
-.badge svg { stroke: currentColor; fill: none; opacity: 0.95; width: 22px; height: 22px; }
-
-/* premium (gold) variant — preserves golden look but keeps the same shape/behavior */
-.badgePremiumBoost {
-  border-left-color: rgba(255,200,80,0.95);
-  border: 1px solid rgba(255,210,95,0.12);
-  box-shadow: 0 8px 26px rgba(255,200,80,0.12), 0 2px 6px rgba(12,18,30,0.03);
-  color: #3b2b00; /* darker text for better contrast on gold */
+  width: 18px;
+  height: 18px;
 }
 
-/* small screens */
-@media (max-width: 560px){
-  .badge { min-width: 100%; border-radius: 12px; padding-left: 12px; border-left-width: 5px; }
-  .badge .iconWrap { width: 42px; height: 42px; }
-  .badge .lbl { font-size: 0.95rem; }
+.badge:hover .iconWrap {
+  transform: translateY(-2px) scale(1.05);
+}
+
+.badge .txt {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.badge .lbl {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: white;
+  line-height: 1.2;
+}
+
+.badge .sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* --- RIGHT DEVICE --- */
+.right {
+  display: flex;
+  justify-content: center;
+}
+
+.deviceCard {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  box-shadow: 0 30px 80px rgba(3, 6, 23, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.deviceCard img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* --- RESPONSIVE LOGIC --- */
+
+/* Tablet / Smaller Laptops */
+@media (max-width: 1400px) {
+  .content {
+    grid-template-columns: 1fr 150px;
+    text-align: center;
+  }
+}
+@media (max-width: 1200px) {
+  .content {
+    grid-template-columns: 1fr 30px;
+    text-align: center;
+  }
+}
+@media (max-width: 980px) {
+  .bgLayer,
+  .overlay {
+    /* Reduce margins so background isn't squeezed */
+    left: 20px;
+    right: 20px;
+  }
+  
+  .content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .left {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .right {
+    display: none; /* Hide device on tablet as requested */
+  }
+
+  .lead {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .badges {
+    justify-content: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+  .hero {
+    padding: 80px 16px 40px; /* More top padding for nav */
+    min-height: auto;
+  }
+
+  /* Full bleed background on mobile looks cleaner */
+  .bgLayer,
+  .overlay {
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .headline {
+    font-size: 2.2rem;
+  }
+
+  .kicker {
+    display: block; /* Keep kicker visible or remove if preferred */
+    font-size: 0.9rem;
+  }
+
+  /* Search Card Mobile Logic */
+  .searchCard {
+    flex-direction: column;
+    padding: 12px;
+  }
+  
+  .searchLeft {
+    width: 100%;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 8px;
+  }
+  
+  .searchBtn {
+    width: 100%;
+  }
+
+  /* Badges Mobile Logic */
+  .badges {
+    flex-direction: column; /* Stack badges vertically on tiny screens */
+    width: 100%;
+    gap: 12px;
+  }
+
+  .badge {
+    min-width: unset; /* Remove min-width constraint */
+    width: 100%; /* Fill container */
+    border-radius: 12px; /* Less rounded on mobile saves space */
+    border-left-width: 5px;
+  }
 }

@@ -387,6 +387,7 @@ namespace Sotlaora.Backend.Controllers
                     Slug = ps.Subcategory.Slug
                 }).ToList(),
                 PhoneNumber = user.PhoneNumber,
+                VerifiedIdentity = user.VerifiedIdentity,
                 Orders = user.Orders.ToList()
             });
         }

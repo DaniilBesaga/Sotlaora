@@ -13,5 +13,6 @@ namespace Sotlaora.Backend.Business.Entities
         public decimal? Price { get; set; }
         public double Rating { get; set; }
         public int ReviewsCount { get; set; } 
+        public bool VerifiedIdentity { get; set; }
     }
 }

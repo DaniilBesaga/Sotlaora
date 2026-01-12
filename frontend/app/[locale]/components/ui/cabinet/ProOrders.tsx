@@ -11,6 +11,7 @@ import ChatList from './ChatList';
 import EarningsPage from './Earnings';
 import NotificationsPage from './NotificationsPage';
 import { OrderDTO } from '@/types/Order';
+import { ChevronRight, ShieldAlert } from 'lucide-react';
 
 export default function ProOrders(){
 
@@ -19,16 +20,7 @@ export default function ProOrders(){
   const [loading, setLoading] = useState(true);
   const [ordersData, setOrdersData] = useState<OrderDTO[]>([]);
 
-  const [profile, setProfile] = useState({
-    name: 'Иван Петров',
-    id: '',
-    city: 'Тимишоара, ул. Ласло Петефи 10',
-    email: 'ivan@example.com',
-    phone: '+40 712 345 678',
-    avatar: '/images/pros/1.jpg',
-    rating: 4.9,
-  });
-
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -41,9 +33,7 @@ export default function ProOrders(){
     }
     
     if (authenticated === 'authenticated' && userLong !== undefined) {
-        setProfile(prevProfile => ({ ...prevProfile, name: userLong.userName || prevProfile.name, avatar: userLong.imageRef || prevProfile.avatar, id: `#${userLong.id}`,
-        city: userLong.location || 'Timisoara', phone: userLong.phoneNumber || prevProfile.phone }));
-
+        
         fetchOrders()
         setLoading(false);
       }
@@ -68,22 +58,42 @@ export default function ProOrders(){
   const activeOrders = ordersData.filter(o => o.status === 'Active' || o.status === 'Assigned');
   const completedOrders = ordersData.filter(o => o.status === 'Completed');
 
-  return ( (authenticated === 'loading' && loading) ? <div>Loading...</div> :
+  return ( (authenticated === 'loading' && loading && !userLong) ? <div>Loading...</div> :
     <div className={styles.page}>
       <div className={styles.container}>
+        {/* --- NEW: Verification Banner --- */}
+        {!userLong?.verifiedIdentity && ( // Only show if not verified
+          <div className={styles.verificationAlert}>
+            <div className={styles.alertContent}>
+              <div className={styles.alertIconBox}>
+                <ShieldAlert size={20} />
+              </div>
+              <div>
+                <h4 className={styles.alertTitle}>Подтвердите личность</h4>
+                <p className={styles.alertText}>
+                  Загрузите фото документов, чтобы повысить доверие и получать больше заказов.
+                </p>
+              </div>
+            </div>
+            <Link href="/verification" className={styles.verifyButton}>
+              Начать
+              <ChevronRight size={16} />
+            </Link>
+          </div>
+        )}
         <header className={styles.headerCard}>
-          <img src={profile.avatar} alt="avatar" className={styles.avatar} />
+          <img src={userLong?.imageRef} alt="avatar" className={styles.avatar} />
           <div className={styles.headerInfo}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div>
-                <div className={styles.hName}>{profile.name}</div>
-                <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>{profile.id}</strong></div>
+                <div className={styles.hName}>{userLong?.userName}</div>
+                <div className={styles.hMeta}>ID: <strong style={{color:'#374151'}}>{userLong?.id}</strong></div>
               </div>
             </div>
 
             <div className={styles.badgeList}>
-              <span className={styles.badge}>{profile.city}</span>
-              {profile.phone && <span className={styles.badge}>{profile.phone}</span>}
+              <span className={styles.badge}>{userLong?.location}</span>
+              {userLong?.phoneNumber && <span className={styles.badge}>{userLong?.phoneNumber}</span>}
             </div>
           </div>
         </header>

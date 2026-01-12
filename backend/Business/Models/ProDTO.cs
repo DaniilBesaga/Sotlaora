@@ -13,6 +13,7 @@ namespace Sotlaora.Business.Models
         public bool IsOnline { get; set; }
         public string? ImageRef { get; set; }
         public string? PhoneNumber { get; set; }
+        public bool VerifiedIdentity { get; set; }
         public DateTime? LastSeen { get; set; }
         public List<SubcategoryDTO> ProSubcategories { get; set; } = new List<SubcategoryDTO>();
         public List<Order> Orders { get; set; } = new List<Order>();

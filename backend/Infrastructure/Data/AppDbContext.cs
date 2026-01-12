@@ -35,6 +35,8 @@ namespace Sotlaora.Infrastructure.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<MessageOffer> MessageOffers { get; set; }
 
+        public DbSet<ProBid> ProBids { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -57,6 +59,8 @@ namespace Sotlaora.Infrastructure.Data
             builder.ApplyConfiguration(new MessageConfiguration());
 
             builder.ApplyConfiguration(new MessageOfferConfiguration());
+
+            builder.ApplyConfiguration(new ProBidConfiguration());
             
             builder.Entity<User>()
                 .HasDiscriminator<string>("UserType")

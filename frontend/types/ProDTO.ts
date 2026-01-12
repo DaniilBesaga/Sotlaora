@@ -1,5 +1,6 @@
 import { Gender } from "./UserProfile";
 import { SubcategoryDTOWithDesc } from "./Category";
+import { SubcategoryDTO } from "./ServicePrices";
 
 export interface ProDTO {
     id: string;
@@ -10,9 +11,19 @@ export interface ProDTO {
     location?: string;
     isOnline: boolean;
     lastSeen?: Date;
-    subcategories: any[];
+    proSubcategories: SubcategoryDTO[];
     orders: any[];
     imageRef?: string;
+    phoneNumber?: string;
+}
+
+export interface ProPublicProfile extends ProDTO {
+    reviews: any[];
+    reviewsCount: number;
+    rating: number;
+    bio: string;
+    price?: number;
+    completedOrdersCount: number;
 }
 
 export interface ProProfileDTO {
@@ -24,4 +35,18 @@ export interface ProProfileDTO {
     subcategoryDTOs: SubcategoryDTOWithDesc[];
     totalCount: number;
     filledSubcategoriesCount: number;
+}
+
+export interface ProCardDTO {
+    id: number;
+    proId: number;
+    userName: string;
+    description: string;
+    imageRef: string;
+    subcategoriesDTO: SubcategoryDTOWithDesc[];
+    location: string;
+    price?: number;
+    rating: number;
+    reviewsCount: number;
+    verifiedIdentity: boolean;
 }

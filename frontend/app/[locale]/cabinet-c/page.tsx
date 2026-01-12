@@ -489,7 +489,7 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
   };
 
   return (
-    <motion.article className={`${styles.card} ${isHistory ? styles.cardHistory : ''}`} whileHover={{ y: -6 }}>
+    <motion.a href={`/orders/${item.id}`} className={`${styles.card} ${isHistory ? styles.cardHistory : ''}`} whileHover={{ y: -6 }}>
       
       {/* LEFT: Image & Status */}
       <div className={styles.cardMedia}>
@@ -561,6 +561,6 @@ function ClientOrderCard({ item }: { item: OrderDTO }) {
         {!isHistory && <button className={styles.ghost}>Edit</button>}
         <button className={styles.secondary}>Details</button>
       </div>
-    </motion.article>
+    </motion.a>
   )
 }

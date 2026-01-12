@@ -515,10 +515,230 @@
     margin-top: 8px;
     font-style: italic;
 }
-
-.calendarBody{
-  
+/* Wrapper for the popup */
+.calendarBody {
   position: absolute;
-  top: -250px;
- 
+  
+  /* DESKTOP: Anchor to the bottom of the input so it grows UPWARDS */
+  /* This automatically calculates the height, no need for -250px */
+  bottom: 100%; 
+  left: 0;
+  top: auto; 
+  
+  margin-bottom: 10px; /* Small gap between input and calendar */
+  z-index: 50; /* Ensure it floats above other fields */
+}
+
+/* MOBILE: Center it on the screen like a modal */
+@media (max-width: 480px) {
+  .calendarBody {
+    position: fixed; /* Fixed to the viewport, not the specific div */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Perfect centering */
+    bottom: auto; /* Reset the desktop rule */
+    min-height: 60vh;
+    /* Ensure it's visible and touchable */
+    width: 90%;
+    max-width: 350px;
+    z-index: 2000; /* Very high z-index to sit on top of everything */
+    
+    /* Stronger shadow for the modal effect */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Selected Pro Card */
+.proSelectionCard {
+  margin-top: 12px;
+  background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%); /* Light blue-green tint */
+  border: 1px solid #bae6fd;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideDown 0.3s ease-out;
+}
+
+.proSelectionInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proAvatarStub {
+  width: 40px;
+  height: 40px;
+  background: #3b82f6; /* Blue */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.proLabel {
+  font-size: 13px;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+.proId {
+  font-size: 12px;
+  color: #60a5fa;
+  font-family: monospace;
+}
+
+.cancelProBtn {
+  background: white;
+  border: 1px solid #fca5a5;
+  color: #ef4444;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cancelProBtn:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   RESPONSIVE MEDIA QUERIES
+   Add this to the very bottom of your CSS
+   ========================================= */
+
+/* --- Tablet & Small Desktop (max-width: 1024px) --- */
+@media (max-width: 1024px) {
+  .wrapper {
+    padding: 30px 15px; /* Reduce outer padding */
+  }
+  
+  .cardWrap, .toggleBtn {
+    width: 100%; /* Ensure full width usage */
+  }
+}
+
+/* --- Mobile Landscape & Tablets (max-width: 768px) --- */
+@media (max-width: 768px) {
+  /* Stack the controls grid to single column earlier */
+  .controlsRow {
+    grid-template-columns: 1fr; 
+    gap: 12px;
+  }
+
+  /* Adjust Modal to fit screen */
+  .modal {
+    width: 95%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modalBody {
+    flex: 1; /* Allow scrolling within modal if tall */
+  }
+
+  /* Adjust main card padding */
+  .formCard, .headerCard {
+    padding: 20px;
+  }
+
+  /* Stack the Pro Selection Card */
+  .proSelectionCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .cancelProBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- Mobile Portrait (max-width: 480px) --- */
+@media (max-width: 480px) {
+  .wrapper {
+    padding: 10px; /* Minimal padding on phones */
+  }
+
+  /* Header adjustments */
+  .brandRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .brand {
+    font-size: 1.25rem;
+  }
+
+  /* Steps Row - Stack vertically */
+  .stepsRow {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .stepCard {
+    width: 100%; /* Full width cards */
+  }
+
+  /* Accordion Inputs */
+  .titleInput {
+    font-size: 1rem;
+    padding: 12px;
+  }
+  
+  .desc {
+    min-height: 100px;
+  }
+
+  /* Buttons - Stack them for easier tapping */
+  .formFooter {
+    flex-direction: column-reverse; /* Put primary button on top if desired, or column for standard order */
+    gap: 10px;
+  }
+
+  .publishBtn, .btnGhost {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+
+  /* Control Panels */
+  .rowHeader {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Ensure dropdowns don't overflow horizontally */
+  .rowBody {
+    width: 100%; 
+    left: 0;
+    box-sizing: border-box; /* Crucial for padding */
+  }
+
+  /* Badges in headers */
+  .formBadge {
+    float: right;
+    margin-top: 2px;
+  }
+  
+  /* Modal Inputs */
+  .modalHead {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

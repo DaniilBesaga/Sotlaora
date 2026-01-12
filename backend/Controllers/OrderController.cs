@@ -211,6 +211,7 @@ namespace Sotlaora.Controllers
         {
             var ordersDTO = context.Orders.AsNoTracking().Where(o => o.ProId == null || o.Pro == null).Select(o => new OrderDTO
             {
+                Id = o.Id,
                 Title = o.Title,
                 Description = o.Description,
                 PostedAt = o.PostedAt,
@@ -376,6 +377,71 @@ namespace Sotlaora.Controllers
                 .ToList();
 
             return Ok(orders);
+        }
+    
+        [HttpPost("{id}/addProBid/{proId}")]
+        [Authorize]
+        public async Task<ActionResult> AddProBid(int id, int proId, [FromBody] BidInfoDTO bidInfo)
+        {
+            var existingOrder = await context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound();
+            }
+
+            var user = await context.Users.OfType<Pro>()
+                .FirstOrDefaultAsync(c => c.Id == id );
+
+            if (user == null)
+            {
+                return NotFound("Pro not found");
+            }
+
+            var bid = new ProBid
+            {
+                OrderId = existingOrder.Id,
+                ProId = proId,
+                BidAmount = bidInfo.BidAmount,
+                Message = bidInfo.Message,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            context.ProBids.Add(bid);
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+    
+        [HttpGet("{id}/getOrderBids")]
+        public async Task<ActionResult<IEnumerable<ProBid>>> GetOrderBids(int id)
+        {
+            var existingOrder = await context.Orders.FindAsync(id);
+            if (existingOrder == null)
+            {
+                return NotFound();
+            }
+
+            var bids = context.ProBids
+                .Where(b => b.OrderId == existingOrder.Id)
+                .Include(b => b.Pro)
+                .AsNoTracking()
+                .Select(b => new ProBidDTO
+                {
+                    Id = b.Id,
+                    ProId = b.ProId,
+                    ProName = b.Pro.UserName,
+                    ProImageUrl = context.Images
+                        .Where(img => img.EntityId == b.ProId && img.EntityType == ImageEntityType.Pro)
+                        .FirstOrDefault(img=>img.Ref != null).Ref ?? string.Empty,
+                    Rating = 5.0, // Placeholder for actual rating calculation
+                    Price = b.BidAmount,
+                    ReviewsCount = b.Pro.Reviews.Count(),
+                    Message = b.Message,
+                    SubmittedAt = b.CreatedAt
+                })
+                .ToList();
+
+            return Ok(bids);
         }
     }
 }

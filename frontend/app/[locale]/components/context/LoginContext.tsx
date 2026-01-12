@@ -20,6 +20,7 @@ interface UserDTOLong extends UserDTO {
     proSubcategories: Subcategory[];
     orders: number[];
     phoneNumber: string;
+    verifiedIdentity?: boolean;
 }
 
 type AuthState = "loading" | "authenticated" | "unauthenticated";
@@ -44,7 +45,8 @@ const EmptyUserLong: UserDTOLong = {
     lastSeen: undefined,
     proSubcategories: [],
     orders: [],
-    phoneNumber: ""
+    phoneNumber: "",
+    verifiedIdentity: false,
 };
 
 type LoginContextType = {
@@ -84,7 +86,9 @@ const LoginProvider = ({children}: {children: React.ReactNode}) =>{
 
                 // If BOTH failed -> redirect to auth
                 if (!resLongClient.ok && !resShort.ok && !res.ok) {
-                    router.push('/auth');
+                    if(path.includes("cabinet-c") || path.includes("cabinet")){
+                        router.push('/auth');
+                    }
                 } else {
                 }
             };

@@ -1,303 +1,271 @@
-/* header shell */
+/* ========================= */
+/* BASE SHELL */
+/* ========================= */
 .siteHeader {
-  background: black; /* белый фон */
-  border-bottom: 1px solid var(--divider);
   position: sticky;
   top: 0;
-  z-index: 60;
-  backdrop-filter: blur(6px);
-  padding: 15px 20px;
-  margin: 0 100px;
+  width: 100%;
+  z-index: 100;
+  background: rgba(5, 10, 8, 1); /* Dark semi-transparent */
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
 }
 
-.siteHeader::before {
-  content: '';
-  position: absolute;
-  inset: 0; /* top:0; left:0; right:0; bottom:0; */
-  padding: 3px; /* толщина границы */
-  border-radius: 10px;
-  -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
-      linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: -1;
+.container {
+  max-width: 1350px; /* Matching WhyUs width */
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
-/* inner layout */
 .headerInner {
   display: flex;
-  gap: 78px;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px 20px;
+  justify-content: space-between; /* Pushes Logo left, Actions right */
+  height: 72px;
 }
 
-/* brand */
+/* ========================= */
+/* LOGO / BRAND */
+/* ========================= */
 .brand {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: white;
-  text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-}
-.brand .dot {
-  display:inline-block;
-  width:10px;height:10px;border-radius:50%;
-  background: var(--accent-1);
-  box-shadow: 0 6px 18px rgba(110,78,242,0.12);
+  max-width: 200px;     /* контролируем ширину */
+  height: 150px;        /* контролируем высоту */
 }
 
-/* nav */
+.brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* сохраняет пропорции */
+}
+
+/* ========================= */
+/* DESKTOP NAV */
+/* ========================= */
+.mainNav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 .mainNav ul {
   display: flex;
-  gap: 10px;
+  gap: 4px;
   align-items: center;
   margin: 0;
-  padding: 10px 15px;
+  padding: 4px;
   list-style: none;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 100px; /* Pill shape container */
 }
 
-/* base nav link appearance */
 .navLink {
-  display: inline-block;
-  padding: 8px 14px;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: white;
-  text-decoration: none;
-  transition: transform .12s ease, box-shadow .12s ease, color .12s ease;
-  outline: none;
-  border: 1px solid var(--accent-gradient);
-}
-
-/* 🔹 Верхняя узкая панель */
-.utilityBar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 4px 0 6px;
-  margin: 0 100px;
-  height: 32px;
-}
-
-.utilityRight {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.utilityLink {
-  color: white;
-  font-size: 0.85rem;
-  text-decoration: none;
-  font-weight: 600;
-  opacity: 0.85;
-}
-
-.utilityLink:hover {
-  opacity: 1;
-}
-
-/* hover / focus: gradient highlight (temporary) */
-.navLink:hover,
-.navLink:focus {
-  color: var(--white);
-  background: var(--accent-gradient);
-  box-shadow: 0 8px 28px rgba(110,78,242,0.08);
-  transform: translateY(-2px);
-}
-
-/* active/current page */
-.navLink.active,
-.navLink[aria-current="page"] {
-  color: var(--white);
-  background: var(--accent-gradient);
-  box-shadow: 0 10px 30px rgba(110,78,242,0.12);
-}
-
-/* variant: always pill with gradient */
-.navPill {
-  color: var(--white);
-  background: var(--accent-gradient);
-  box-shadow: 0 8px 28px rgba(110,78,242,0.10);
-}
-.navPill:hover { transform: translateY(-2px); }
-
-/* accessible focus ring */
-.navLink:focus-visible {
-  box-shadow: 0 0 0 4px rgba(110,78,242,0.12), 0 6px 20px rgba(0,0,0,0.06);
-  border-radius: 999px;
-}
-
-/* header actions */
-.headerActions {
-  display:flex;
-  gap: 10px;
-  align-items:center;
-}
-
-/* reuse your existing .btn styles, slightly adapted */
-.btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chatButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid var(--accent-gradient);
-  background: var(--surface-soft);
-  color: var(--accent);
-  cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
-}
-
-.chatButton:hover,
-.chatButton:focus {
-  background: var(--accent-gradient);
-  color: var(--white);
-  box-shadow: 0 8px 28px rgba(110,78,242,0.10);
-  transform: translateY(-2px);
-}
-
-.chatIcon {
-  width: 20px;
-  height: 20px;
   display: block;
-}
-
-.btn.primary {
-  background: var(--accent-gradient);
-  color: white;
-}
-
-.btn.ghost {
-  background: var(--surface-soft);
-  color: var(--text-dark);
-  border: 1px solid var(--divider);
-}
-
-/* hamburger for mobile */
-.hamburger {
-  display: none;
-  background: transparent;
-  border: 0;
-  padding: 8px;
-  margin-left: 6px;
-  color: var(--text-dark);
-  cursor: pointer;
-}
-
-.langSwitch {
-  display: flex;
-  align-items: center;
-  border: 1px solid var(--divider);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-right: 30px;
-}
-
-.profilePic {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.chatBadge{
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--accent);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.langBtn {
-  padding: 6px 10px;
-  background: var(--surface);
-  color: var(--text-dark);
-  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 100px;
   font-size: 0.9rem;
-  border: none;
-  cursor: pointer;
-  transition: background .12s ease, color .12s ease;
+  font-weight: 500;
+  color: #a0a0a0;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-.langBtn:hover {
-  background: white;
-  color: var(--accent-gradient);
-}
-
-.langActive {
-  background: var(--accent-gradient);
+.navLink:hover {
   color: white;
+  background: rgba(255, 255, 255, 0.1);
 }
 
-/* mobile menu */
-.mobileMenu {
-  background: var(--surface);
-  border-top: 1px solid var(--divider);
-  box-shadow: 0 10px 30px rgba(15,23,42,0.04);
-}
-.mobileMenu ul { list-style:none; margin:0; padding: 12px 16px; display:flex; flex-direction:column; gap:8px; }
-.mobileMenu .navLink { padding: 12px 14px; }
-
-/* responsive */
-@media (max-width: 980px) {
-  .mainNav { display: none; }
-  .hamburger { display: inline-flex; }
-  .headerActions .btn { display: none; } /* optionally hide desktop CTAs */
-  .headerActions .btn.primary { display:inline-flex; } /* keep primary if desired */
-}
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+.navLink.active {
+  color: black;
+  background: white;
+  font-weight: 600;
 }
 
+/* ========================= */
+/* ACTIONS (RIGHT SIDE) */
+/* ========================= */
 .actionsRow {
   display: flex;
   align-items: center;
   gap: 12px;
+  z-index: 102;
 }
 
+/* Language Switcher */
+.langSwitch {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 2px;
+  margin-right: 12px;
+}
+
+.langBtn {
+  background: transparent;
+  border: none;
+  color: #777;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.langBtn:hover {
+  color: white;
+}
+
+.langActive {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* Icon Buttons (Chat, Profile, Login) */
 .iconBtn {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: 50%; /* Circle looks better */
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-soft);
-  border: 1px solid var(--divider);
-  color: var(--accent);
-  cursor: pointer;
-  transition: all .15s ease;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s;
   position: relative;
 }
 
 .iconBtn:hover {
-  background: var(--accent-gradient);
-  border-color: transparent;
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.profilePic {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Chat Notification Badge */
+.chatBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: #ff4757;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  height: 16px;
+  min-width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 2px solid #000; /* Contrast stroke */
+}
+
+/* Primary Button (Order) */
+.btn {
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.btn.primary {
+  background:var(--accent-gradient);
+  color: white;
+}
+.btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 8px;
+  cursor: pointer;
+}
+
+/* ========================= */
+/* MOBILE MENU */
+/* ========================= */
+.mobileMenu {
+  background: #081210; /* Match body bg */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+.mobileMenu.open {
+  height: auto;
+  opacity: 1;
+  padding-bottom: 24px;
+}
+
+.mobileNavList {
+  list-style: none;
+  padding: 24px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobileNavLink {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #ccc;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.mobileNavLink:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+/* ========================= */
+/* RESPONSIVE BREAKPOINTS */
+/* ========================= */
+@media (max-width: 1200px) {
+  .mainNav {
+    left: 40%;
+  }
+}
+@media (max-width: 1024px) {
+  .mainNav {
+    display: none; /* Hide center pills */
+  }
+
+  .hamburger {
+    display: block;
+  }
+  
+  /* Hide "Create Order" button on mobile if needed, 
+     or keep it and hide only language/profile text */
+  .langSwitch {
+    display: none; 
+  }
 }
